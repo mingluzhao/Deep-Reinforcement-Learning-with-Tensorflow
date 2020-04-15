@@ -2,19 +2,445 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="32e38a5f-0d38-4134-96a8-ea720b1cb818" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/references/ddpg_old.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/ddpg_class.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/logs/events.out.tfevents.1583279716.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/onlineDDPG.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/onlineDDPG.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/A2C.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/A2C.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/NNpractice.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/NNpractice.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/ddpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/ddpg_morvan.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/ddpg_morvan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/ddpg_web.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/ddpg_web.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/dpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/dpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/tfCoursera.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/references/tfCoursera.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/references/tfPractice.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/tfPractice.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/singleWolfEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/singleWolfEnv.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586303187.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586303953.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304506.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304541.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304641.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304702.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304779.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304924.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586304988.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586305261.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/actorOnlineDDPG/events.out.tfevents.1586305314.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/criticOnlineDDPG/events.out.tfevents.1586303187.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/criticOnlineDDPG/events.out.tfevents.1586304925.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/criticOnlineDDPG/events.out.tfevents.1586304989.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/tensorBoard/criticOnlineDDPG/events.out.tfevents.1586305262.Lululucyzs-MacBook-Pro.local" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/exec/visualizeContinuousChasing.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/visualizeContinuousChasing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/src/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/src/ddpg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/src/envNoPhysics.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/src/envNoPhysics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/src/policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/src/policy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/src/reward.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/src/reward.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/tests/testDDPG.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/tests/testddpgNNStructure.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/checkpoint" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/criticModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/criticModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/criticModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/criticModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/criticModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/criticModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trajectory/traj1.pickle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/Demo.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/Demo1.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0000.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0002.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0003.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0004.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0005.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0006.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0007.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0008.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0009.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0010.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0011.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0012.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0013.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0014.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0015.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0016.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0017.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0018.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0019.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0020.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0021.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0022.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0023.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0025.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0026.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0027.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0028.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0029.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0030.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0031.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0032.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0033.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0034.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0035.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0036.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0037.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0038.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0039.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0040.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0041.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0042.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0044.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0045.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0046.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0047.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0048.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0049.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0050.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0051.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0052.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0053.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0054.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0055.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0056.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0057.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0058.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0059.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0060.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0061.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0062.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0063.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0064.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0065.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0066.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0067.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0068.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0069.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0070.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0071.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0072.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0073.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0074.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0075.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0076.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0077.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0078.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0079.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0080.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0081.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0082.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0083.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0084.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0085.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0086.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0087.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0088.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0089.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0090.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0091.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0092.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0093.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0094.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0095.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0096.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0097.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0098.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0099.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0101.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0102.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0103.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0104.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0105.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0106.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0107.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0108.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0109.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0110.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0111.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0112.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0113.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0114.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0115.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0116.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0117.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0120.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0121.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0122.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0123.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0124.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0125.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0126.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0127.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0128.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0129.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0130.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0131.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0132.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0133.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0134.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0135.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0136.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0137.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0138.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0139.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0140.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0141.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0142.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0143.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0144.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0145.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0146.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0147.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0148.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0149.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0150.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0151.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0152.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0153.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0154.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0155.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0156.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0157.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0158.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0159.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0160.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0161.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0162.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0163.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0164.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0165.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0166.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0167.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0168.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0169.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0170.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0171.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0172.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0173.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0174.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0175.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0176.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0177.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0178.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/Demo/demoPics/0179.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0000.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0002.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0003.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0004.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0005.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0006.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0007.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0008.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0009.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0010.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0011.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0012.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0013.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0014.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0015.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0016.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0017.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0018.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0019.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0020.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0021.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0022.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0023.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0025.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0026.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0027.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0028.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0029.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0030.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0031.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0032.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0033.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0034.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0035.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0036.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0037.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0038.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0039.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0040.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0041.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0042.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0044.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0045.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0046.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0047.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0048.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0049.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0050.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0051.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0052.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0053.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0054.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0055.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0056.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0057.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0058.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0059.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0060.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0061.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0062.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0063.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0064.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0065.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0066.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0067.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0068.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0069.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0070.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0071.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0072.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0073.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0074.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0075.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0076.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0077.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0078.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0079.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0080.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0081.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0082.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0083.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0084.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0085.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0086.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0087.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0088.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0089.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0090.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0091.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0092.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0093.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0094.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0095.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0096.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0097.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0098.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0099.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0100.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0101.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0102.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0103.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0104.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0105.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0106.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0107.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0108.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0109.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0110.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0111.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0112.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0113.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0114.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0115.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0116.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0117.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0118.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0119.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0120.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0121.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0122.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0123.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0124.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0125.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0126.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0127.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0128.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0129.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0130.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0131.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0132.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0133.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0134.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0135.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0136.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0137.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0138.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0139.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0140.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0141.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0142.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0143.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0144.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0145.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0146.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0147.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0148.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0149.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0150.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0151.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0152.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0153.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0154.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0155.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0156.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0157.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0158.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0159.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0160.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0161.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0162.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0163.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0164.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0165.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0166.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0167.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0168.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0169.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0170.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0171.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0172.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0173.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0174.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0175.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0176.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0177.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0178.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0179.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0180.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0181.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0182.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0183.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0184.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0185.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0186.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0187.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0188.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0189.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0190.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0191.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0193.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0194.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0195.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0196.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0197.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0198.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0199.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0200.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0201.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0202.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0203.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0204.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0205.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0206.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0207.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0208.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0209.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0210.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0211.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0212.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0213.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0214.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0215.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0216.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0217.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0218.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0219.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0220.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0221.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0222.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0223.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/demo/DemoAfterChange/0224.png" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,53 +449,44 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="359">
-              <caret line="293" lean-forward="true" selection-start-line="293" selection-end-line="293" />
-              <folding>
-                <element signature="e#30946#30969#0" expanded="true" />
-                <element signature="e#31062#37543#0" />
-                <element signature="e#35656#35697#0" />
-                <element signature="e#39091#48973#0" />
-                <element signature="e#45701#45736#0" />
-                <element signature="e#49988#50251#0" />
-                <element signature="e#18656#18721#0" />
-                <element signature="e#51257#51607#0" />
-                <element signature="e#48273#48334#0" />
-                <element signature="e#52170#52232#0" />
-                <element signature="e#54675#55107#0" />
-                <element signature="e#55132#56577#0" />
-                <element signature="e#56608#57070#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DDPG psedocode.png">
           <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="215">
-              <caret line="85" column="16" lean-forward="true" selection-start-line="85" selection-start-column="16" selection-end-line="85" selection-end-column="16" />
-              <folding>
-                <element signature="e#1#10#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="160">
+              <caret line="11" selection-start-line="11" selection-end-line="11" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ddpg/tests/testPolicy.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="103">
+              <caret line="14" column="32" lean-forward="true" selection-start-line="14" selection-start-column="32" selection-end-line="14" selection-end-column="32" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py">
+        <entry file="file://$PROJECT_DIR$/ddpg/tests/testActor.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="97" column="26" lean-forward="true" selection-start-line="97" selection-start-column="26" selection-end-line="97" selection-end-column="26" />
+            <state relative-caret-position="312">
+              <caret line="62" lean-forward="true" selection-start-line="62" selection-end-line="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="373">
+              <caret line="95" column="23" lean-forward="true" selection-start-line="95" selection-start-column="23" selection-end-line="95" selection-end-column="23" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -78,40 +495,41 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/src/envNoPhysics.py">
+        <entry file="file://$PROJECT_DIR$/ddpg/src/policy.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="15" column="59" lean-forward="true" selection-start-line="15" selection-start-column="59" selection-end-line="15" selection-end-column="59" />
+            <state relative-caret-position="1060">
+              <caret line="73" column="58" selection-start-line="73" selection-start-column="58" selection-end-line="73" selection-end-column="58" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#504#506#0" />
+                <element signature="e#883#911#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/src/policy.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="20">
-              <caret line="1" selection-start-line="1" selection-end-line="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/src/reward.py">
+        <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_withModifiedCritic.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="80">
-              <caret line="4" column="36" lean-forward="true" selection-start-line="4" selection-start-column="36" selection-end-line="4" selection-end-column="36" />
+              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+                <element signature="e#1665#8184#0" />
+                <element signature="e#17774#27098#0" />
+                <element signature="e#22299#24990#0" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_52.py">
+        <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="509">
-              <caret line="151" column="26" selection-start-line="151" selection-start-column="26" selection-end-line="151" selection-end-column="26" />
+            <state relative-caret-position="169">
+              <caret line="90" column="42" selection-start-line="90" selection-start-column="42" selection-end-line="90" selection-end-column="42" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -128,26 +546,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>updateParam_</find>
-      <find>tbdata</find>
-      <find>summaryPath</find>
-      <find>print</find>
-      <find>transition</find>
-      <find>evaAction_</find>
-      <find>saver</find>
-      <find>reset</find>
-      <find>killzoneRadius</find>
-      <find>trainActivationOutput_</find>
-      <find>learningRate_</find>
-      <find>learningRate</find>
-      <find>tau</find>
-      <find>numActionSpace</find>
-      <find>actionRatio</find>
-      <find>fcLayer</find>
       <find>batch_normalization</find>
       <find>str</find>
       <find>summary</find>
-      <find>trainCritic</find>
       <find>criticWriter</find>
       <find>8</find>
       <find>reward</find>
@@ -156,8 +557,25 @@
       <find>reshape</find>
       <find>transi</find>
       <find>evaluateCriticTrain</find>
-      <find>Memory</find>
       <find>actByAn</find>
+      <find>Memory</find>
+      <find>batch</find>
+      <find>actorSaver</find>
+      <find>episodeIndex</find>
+      <find>trainCritic</find>
+      <find>actorWriter</find>
+      <find>episodeID</find>
+      <find>target</find>
+      <find>action</find>
+      <find>gamma</find>
+      <find>self.criticModel</find>
+      <find>self.trainCriticBySASRA_</find>
+      <find>self.self</find>
+      <find>trainCriticBySASRA_</find>
+      <find>tau</find>
+      <find>Critic</find>
+      <find>samplePosition</find>
+      <find>trainAction_</find>
     </findStrings>
     <replaceStrings>
       <replace>test</replace>
@@ -168,6 +586,12 @@
       <replace>actionDim</replace>
       <replace>actionRange</replace>
       <replace>1</replace>
+      <replace>criticModel</replace>
+      <replace>self.tau</replace>
+      <replace>self</replace>
+      <replace>trainCriticBySASRQ</replace>
+      <replace>trainCriticBySASRA_</replace>
+      <replace>Actor</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -207,36 +631,37 @@
         <option value="$PROJECT_DIR$/src/buildSheepDDPGModel.py" />
         <option value="$PROJECT_DIR$/ddpg/buildSheepDDPGModel.py" />
         <option value="$PROJECT_DIR$/ddpg/exec/cartPole.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testDDPG.py" />
+        <option value="$PROJECT_DIR$/ddpg/exec/visualizeContinuousChasing.py" />
+        <option value="$PROJECT_DIR$/ddpg/src/ddpg_batchNorm.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_52.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py" />
         <option value="$PROJECT_DIR$/ddpg/src/ddpg.py" />
-        <option value="$PROJECT_DIR$/ddpg/src/policy.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testOneStepDDPG.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_53.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testCritic.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testActor.py" />
         <option value="$PROJECT_DIR$/ddpg/src/envNoPhysics.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testEnv.py" />
+        <option value="$PROJECT_DIR$/ddpg/src/reward.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testReward.py" />
+        <option value="$PROJECT_DIR$/ddpg/src/ddpg_withModifiedCritic.py" />
+        <option value="$PROJECT_DIR$/ddpg/src/policy.py" />
+        <option value="$PROJECT_DIR$/ddpg/tests/testPolicy.py" />
+        <option value="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py" />
         <option value="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectConfigurationFiles">
-    <option name="files">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/maddpg.iml" />
-        <option value="$PROJECT_DIR$/.idea/misc.xml" />
-        <option value="$PROJECT_DIR$/.idea/modules.xml" />
-        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
-        <option value="$PROJECT_DIR$/.idea/libraries/R_User_Library.xml" />
-      </list>
-    </option>
-  </component>
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="y" value="23" />
     <option name="width" value="1440" />
-    <option name="height" value="808" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -251,20 +676,50 @@
             </path>
             <path>
               <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="exec" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="tests" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="trainedDDPGModels" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="trajectory" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
               <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ddpg/tests" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -277,6 +732,9 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/ddpg/tests" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/ddpg" />
       <recent name="$PROJECT_DIR$/ddpg/tests" />
@@ -297,7 +755,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.generateTraj">
+  <component name="RunManager" selected="Python.testActor">
     <configuration name="buildSheepDDPGModel" type="PythonConfigurationType" factoryName="Python">
       <module name="maddpg" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -312,28 +770,6 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="functionReferences" type="PythonConfigurationType" factoryName="Python">
-      <module name="maddpg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/functionReferences.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -364,7 +800,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="testDDPG" type="PythonConfigurationType" factoryName="Python">
+    <configuration name="testActor" type="PythonConfigurationType" factoryName="Python">
       <module name="maddpg" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -377,7 +813,95 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/tests/testDDPG.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/tests/testActor.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="testCritic" type="PythonConfigurationType" factoryName="Python">
+      <module name="maddpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg/tests" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/tests/testCritic.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="testEnv" type="PythonConfigurationType" factoryName="Python">
+      <module name="maddpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg/tests" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/tests/testEnv.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="testPolicy" type="PythonConfigurationType" factoryName="Python">
+      <module name="maddpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg/tests" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/tests/testPolicy.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="testReward" type="PythonConfigurationType" factoryName="Python">
+      <module name="maddpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg/tests" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/tests/testReward.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -409,8 +933,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.functionReferences" />
-      <item itemvalue="Python.testDDPG" />
+      <item itemvalue="Python.testReward" />
+      <item itemvalue="Python.testCritic" />
+      <item itemvalue="Python.testActor" />
+      <item itemvalue="Python.testEnv" />
+      <item itemvalue="Python.testPolicy" />
       <item itemvalue="Python.buildSheepDDPGModel" />
       <item itemvalue="Python.generateTraj" />
       <item itemvalue="Python.visualize" />
@@ -426,40 +953,50 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1584475655431</updated>
-      <workItem from="1584475657671" duration="109033000" />
+      <workItem from="1584475657671" duration="115797000" />
+      <workItem from="1586360760445" duration="43956000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="109033000" />
+    <option name="totallyTimeSpent" value="159753000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="900" extended-state="6" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Favorites" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16570605" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14553314" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" weight="0.3292232" />
-      <window_info anchor="bottom" id="Python Console" sideWeight="0.49927953" weight="0.25524044" />
-      <window_info anchor="bottom" id="Terminal" sideWeight="0.49927953" weight="0.13440198" />
-      <window_info anchor="bottom" id="Event Log" sideWeight="0.50144094" side_tool="true" weight="0.27373612" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3292232" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985591" weight="0.28236744" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49927953" visible="true" weight="0.1565968" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985591" weight="0.2651048" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49927953" visible="true" weight="0.26263872" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Database" />
-      <window_info anchor="right" id="R Packages" />
-      <window_info anchor="right" id="SciView" weight="0.3299712" />
-      <window_info anchor="right" id="R Graphics" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.3292232" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3292232" />
+      <window_info anchor="bottom" id="Database Changes" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50144094" side_tool="true" weight="0.27373612" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49927953" weight="0.17139333" />
+      <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.49927953" weight="0.39334154" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.4092219" />
+      <window_info anchor="right" id="R Graphics" order="4" />
+      <window_info anchor="right" id="R Packages" order="5" />
+      <window_info anchor="right" id="Database" order="6" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,21 +1007,44 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/ddpg/src/ddpg.py</url>
-          <line>493</line>
-          <option name="timeStamp" value="75" />
+          <line>11</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py</url>
+          <line>94</line>
+          <option name="timeStamp" value="115" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ddpg/tests/testActor.py</url>
+          <line>68</line>
+          <option name="timeStamp" value="116" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/maddpg$visualize.coverage" NAME="visualize Coverage Results" MODIFIED="1585887392733" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/maddpg$saveTraj.coverage" NAME="generateTraj Coverage Results" MODIFIED="1586305308174" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$visualize.coverage" NAME="visualize Coverage Results" MODIFIED="1586358552449" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$saveTraj.coverage" NAME="generateTraj Coverage Results" MODIFIED="1586358933300" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$testPolicy.coverage" NAME="testPolicy Coverage Results" MODIFIED="1586992582515" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
     <SUITE FILE_PATH="coverage/maddpg$functionReferences.coverage" NAME="functionReferences Coverage Results" MODIFIED="1585331966902" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg" />
-    <SUITE FILE_PATH="coverage/maddpg$testDDPG.coverage" NAME="testDDPG Coverage Results" MODIFIED="1586140565786" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
-    <SUITE FILE_PATH="coverage/maddpg$ddpg_refactored.coverage" NAME="buildSheepDDPGModel Coverage Results" MODIFIED="1586305254564" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$testEnv.coverage" NAME="testEnv Coverage Results" MODIFIED="1586971561135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
+    <SUITE FILE_PATH="coverage/maddpg$generateTraj.coverage" NAME="generateTraj Coverage Results" MODIFIED="1586993342443" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$testOneStepDDPG.coverage" NAME="testCritic Coverage Results" MODIFIED="1586971537087" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
+    <SUITE FILE_PATH="coverage/maddpg$testReward.coverage" NAME="testReward Coverage Results" MODIFIED="1586971557728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
+    <SUITE FILE_PATH="coverage/maddpg$buildSheepDDPGModel.coverage" NAME="buildSheepDDPGModel Coverage Results" MODIFIED="1586993032862" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$testDDPG.coverage" NAME="testDDPG Coverage Results" MODIFIED="1586305871885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
+    <SUITE FILE_PATH="coverage/maddpg$ddpg_refactored.coverage" NAME="buildSheepDDPGModel Coverage Results" MODIFIED="1586321162538" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$testActor.coverage" NAME="testActor Coverage Results" MODIFIED="1586993479914" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>plt.plot(lossList)
+plt.show()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>stateBatch = np.asarray([[1,1,1,1]])</expression-string>
         <language-id>Python</language-id>
@@ -493,71 +1053,54 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>np.asarray(list(zip(*miniBatch))[1]).mean()</expression-string>
+        <expression-string>sheepPolicy(reset())</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.asarray(list(zip(*miniBatch))[1])</expression-string>
+        <expression-string>reset()</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>np.asarray(list(zip(*miniBatch))[1]).reshape(len(miniBatch), -1)</expression-string>
+        <expression-string>reset)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(zip(*miniBatch))[1]</expression-string>
+        <expression-string>policy(reset())</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(zip(*miniBatch))[1].shape</expression-string>
+        <expression-string>-np.pi &lt;= actionWithNoise &lt;= np.pi</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(zip(*miniBatch))</expression-string>
+        <expression-string>plt.plot(lossList)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>list(zip*(miniBatch))</expression-string>
+        <expression-string>actionList</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>miniBatch</expression-string>
+        <expression-string>trainActionWeights&lt;0</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>sheepPolicy([1,2,3,4])</expression-string>
+        <expression-string>trainActionWeights[0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/ddpg/ddpg_update.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="89" lean-forward="true" selection-start-line="89" selection-end-line="89" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#88#155#0" />
-            <element signature="e#3766#4025#0" />
-            <element signature="e#4091#4399#0" />
-            <element signature="e#4466#4783#0" />
-            <element signature="e#4809#6573#0" />
-            <element signature="e#6643#7063#0" />
-            <element signature="e#7126#7433#0" />
-            <element signature="e#7458#8741#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/ddpg_update.py" />
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_46.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
@@ -678,9 +1221,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/tests/testDDPG.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_51.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="40">
@@ -730,13 +1270,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/data/checkpoint">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/data/checkpoint" />
     <entry file="file://$PROJECT_DIR$/references/singleWolfEnv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="610">
@@ -757,35 +1291,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/visualizeContinuousChasing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="759">
-          <caret line="57" selection-start-line="57" selection-end-line="57" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/tensorflow/python/training/saver.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="147">
           <caret line="1267" selection-start-line="1267" selection-end-line="1267" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/tests/testDDPG.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="128" selection-start-line="128" selection-end-line="128" />
-          <folding>
-            <element signature="e#3024#4493#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/references/tfCoursera.ipynb">
-      <provider selected="true" editor-type-id="jupyter-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/references/functionReferences.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -798,17 +1309,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/cartPole.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1420">
-          <caret line="71" column="29" selection-start-line="71" selection-start-column="29" selection-end-line="71" selection-end-column="29" />
-          <folding>
-            <element signature="e#545#568#0" expanded="true" />
-            <element signature="e#6556#6562#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/tensorflow/python/client/session.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="317">
@@ -816,90 +1316,182 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/references/onlineDDPG.py">
+    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_batchNorm.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="126" column="32" selection-start-line="126" selection-start-column="32" selection-end-line="126" selection-end-column="32" />
+        <state relative-caret-position="9920">
+          <caret line="496" column="44" selection-start-line="496" selection-start-column="44" selection-end-line="496" selection-end-column="44" />
           <folding>
-            <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#6004#7717#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="359">
-          <caret line="293" lean-forward="true" selection-start-line="293" selection-end-line="293" />
-          <folding>
-            <element signature="e#30946#30969#0" expanded="true" />
-            <element signature="e#31062#37543#0" />
-            <element signature="e#35656#35697#0" />
-            <element signature="e#39091#48973#0" />
-            <element signature="e#45701#45736#0" />
-            <element signature="e#49988#50251#0" />
-            <element signature="e#18656#18721#0" />
-            <element signature="e#51257#51607#0" />
-            <element signature="e#48273#48334#0" />
-            <element signature="e#52170#52232#0" />
-            <element signature="e#54675#55107#0" />
-            <element signature="e#55132#56577#0" />
-            <element signature="e#56608#57070#0" />
+            <element signature="e#1#24#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_52.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="509">
-          <caret line="151" column="26" selection-start-line="151" selection-start-column="26" selection-end-line="151" selection-end-column="26" />
+        <state relative-caret-position="336">
+          <caret line="153" column="18" selection-start-line="153" selection-start-column="18" selection-end-line="153" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/exec/visualizeContinuousChasing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-17">
+          <caret line="36" column="22" selection-start-line="36" selection-start-column="22" selection-end-line="36" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/references/onlineDDPG.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="275">
+          <caret line="361" column="74" selection-start-line="361" selection-start-column="55" selection-end-line="361" selection-end-column="74" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#6004#7717#0" />
+            <element signature="e#12618#15238#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/references/tfCoursera.ipynb">
+      <provider selected="true" editor-type-id="jupyter-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/exec/cartPole.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="429">
+          <caret line="71" column="29" selection-start-line="71" selection-start-column="29" selection-end-line="71" selection-end-column="29" />
+          <folding>
+            <element signature="e#545#568#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="17" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/tests/testddpgNNStructure.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="97" column="45" lean-forward="true" selection-start-line="97" selection-start-column="45" selection-end-line="97" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/tests/testCritic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="18" selection-start-line="18" selection-end-line="20" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_53.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DDPG psedocode.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/src/envNoPhysics.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="474">
+          <caret line="57" column="8" selection-start-line="57" selection-start-column="8" selection-end-line="57" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/tests/testEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="45" column="11" lean-forward="true" selection-start-line="45" selection-start-column="11" selection-end-line="45" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/src/reward.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="21" lean-forward="true" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/tests/testReward.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="18" lean-forward="true" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/tensorflow/python/framework/errors_impl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="413">
+          <caret line="532" selection-start-line="532" selection-end-line="532" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="97" column="26" lean-forward="true" selection-start-line="97" selection-start-column="26" selection-end-line="97" selection-end-column="26" />
+        <state relative-caret-position="169">
+          <caret line="90" column="42" selection-start-line="90" selection-start-column="42" selection-end-line="90" selection-end-column="42" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/envNoPhysics.py">
+    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_withModifiedCritic.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="15" column="59" lean-forward="true" selection-start-line="15" selection-start-column="59" selection-end-line="15" selection-end-column="59" />
+        <state relative-caret-position="80">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#1665#8184#0" />
+            <element signature="e#17774#27098#0" />
+            <element signature="e#22299#24990#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="95" column="23" lean-forward="true" selection-start-line="95" selection-start-column="23" selection-end-line="95" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/src/policy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/reward.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="4" column="36" lean-forward="true" selection-start-line="4" selection-start-column="36" selection-end-line="4" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DDPG psedocode.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="215">
-          <caret line="85" column="16" lean-forward="true" selection-start-line="85" selection-start-column="16" selection-end-line="85" selection-end-column="16" />
+        <state relative-caret-position="1060">
+          <caret line="73" column="58" selection-start-line="73" selection-start-column="58" selection-end-line="73" selection-end-column="58" />
           <folding>
-            <element signature="e#1#10#0" expanded="true" />
+            <element signature="e#504#506#0" />
+            <element signature="e#883#911#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/tests/testActor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="62" lean-forward="true" selection-start-line="62" selection-end-line="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/tests/testPolicy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="103">
+          <caret line="14" column="32" lean-forward="true" selection-start-line="14" selection-start-column="32" selection-end-line="14" selection-end-column="32" />
         </state>
       </provider>
     </entry>

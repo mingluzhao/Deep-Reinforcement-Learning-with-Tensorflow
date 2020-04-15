@@ -1,13 +1,15 @@
 import os
 import numpy as np
 
-from src.ddpg import BuildActorModel, BuildCriticModel, actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget,\
-    TrainCritic, getActionGradients, TrainActor, AddActionNoise, addToMemory, initializeMemory, \
-    ActAngleWithNoise, ActByAngle,RunDDPGTimeStep, RunEpisode, DDPG
+from src.ddpg_withModifiedCritic import BuildActorModel, BuildCriticModel, actByPolicyTrain, \
+    actByPolicyTarget, evaluateCriticTarget, TrainCritic, getActionGradients, TrainActor, \
+    addToMemory, initializeMemory, UpdateModelsByMiniBatch, RunDDPGTimeStep, RunEpisode, DDPG,\
+    UpdateParameters, TrainCriticBySASRQ, TrainActorFromGradients, TrainActorOneStep
 from src.reward import RewardFunctionCompete
-from src.policy import HeatSeekingContinuousDeterministicPolicy
-from src.envNoPhysics import Reset, TransitForNoPhysics, StayWithinBoundary, TransitWithSingleWolf, GetAgentPosFromState,\
-    IsTerminal
+from src.policy import AddActionNoise, HeatSeekingContinuousDeterministicPolicy, \
+    ActByAngle, ActOneStepWithNoise
+from src.envNoPhysics import Reset, TransitForNoPhysics, StayWithinBoundary, \
+    TransitWithSingleWolf, GetAgentPosFromState, IsTerminal
 
 
 class GetSavePath:
@@ -27,6 +29,14 @@ class GetSavePath:
         path = os.path.join(self.dataDirectory, fileName)
         return path
 
+
+def saveVariables(model, path):
+    graph = model.graph
+    saver = graph.get_collection_ref("saver")[0]
+    saver.save(model, path)
+    print("Model saved in {}".format(path))
+
+
 def main():
     numAgents = 2
     numStateSpace = numAgents * 2
@@ -38,64 +48,68 @@ def main():
     buildActorModel = BuildActorModel(numStateSpace, actionDim, actionRange)
     actorTrainingLayerWidths = [20, 20]
     actorTargetLayerWidths = actorTrainingLayerWidths
-    actorSaver, actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
+    actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
 
     buildCriticModel = BuildCriticModel(numStateSpace, actionDim)
     criticTrainingLayerWidths = [100, 100]
     criticTargetLayerWidths = criticTrainingLayerWidths
-    criticSaver, criticWriter, criticModel = buildCriticModel(criticTrainingLayerWidths, criticTargetLayerWidths)
-
-    xBoundary = (0, 50)
-    yBoundary = (0, 50)
-    stayWithinBoundary = StayWithinBoundary(xBoundary, yBoundary)
-    physicalTransition = TransitForNoPhysics(stayWithinBoundary)
+    criticWriter, criticModel = buildCriticModel(criticTrainingLayerWidths, criticTargetLayerWidths)
 
     sheepId = 0
     wolfId = 1
     getSheepXPos = GetAgentPosFromState(sheepId)
     getWolfXPos = GetAgentPosFromState(wolfId)
-
-    actionMagnitude = 1
-    wolfPolicy = HeatSeekingContinuousDeterministicPolicy(getWolfXPos, getSheepXPos, actionMagnitude)
-    transitionFunction = TransitWithSingleWolf(physicalTransition, wolfPolicy)
-
     killzoneRadius = 1
     isTerminal = IsTerminal(getWolfXPos, getSheepXPos, killzoneRadius)
 
-    reset = Reset(xBoundary, yBoundary, numAgents)
-    actionNoise = 0.1
-    noiseDecay = 0.999
-    addActionNoise = AddActionNoise(actionNoise, noiseDecay, actionLow, actionHigh)
-
     maxRunningSteps = 20
     sheepAliveBonus = 1 / maxRunningSteps
+    # sheepAliveBonus = 0
+
     sheepTerminalPenalty = -1
     rewardSheep = RewardFunctionCompete(sheepAliveBonus, sheepTerminalPenalty, isTerminal)
 
     tau = 0.01
-    gamma = 0.95
-    learningRateActor = 0.0001
+    updateParameters = UpdateParameters(tau)
+
     learningRateCritic = 0.001
+    gamma = 0.95
+    trainCriticBySASRQ = TrainCriticBySASRQ(learningRateCritic, gamma, criticWriter)
+    trainCritic = TrainCritic(rewardSheep, actByPolicyTarget, evaluateCriticTarget, trainCriticBySASRQ, updateParameters)
 
-    trainCritic = TrainCritic(learningRateCritic, gamma, tau, criticWriter, actByPolicyTarget, rewardSheep, evaluateCriticTarget)
-    trainActor = TrainActor(learningRateActor, tau, actorWriter, actByPolicyTrain, getActionGradients)
+    learningRateActor = 0.0001
+    trainActorFromGradients = TrainActorFromGradients(learningRateActor, actorWriter)
+    trainActorOneStep = TrainActorOneStep(actByPolicyTrain, trainActorFromGradients, getActionGradients)
+    trainActor = TrainActor(trainActorOneStep, updateParameters)
 
-    actWithNoise = ActAngleWithNoise(actByPolicyTrain, addActionNoise)
+    updateModelsByMiniBatch = UpdateModelsByMiniBatch(trainActor, trainCritic)
 
+    actionNoise = 0.1
+    noiseDecay = 0.999
+    addActionNoise = AddActionNoise(actionNoise, noiseDecay, actionLow, actionHigh)
+
+    actionMagnitude = 1
+    actByAngle = ActByAngle(actionMagnitude)
+    wolfPolicy = HeatSeekingContinuousDeterministicPolicy(getWolfXPos, getSheepXPos, actionMagnitude)
+
+    xBoundary = (0, 20)
+    yBoundary = (0, 20)
+    stayWithinBoundary = StayWithinBoundary(xBoundary, yBoundary)
+    physicalTransition = TransitForNoPhysics(stayWithinBoundary)
+    transitionFunction = TransitWithSingleWolf(physicalTransition, wolfPolicy)
+
+    actOneStepWithNoise = ActOneStepWithNoise(actByPolicyTrain, addActionNoise, actByAngle, transitionFunction)
     minibatchSize = 32
-    velocity = 1
-    actByAngle = ActByAngle(velocity)
-    runDDPGTimeStep = RunDDPGTimeStep(actWithNoise, actByAngle, transitionFunction, addToMemory,
-                                      trainCritic, trainActor, minibatchSize, numStateSpace)
-
+    runDDPGTimeStep = RunDDPGTimeStep(actOneStepWithNoise, addToMemory, updateModelsByMiniBatch, minibatchSize)
+#
     maxTimeStep = 200
+    reset = Reset(xBoundary, yBoundary, numAgents)
     runEpisode = RunEpisode(reset, isTerminal, runDDPGTimeStep, maxTimeStep)
 
-    memoryCapacity = 100000
-    maxEpisode = 200
+    memoryCapacity = 10000
+    maxEpisode = 50
     ddpg = DDPG(initializeMemory, runEpisode, memoryCapacity, maxEpisode)
     trainedActorModel, trainedCriticModel = ddpg(actorModel, criticModel)
-
 
     modelIndex = 0
     actorFixedParam = {'actorModel': modelIndex}
@@ -111,9 +125,9 @@ def main():
     savePathCritic = getCriticSavePath(parameters)
 
     with actorModel.as_default():
-        actorSaver.save(trainedActorModel, savePathActor)
+        saveVariables(trainedActorModel, savePathActor)
     with criticModel.as_default():
-        criticSaver.save(trainedCriticModel, savePathCritic)
+        saveVariables(trainedCriticModel, savePathCritic)
 
 if __name__ == '__main__':
     main()

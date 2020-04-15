@@ -1,6 +1,4 @@
 import numpy as np
-from itertools import chain
-
 
 class Reset():
     def __init__(self, xBoundary, yBoundary, numOfAgent):
@@ -18,12 +16,12 @@ class Reset():
 
         return np.array(initState)
 
-
-def samplePosition(xBoundary, yBoundary):
-    positionX = np.random.uniform(xBoundary[0], xBoundary[1])
-    positionY = np.random.uniform(yBoundary[0], yBoundary[1])
-    position = [positionX, positionY]
-    return position
+#
+# def samplePosition(xBoundary, yBoundary):
+#     positionX = np.random.uniform(xBoundary[0], xBoundary[1])
+#     positionY = np.random.uniform(yBoundary[0], yBoundary[1])
+#     position = [positionX, positionY]
+#     return position
 
 
 class TransitForNoPhysics():
@@ -32,10 +30,10 @@ class TransitForNoPhysics():
 
     def __call__(self, state, action):
         numAgents = int(len(state)/2)
-        newState = state + np.array(action)
+        newState = np.array(state) + np.array(action)
         agentsPosition = [[newState[2 * id], newState[2 * id + 1]] for id in range(numAgents)]
         checkedNextState = [self.stayWithinBoundary(position) for position in agentsPosition]
-        nextState = list(chain.from_iterable(checkedNextState))
+        nextState = np.concatenate(checkedNextState)
         return nextState
 
 class StayWithinBoundary:
@@ -54,6 +52,7 @@ class StayWithinBoundary:
         if nextY > self.yMax:
             nextY = self.yMax
         return nextX, nextY
+
 
 class TransitWithSingleWolf:
     def __init__(self, transit, wolfPolicy):

@@ -12,7 +12,9 @@ import pandas as pd
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
-def restoreVariables(model, saver, path):
+def restoreVariables(model, path):
+    graph = model.graph
+    saver = graph.get_collection_ref("saver")[0]
     saver.restore(model, path)
     print("Model restored from {}".format(path))
     return model
@@ -59,18 +61,19 @@ def main():
     buildActorModel = BuildActorModel(numStateSpace, actionDim, actionRange)
     actorTrainingLayerWidths = [20, 20]
     actorTargetLayerWidths = actorTrainingLayerWidths
-    actorSaver, actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
+    actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
 
     # sheep NN Policy
-    sheepActModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt')
-    restoreVariables(actorModel, actorSaver, sheepActModelPath)
+    sheepActModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=50_maxTimeStep=200_minibatchSize=32.ckpt')
+
+    restoreVariables(actorModel, sheepActModelPath)
     velocity = 1
     actByAngle = ActByAngle(velocity)
     sheepPolicy = ActByDDPG(actByAngle, actByPolicyTrain, actorModel)
 
 ###physics
-    xBoundary = (0, 50)
-    yBoundary = (0, 50)
+    xBoundary = (0, 20)
+    yBoundary = (0, 20)
     stayWithinBoundary = StayWithinBoundary(xBoundary, yBoundary)
     transit = TransitForNoPhysics(stayWithinBoundary)
 
@@ -87,15 +90,17 @@ def main():
     numAgents = 2
     reset = Reset(xBoundary, yBoundary, numAgents)
 
+
     policy = lambda state: list(sheepPolicy(state)) + list(wolfPolicy(state))
     maxRunningSteps = 20        # max possible length of the trajectory/episode
     sampleTrajectory = SampleTrajectory(maxRunningSteps, transit, isTerminal, reset)
     trajectory = sampleTrajectory(policy)
 
-    dataPath = os.path.join(dirName, '..', 'trajectory', 'traj1' + '.pickle')
+    dataPath = os.path.join(dirName, '..', 'trajectory', 'traj200steps' + '.pickle')
     saveToPickle(trajectory, dataPath)
 
 if __name__ == '__main__':
     main()
 
 
+# always output action [-1, 0] -> training output angle = pi -> activation output = 1
