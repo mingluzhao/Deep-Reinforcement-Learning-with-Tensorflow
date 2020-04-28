@@ -15,7 +15,7 @@ class TestBuildActorModel(unittest.TestCase):
         self.buildCriticModel = BuildCriticModel(self.numStateSpace, self.actionDim)
 
     def testBuildActorModelWithEmptyInput(self):
-        actorSaver, actorWriter, model  = self.buildActorModel([], [])
+        actorWriter, model  = self.buildActorModel([], [])
         groundTruthShapes = [[4, 1], [4, 1]]
 
         actorGraph = model.graph
@@ -39,7 +39,7 @@ class TestBuildActorModel(unittest.TestCase):
           )
     @unpack
     def testBuildActorModelWithInput(self, trainingLayerWidths, targetLayerWidths, groundTruthShapes):
-        actorSaver, actorWriter, model = self.buildActorModel(trainingLayerWidths, targetLayerWidths)
+        actorWriter, model = self.buildActorModel(trainingLayerWidths, targetLayerWidths)
         actorGraph = model.graph
         weights_ = actorGraph.get_collection("weights")
         generatedWeightShapes = [w_.shape.as_list() for w_ in weights_]
@@ -61,7 +61,7 @@ class TestBuildActorModel(unittest.TestCase):
           )
     @unpack
     def testBuildCriticModel(self, trainingLayerWidths, targetLayerWidths, groundTruthShapes):
-        criticSaver, criticWriter, model = self.buildCriticModel(trainingLayerWidths, targetLayerWidths)
+        criticWriter, model = self.buildCriticModel(trainingLayerWidths, targetLayerWidths)
         criticGraph = model.graph
         weights_ = criticGraph.get_collection("weights")
         generatedWeightShapes = [w_.shape.as_list() for w_ in weights_]
@@ -92,7 +92,7 @@ class TestBuildActorModel(unittest.TestCase):
     def testActByTrainModelWithEmptyInputLayerWidths(self, states, miniBatchSize):
         trainingLayerWidths = []
         targetLayerWidths = []
-        actorSaver, actorWriter, actorModel = self.buildActorModel(trainingLayerWidths, targetLayerWidths)
+        actorWriter, actorModel = self.buildActorModel(trainingLayerWidths, targetLayerWidths)
 
         stateBatch = np.asarray(states).reshape(miniBatchSize, -1)
         actionAngleTrainModelOutput = actByPolicyTrain(actorModel, stateBatch)

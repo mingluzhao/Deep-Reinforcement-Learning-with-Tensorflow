@@ -1,5 +1,7 @@
 import numpy as np
 
+np.random.seed(1)
+
 class Reset():
     def __init__(self, xBoundary, yBoundary, numOfAgent):
         self.xBoundary = xBoundary

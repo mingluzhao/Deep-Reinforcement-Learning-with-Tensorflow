@@ -2,10 +2,9 @@ import sys
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg_withModifiedCritic import *
+from src.ddpg import *
 from src.policy import *
 
-import matplotlib.pyplot as plt
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -37,10 +36,11 @@ class TestActor(unittest.TestCase):
         self.learningRateCritic = 0.001
 
 
-    @data(([[10, 5, 2, 5], [10, 5, 2, 5]], [[0], [-np.pi]], [[0], [0]])
+    @data(([[10, 5, 2, 5], [10, 5, 2, 5]], [[0], [-np.pi]], [[0], [0]]),
+          ([[8, 4, 6, 4]], [[0]], [[0]])
           )
     @unpack
-    def testActor(self, stateBatch, actionBatch, rewardBatch):
+    def testActorWithSymmetricTargetQ(self, stateBatch, actionBatch, rewardBatch):
         criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths,
                                                           self.criticTargetLayerWidths)
         trainCriticBySASRQ = TrainCriticBySASRQ(self.learningRateCritic, self.gamma, criticWriter)
@@ -67,6 +67,8 @@ class TestActor(unittest.TestCase):
         trainedValue = evaluateCriticTrain(criticModel, stateBatch, train1StepAct)
 
         [self.assertTrue(trained > untrained) for trained, untrained in zip(trainedValue, untrainedValue)]
+
+
 
 
     def testUpdateActorParams(self):

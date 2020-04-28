@@ -20,7 +20,7 @@ def loadFromPickle(path):
 
 def main():
     dirName = os.path.dirname(__file__)
-    dataPath = os.path.join(dirName, '..', 'trajectory', 'traj1' + '.pickle')
+    dataPath = os.path.join(dirName, '..', 'trajectory', 'traj200steps' + '.pickle')
     trajectory = loadFromPickle(dataPath)
 
     numAgents = 2

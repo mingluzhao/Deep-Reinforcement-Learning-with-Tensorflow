@@ -64,12 +64,12 @@ def main():
     actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
 
     # sheep NN Policy
-    sheepActModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'actorModel=0_gamma=0.95_learningRateActor=0.0001_learningRateCritic=0.001_maxEpisode=50_maxTimeStep=200_minibatchSize=32.ckpt')
+    sheepActModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'actorModel=0_dimension=2_gamma=0.9_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=32.ckpt')
 
     restoreVariables(actorModel, sheepActModelPath)
     velocity = 1
     actByAngle = ActByAngle(velocity)
-    sheepPolicy = ActByDDPG(actByAngle, actByPolicyTrain, actorModel)
+    sheepPolicy = ActByDDPG1D(actByAngle, actByPolicyTrain, actorModel)
 
 ###physics
     xBoundary = (0, 20)
@@ -103,4 +103,4 @@ if __name__ == '__main__':
     main()
 
 
-# always output action [-1, 0] -> training output angle = pi -> activation output = 1
+# always output action [-1, 0] -> training output angle = pi -> activation output = +-1

@@ -2,6 +2,12 @@ import tensorflow as tf
 import numpy as np
 from collections import deque
 import random
+import matplotlib.pyplot as plt
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+np.random.seed(1)
+tf.set_random_seed(1)
 
 def actByPolicyTrain(actorModel, stateBatch):
     actorGraph = actorModel.graph
@@ -21,10 +27,18 @@ def actByPolicyTarget(actorModel, stateBatch):
 def evaluateCriticTarget(criticModel, stateBatch, actionsBatch):
     criticGraph = criticModel.graph
     states_ = criticGraph.get_collection_ref("states_")[0]
-    action_ = criticGraph.get_collection_ref("action_")[0]
+    actionTarget_ = criticGraph.get_collection_ref("actionTarget_")[0]
     targetValues_ = criticGraph.get_collection_ref("targetValues_")[0]
-    targetValues = criticModel.run(targetValues_, feed_dict={states_: stateBatch, action_: actionsBatch})
+    targetValues = criticModel.run(targetValues_, feed_dict={states_: stateBatch, actionTarget_: actionsBatch})
     return targetValues
+
+def evaluateCriticTrain(criticModel, stateBatch, actionsBatch):
+    criticGraph = criticModel.graph
+    states_ = criticGraph.get_collection_ref("states_")[0]
+    action_ = criticGraph.get_collection_ref("action_")[0]
+    trainValues_ = criticGraph.get_collection_ref("trainValues_")[0]
+    trainValues = criticModel.run(trainValues_, feed_dict={states_: stateBatch, action_: actionsBatch})
+    return trainValues
 
 def getActionGradients(criticModel, stateBatch, actionsBatch):
     criticGraph = criticModel.graph
@@ -37,18 +51,15 @@ def getActionGradients(criticModel, stateBatch, actionsBatch):
 
 
 class BuildActorModel:
-    def __init__(self, numStateSpace, actionDim, actionRange, seed=128):
+    def __init__(self, numStateSpace, actionDim, actionRange):
         self.numStateSpace = numStateSpace
         self.actionDim = actionDim
         self.actionRange = actionRange
-        self.seed = seed
 
     def __call__(self, trainingLayerWidths, targetLayerWidths, summaryPath="./tbdata"):
         print("Generating Actor NN Model with training layers: {}, target layers: {}".format(trainingLayerWidths, targetLayerWidths))
         graph = tf.Graph()
         with graph.as_default():
-            if self.seed is not None:
-                tf.set_random_seed(self.seed)
 
             with tf.name_scope("inputs"):
                 states_ = tf.placeholder(tf.float32, [None, self.numStateSpace])
@@ -57,26 +68,32 @@ class BuildActorModel:
                 tf.add_to_collection("actionGradients_", actionGradients_)
 
             with tf.name_scope("trainingParams"):
+                # states_ = tf.layers.batch_normalization(states_)
                 learningRate_ = tf.constant(0, dtype=tf.float32)
                 tau_ = tf.constant(0, dtype=tf.float32)
                 tf.add_to_collection("learningRate_", learningRate_)
                 tf.add_to_collection("tau_", tau_)
 
-            initWeight = tf.random_uniform_initializer(-0.03, 0.03)
-            initBias = tf.constant_initializer(0.001)
+            initWeight = tf.random_uniform_initializer(0, 0.3)
+            initBias = tf.constant_initializer(0.1)
             with tf.variable_scope("trainHidden"):
                 activation_ = states_
                 for i in range(len(trainingLayerWidths)):
                     fcLayer = tf.layers.Dense(units=trainingLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
-                                              bias_initializer=initBias, name="fc{}".format(i+1))
+                                              bias_initializer=initBias, name="fc{}".format(i+1), trainable = True)
+                    # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
                     activation_ = fcLayer(activation_)
 
                     tf.add_to_collections(["weights", f"weight/{fcLayer.kernel.name}"], fcLayer.kernel)
                     tf.add_to_collections(["biases", f"bias/{fcLayer.bias.name}"], fcLayer.bias)
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
-                trainActivation_ = tf.identity(activation_, name="output")
+                trainActivation_ = tf.identity(activation_)
+                tf.add_to_collection("trainActivation_", trainActivation_)
+
                 outputFCLayer = tf.layers.Dense(units=self.actionDim, activation= tf.nn.tanh, kernel_initializer=initWeight,
-                                                bias_initializer=initBias,name="fc{}".format(len(trainingLayerWidths) + 1))
+                                                bias_initializer=initBias,name="fc{}".format(len(trainingLayerWidths) + 1), trainable = True)
+                # trainActivationOutput_ = tf.layers.batch_normalization(outputFCLayer(trainActivation_))
+
                 trainActivationOutput_ = outputFCLayer(trainActivation_)
 
                 tf.add_to_collections(["weights", f"weight/{outputFCLayer.kernel.name}"], outputFCLayer.kernel)
@@ -87,16 +104,18 @@ class BuildActorModel:
                 activation_ = states_
                 for i in range(len(targetLayerWidths)):
                     fcLayer = tf.layers.Dense(units=targetLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
-                                              bias_initializer=initBias, name="fc{}".format(i+1))
+                                              bias_initializer=initBias, name="fc{}".format(i+1), trainable = False)
                     activation_ = fcLayer(activation_)
+                    # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
 
                     tf.add_to_collections(["weights", f"weight/{fcLayer.kernel.name}"], fcLayer.kernel)
                     tf.add_to_collections(["biases", f"bias/{fcLayer.bias.name}"], fcLayer.bias)
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
                 targetActivation_ = tf.identity(activation_, name="output")
                 outputFCLayer = tf.layers.Dense(units=self.actionDim, activation=tf.nn.tanh, kernel_initializer=initWeight,
-                                                bias_initializer=initBias,name="fc{}".format(len(trainingLayerWidths) + 1))
+                                                bias_initializer=initBias,name="fc{}".format(len(trainingLayerWidths) + 1), trainable = False)
                 targetActivationOutput_ = outputFCLayer(targetActivation_)
+                # targetActivationOutput_ = tf.layers.batch_normalization(outputFCLayer(targetActivation_))
 
                 tf.add_to_collections(["weights", f"weight/{outputFCLayer.kernel.name}"], outputFCLayer.kernel)
                 tf.add_to_collections(["biases", f"bias/{outputFCLayer.bias.name}"], outputFCLayer.bias)
@@ -105,11 +124,11 @@ class BuildActorModel:
             with tf.name_scope("updateParameters"):
                 trainParams_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='trainHidden')
                 targetParams_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='targetHidden')
-                updateParameters_ = [targetParams_[i].assign((1 - tau_) * targetParams_[i] + tau_ * trainParams_[i]) for i in range(len(targetParams_))]
+                updateParam_ = [targetParams_[i].assign((1 - tau_) * targetParams_[i] + tau_ * trainParams_[i]) for i in range(len(targetParams_))]
 
                 tf.add_to_collection("trainParams_", trainParams_)
                 tf.add_to_collection("targetParams_", targetParams_)
-                tf.add_to_collection("updateParameters_", updateParameters_)
+                tf.add_to_collection("updateParam_", updateParam_)
 
             with tf.name_scope("output"):
                 trainAction_ = tf.multiply(trainActivationOutput_, self.actionRange, name='trainAction_')
@@ -124,7 +143,7 @@ class BuildActorModel:
 
             with tf.name_scope("train"):
                 optimizer = tf.train.AdamOptimizer(-learningRate_, name='adamOptimizer')
-                trainOpt_ = optimizer.apply_gradients(list(zip(policyGradient_, trainParams_)))
+                trainOpt_ = optimizer.apply_gradients(zip(policyGradient_, trainParams_))
                 tf.add_to_collection("trainOpt_", trainOpt_)
 
             fullSummary = tf.summary.merge_all()
@@ -143,31 +162,31 @@ class BuildActorModel:
 
 
 class BuildCriticModel:
-    def __init__(self, numStateSpace, actionDim, seed=128):
+    def __init__(self, numStateSpace, actionDim):
         self.numStateSpace = numStateSpace
         self.actionDim = actionDim
-        self.seed = seed
 
     def __call__(self, trainingLayerWidths, targetLayerWidths, summaryPath="./tbdata"):
         print("Generating Critic NN Model with training layers: {}, target layers: {}".format(trainingLayerWidths, targetLayerWidths))
         graph = tf.Graph()
         with graph.as_default():
-            if self.seed is not None:
-                tf.set_random_seed(self.seed)
 
             with tf.name_scope("inputs"):
                 states_ = tf.placeholder(tf.float32, [None, self.numStateSpace])
                 action_ = tf.stop_gradient(tf.placeholder(tf.float32, [None, self.actionDim]))
+                actionTarget_ = tf.placeholder(tf.float32, [None, self.actionDim])
 
                 reward_ = tf.placeholder(tf.float32, [None, 1])
                 valueTarget_ = tf.placeholder(tf.float32, [None, 1])
 
                 tf.add_to_collection("states_", states_)
                 tf.add_to_collection("action_", action_)
+                tf.add_to_collection("actionTarget_", actionTarget_)
                 tf.add_to_collection("reward_", reward_)
                 tf.add_to_collection("valueTarget_", valueTarget_)
 
             with tf.name_scope("trainingParams"):
+                # states_ = tf.layers.batch_normalization(states_)
                 learningRate_ = tf.constant(0, dtype=tf.float32)
                 tau_ = tf.constant(0, dtype=tf.float32)
                 gamma_ = tf.constant(0, dtype=tf.float32)
@@ -176,24 +195,31 @@ class BuildCriticModel:
                 tf.add_to_collection("tau_", tau_)
                 tf.add_to_collection("gamma_", gamma_)
 
-            initWeight = tf.random_uniform_initializer(-0.03, 0.03)
-            initBias = tf.constant_initializer(0.001)
+            initWeight = tf.random_uniform_initializer(0, 0.1)
+            initBias = tf.constant_initializer(0.1)
             with tf.variable_scope("trainHidden"):
                 activation_ = states_
                 for i in range(len(trainingLayerWidths)-1):
                     fcLayer = tf.layers.Dense(units=trainingLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
-                                              bias_initializer=initBias, name="fc{}".format(i+1))
+                                              bias_initializer=initBias, name="fc{}".format(i+1), trainable = True)
                     activation_ = fcLayer(activation_)
+                    # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
+
                     tf.add_to_collections(["weights", f"weight/{fcLayer.kernel.name}"], fcLayer.kernel)
                     tf.add_to_collections(["biases", f"bias/{fcLayer.bias.name}"], fcLayer.bias)
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
                 trainActivation_ = tf.identity(activation_, name="output")
 
-                secondLastFCUnit = trainingLayerWidths[-2]
+                secondLastFCUnit = trainingLayerWidths[-2] if len(trainingLayerWidths) >= 2 else self.numStateSpace
+
                 lastFCUnit = trainingLayerWidths[-1]
                 trainStateFCToLastFCWeights_ = tf.get_variable(name='trainStateFCToLastFCWeights_', shape=[secondLastFCUnit,lastFCUnit], initializer=initWeight)
                 trainActionFCToLastFCWeights_ = tf.get_variable(name='trainActionFCToLastFCWeights_', shape=[self.actionDim, lastFCUnit], initializer=initWeight)
                 trainActionLastFCBias_ = tf.get_variable(name='trainActionLastFCBias_', shape=[lastFCUnit], initializer=initBias)
+
+                trainLastFCZ_ = tf.matmul(trainActivation_, trainStateFCToLastFCWeights_) + \
+                                tf.matmul(action_, trainActionFCToLastFCWeights_) + trainActionLastFCBias_
+                tf.add_to_collections("trainLastFCZ_", trainLastFCZ_)
 
                 trainLastFCActivation_ = tf.nn.relu(tf.matmul(trainActivation_, trainStateFCToLastFCWeights_) +
                                           tf.matmul(action_, trainActionFCToLastFCWeights_) +
@@ -204,7 +230,7 @@ class BuildCriticModel:
                 tf.add_to_collections(["biases", "bias/trainActionLastFCBias_"], trainActionLastFCBias_)
                 tf.add_to_collections(["activations", "activation/trainLastFCActivation_"], trainLastFCActivation_)
 
-                trainOutputLayer = tf.layers.Dense(units=1, kernel_initializer=initWeight, bias_initializer=initBias, activation=None)
+                trainOutputLayer = tf.layers.Dense(units=1, kernel_initializer=initWeight, bias_initializer=initBias, activation=None, trainable = True)
                 trainValues_ = trainOutputLayer(trainLastFCActivation_)
                 tf.add_to_collections(["weights", f"weight/{trainOutputLayer.kernel.name}"], trainOutputLayer.kernel)
                 tf.add_to_collections(["biases", f"bias/{trainOutputLayer.bias.name}"], trainOutputLayer.bias)
@@ -215,21 +241,22 @@ class BuildCriticModel:
                 activation_ = states_
                 for i in range(len(targetLayerWidths)-1):
                     fcLayer = tf.layers.Dense(units=targetLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
-                                              bias_initializer=initBias, name="fc{}".format(i+1))
+                                              bias_initializer=initBias, name="fc{}".format(i+1), trainable = False)
                     activation_ = fcLayer(activation_)
+                    # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
 
                     tf.add_to_collections(["weights", f"weight/{fcLayer.kernel.name}"], fcLayer.kernel)
                     tf.add_to_collections(["biases", f"bias/{fcLayer.bias.name}"], fcLayer.bias)
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
                 targetActivation_ = tf.identity(activation_, name="output")
 
-                secondLastFCUnit = targetLayerWidths[-2] # 3
+                secondLastFCUnit = trainingLayerWidths[-2] if len(trainingLayerWidths) >= 2 else self.numStateSpace
                 lastFCUnit = targetLayerWidths[-1] # 5
                 targetStateFCToLastFCWeights_ = tf.get_variable(name='targetStateFCToLastFCWeights_', shape=[secondLastFCUnit, lastFCUnit], initializer=initWeight)
                 targetActionFCToLastFCWeights_ = tf.get_variable(name='targetActionFCToLastFCWeights_', shape=[self.actionDim, lastFCUnit], initializer=initWeight)
                 targetActionLastFCBias_ = tf.get_variable(name='targetActionLastFCBias_', shape=[lastFCUnit], initializer=initBias)
                 targetLastFCActivation_ = tf.nn.relu(tf.matmul(targetActivation_, targetStateFCToLastFCWeights_) +
-                                           tf.matmul(action_,targetActionFCToLastFCWeights_) +
+                                           tf.matmul(actionTarget_,targetActionFCToLastFCWeights_) +
                                            targetActionLastFCBias_)
 
                 tf.add_to_collections(["weights", "weight/targetStateFCToLastFCWeights_"], targetStateFCToLastFCWeights_)
@@ -237,7 +264,7 @@ class BuildCriticModel:
                 tf.add_to_collections(["biases", "bias/targetActionLastFCBias_"], targetActionLastFCBias_)
                 tf.add_to_collections(["activations", "activation/targetLastFCActivation_"], targetLastFCActivation_)
 
-                targetOutputLayer = tf.layers.Dense(units=1, kernel_initializer=initWeight, bias_initializer=initBias, activation=None)
+                targetOutputLayer = tf.layers.Dense(units=1, kernel_initializer=initWeight, bias_initializer=initBias, activation=None, trainable = False)
                 targetValues_ = targetOutputLayer(targetLastFCActivation_)
                 tf.add_to_collections(["weights", f"weight/{targetOutputLayer.kernel.name}"], targetOutputLayer.kernel)
                 tf.add_to_collections(["biases", f"bias/{targetOutputLayer.bias.name}"], targetOutputLayer.bias)
@@ -265,12 +292,13 @@ class BuildCriticModel:
 
             with tf.name_scope("evaluate"):
                 yi_ = reward_ + gamma_ * valueTarget_
-                valueLoss_ = tf.reduce_mean(tf.squared_difference(yi_, trainQ_))
+                valueLoss_ = tf.losses.mean_squared_error(labels=yi_, predictions=trainQ_)
 
+                tf.add_to_collection("yi_", yi_)
                 tf.add_to_collection("valueLoss_", valueLoss_)
 
             with tf.name_scope("train"):
-                trainOpt_ = tf.train.AdamOptimizer(learningRate_, name='adamOptimizer').minimize(valueLoss_)
+                trainOpt_ = tf.train.AdamOptimizer(learningRate_, name='adamOptimizer').minimize(valueLoss_, var_list=trainParams_)
                 tf.add_to_collection("trainOpt_", trainOpt_)
 
             fullSummary = tf.summary.merge_all()
@@ -287,201 +315,308 @@ class BuildCriticModel:
 
         return criticWriter, model
 
-class TrainCritic:
-    def __init__(self, criticLearningRate, gamma, tau, criticWriter, actByPolicyTarget, rewardFunction, evaluateCriticTarget):
+
+
+
+
+class TrainCriticBySASRQ:
+    def __init__(self, criticLearningRate, gamma, criticWriter):
         self.criticLearningRate = criticLearningRate
         self.gamma = gamma
-        self.tau = tau
         self.criticWriter = criticWriter
-        self.actByPolicyTarget = actByPolicyTarget
-        self.rewardFunction = rewardFunction
-        self.evaluateCriticTarget = evaluateCriticTarget
 
-    def __call__(self, actorModel, criticModel, miniBatch):
-        states, actions, nextStates = list(zip(*miniBatch))
-        rewards = np.array([self.rewardFunction(state, action) for state, action in zip(states, actions)])
-        stateBatch = np.asarray(states).reshape(len(miniBatch), -1)
-        actionBatch = np.asarray(actions).reshape(len(miniBatch), -1)
-        nextStateBatch = np.asarray(nextStates).reshape(len(miniBatch), -1)
-        rewardBatch = rewards.reshape(len(miniBatch), -1)
-
-        targetNextActionBatch = self.actByPolicyTarget(actorModel, nextStateBatch)
-        targetQValue = self.evaluateCriticTarget(criticModel, nextStateBatch, targetNextActionBatch)
-
+    def __call__(self, criticModel, stateBatch, actionBatch, rewardBatch, targetQValue):
         criticGraph = criticModel.graph
         states_ = criticGraph.get_collection_ref("states_")[0]
         action_ = criticGraph.get_collection_ref("action_")[0]
         reward_ = criticGraph.get_collection_ref("reward_")[0]
         valueTarget_ = criticGraph.get_collection_ref("valueTarget_")[0]
         learningRate_ = criticGraph.get_collection_ref("learningRate_")[0]
-        tau_ = criticGraph.get_collection_ref("tau_")[0]
         gamma_ = criticGraph.get_collection_ref("gamma_")[0]
 
         valueLoss_ = criticGraph.get_collection_ref("valueLoss_")[0]
         trainOpt_ = criticGraph.get_collection_ref("trainOpt_")[0]
         criticLoss, trainOpt = criticModel.run([valueLoss_, trainOpt_],
                                                feed_dict={states_: stateBatch, action_: actionBatch, reward_: rewardBatch, valueTarget_: targetQValue,
-                                                          learningRate_: self.criticLearningRate, tau_: self.tau, gamma_: self.gamma})
-        updateParam_ = criticGraph.get_collection_ref("updateParam_")[0]
-        criticModel.run(updateParam_)
+                                                          learningRate_: self.criticLearningRate, gamma_: self.gamma})
 
-        ######
         summary = tf.Summary()
         summary.value.add(tag='reward', simple_value=float(np.mean(rewardBatch)))
         summary.value.add(tag='loss', simple_value=float(criticLoss))
-        ###
-        # self.criticWriter.add_summary(summary, eposideID)
         self.criticWriter.flush()
-
         return criticLoss, criticModel
 
 
-
-class TrainActor:
-    def __init__(self, actorLearningRate, tau, actorWriter, actByPolicyTrain, getActionGradients):
-        self.actorLearningRate = actorLearningRate
-        self.tau = tau
-        self.actorWriter = actorWriter
-        self.actByPolicyTrain = actByPolicyTrain
-        self.getActionGradients = getActionGradients
+class TrainCritic:
+    def __init__(self, actByPolicyTarget, evaluateCriticTarget, trainCriticBySASRQ):
+        self.actByPolicyTarget = actByPolicyTarget
+        self.evaluateCriticTarget = evaluateCriticTarget
+        self.trainCriticBySASRQ = trainCriticBySASRQ
 
     def __call__(self, actorModel, criticModel, miniBatch):
-        states, actions, nextStates = list(zip(*miniBatch))
+        states, actions, rewards, nextStates = list(zip(*miniBatch))
         stateBatch = np.asarray(states).reshape(len(miniBatch), -1)
+        actionBatch = np.asarray(actions).reshape(len(miniBatch), -1)
+        nextStateBatch = np.asarray(nextStates).reshape(len(miniBatch), -1)
+        rewardBatch = np.asarray(rewards).reshape(len(miniBatch), -1)
 
-        actionsBatch = self.actByPolicyTrain(actorModel, stateBatch)
-        actionGradients = self.getActionGradients(criticModel, stateBatch, actionsBatch)
+        targetNextActionBatch = self.actByPolicyTarget(actorModel, nextStateBatch)
+        targetQValue = self.evaluateCriticTarget(criticModel, nextStateBatch, targetNextActionBatch)
 
+        criticLoss, criticModel = self.trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
+        return criticLoss, criticModel
+
+
+class TrainActorFromGradients:
+    def __init__(self, actorLearningRate, actorWriter):
+        self.actorLearningRate = actorLearningRate
+        self.actorWriter = actorWriter
+
+    def __call__(self, actorModel, stateBatch, actionGradients):
         actorGraph = actorModel.graph
         states_ = actorGraph.get_collection_ref("states_")[0]
         actionGradients_ = actorGraph.get_collection_ref("actionGradients_")[0]
-        tau_ = actorGraph.get_collection_ref("tau_")[0]
         learningRate_ = actorGraph.get_collection_ref("learningRate_")[0]
 
         trainOpt_ = actorGraph.get_collection_ref("trainOpt_")[0]
-        trainOpt = actorModel.run([trainOpt_], feed_dict={states_: stateBatch, actionGradients_: actionGradients,
-                                                        tau_: self.tau, learningRate_: self.actorLearningRate})
-
-        updateParameters_ = actorGraph.get_collection_ref("updateParam_")
-        actorModel.run(updateParameters_)
-
-######
+        trainActivation_ = actorGraph.get_collection_ref("trainActivation_")[0]
+        trainActivation, trainOpt = actorModel.run([trainActivation_,trainOpt_], feed_dict={states_: stateBatch, actionGradients_: actionGradients,
+                                                        learningRate_: self.actorLearningRate})
+        # print(trainActivation)
         self.actorWriter.flush()
-        return trainOpt, actorModel
+        return actorModel
 
 
-class AddActionNoise():
-    def __init__(self, actionNoise, noiseDecay, actionLow, actionHigh):
-        self.actionNoise = actionNoise
-        self.noiseDecay = noiseDecay
-        self.actionLow, self.actionHigh = actionLow, actionHigh
 
-    def __call__(self, actionPerfect, episodeIndex):
-        noisyAction = np.random.normal(actionPerfect, self.actionNoise * (self.noiseDecay ** episodeIndex))
-        action = np.clip(noisyAction, self.actionLow, self.actionHigh)
-        return action
+class TrainActorOneStep:
+    def __init__(self, actByPolicyTrain, trainActorFromGradients, getActionGradients):
+        self.actByPolicyTrain = actByPolicyTrain
+        self.trainActorFromGradients = trainActorFromGradients
+        self.getActionGradients = getActionGradients
+
+    def __call__(self, actorModel, criticModel, stateBatch):
+        actionsBatch = self.actByPolicyTrain(actorModel, stateBatch)
+        actionGradients = self.getActionGradients(criticModel, stateBatch, actionsBatch)
+        actorModel = self.trainActorFromGradients(actorModel, stateBatch, actionGradients)
+        return actorModel
 
 
-def addToMemory(buffer, state, action, nextState):
-    experience = (state, action, nextState)
+class TrainActor:
+    def __init__(self, trainActorOneStep):
+        self.trainActorOneStep = trainActorOneStep
+
+    def __call__(self, actorModel, criticModel, miniBatch):
+        states, actions, rewards, nextStates = list(zip(*miniBatch))
+        stateBatch = np.asarray(states).reshape(len(miniBatch), -1)
+        actorModel = self.trainActorOneStep(actorModel, criticModel, stateBatch)
+
+        return actorModel
+
+
+def addToMemory(buffer, state, action, reward, nextState):
+    experience = (state, action, reward, nextState)
     buffer.append(experience)
     return buffer
 
-def initializeMemory(bufferSize):
-    return deque(maxlen=bufferSize)
+
+# class InitializeMemory:
+#     def __init__(self, bufferSize):
+#         self.bufferSize = bufferSize
+#
+#     def __call__(self):
+#         return deque(maxlen=self.bufferSize)
 
 
-class ActAngleWithNoise:
-    def __init__(self, actByModel, addActionNoise):
-        self.actByModel = actByModel
-        self.addActionNoise = addActionNoise
+class UpdateParameters:
+    def __init__(self, tau, paramUpdateInterval):
+        self.tau = tau
+        self.paramUpdateInterval = paramUpdateInterval
 
-    def __call__(self, actorModel, stateBatch, timeStep):
-        actionPerfect = self.actByModel(actorModel, stateBatch)
-        actionAngle = self.addActionNoise(actionPerfect, timeStep)
-        return actionAngle
+    def __call__(self, model, runTime):
+        if runTime % self.paramUpdateInterval == 0:
+            graph = model.graph
+            updateParam_ = graph.get_collection_ref("updateParam_")[0]
+            tau_ = graph.get_collection_ref("tau_")[0]
 
-class ActByAngle:
-    def __init__(self,velocity):
-        self.velocity = velocity
+            model.run(updateParam_, feed_dict={tau_: self.tau})
 
-    def __call__(self, actionAngle):
-        positiveX = np.array([1, 0])
-        positiveY = np.array([0, 1])
-        action = np.cos(actionAngle) * positiveX + np.sin(actionAngle) * positiveY
-        return action
+        return model
 
 
 class UpdateModelsByMiniBatch:
-    def __init__(self, trainActor, trainCritic):
+    def __init__(self, updateParameters, trainActor, trainCritic):
+        self.updateParameters = updateParameters
         self.trainActor = trainActor
         self.trainCritic = trainCritic
 
-    def __call__(self, actorModel, criticModel, miniBatch):
+    def __call__(self, actorModel, criticModel, miniBatch, runTime):
         criticLoss, criticModel = self.trainCritic(actorModel, criticModel, miniBatch)
-        actorTrainOpt, actorModel = self.trainActor(actorModel, criticModel, miniBatch)
+        actorModel = self.trainActor(actorModel, criticModel, miniBatch)
+        actorModel = self.updateParameters(actorModel, runTime)
+        criticModel = self.updateParameters(criticModel, runTime)
 
         return actorModel, criticModel
 
-class ActOneStepWithNoise:
-    def __init__(self, actAngleWithNoise, actByAngle, transitionFunction):
-        self.actAngleWithNoise = actAngleWithNoise
-        self.actByAngle = actByAngle
-        self.transitionFunction = transitionFunction
 
-    def __call__(self, timeStep, actorModel, state):
-        stateBatch = np.asarray(state).reshape(1, -1)
-        actionOutput = self.actAngleWithNoise(actorModel, stateBatch, timeStep)
-        action = self.actByAngle(actionOutput)[0]
-        nextState = self.transitionFunction(state, action)
-        return state, actionOutput, nextState
+# class RunDDPGTimeStep:
+#     def __init__(self, actOneStepWithNoise, addToMemory, updateModelsByMiniBatch, updateParameter, minibatchSize,
+#                  learningStartBufferSize, paramUpdateInterval, env = None):
+#         self.actOneStepWithNoise = actOneStepWithNoise
+#         self.addToMemory = addToMemory
+#         self.updateModelsByMiniBatch = updateModelsByMiniBatch
+#         self.updateParameter = updateParameter
+#         self.minibatchSize = minibatchSize
+#         self.learningStartBufferSize = learningStartBufferSize
+#         self.paramUpdateInterval = paramUpdateInterval
+#         self.env = env
+#
+#     def __call__(self, state, actorModel, criticModel, replayBuffer, pointer):
+#         if self.env is not None:
+#             self.env.render()
+#         state, action, reward, nextState, terminal = self.actOneStepWithNoise(pointer, actorModel, state)##
+#         replayBuffer = self.addToMemory(replayBuffer, state, action, reward, nextState)
+#         pointer += 1
+#         if len(replayBuffer) >= self.learningStartBufferSize:
+#         # if len(replayBuffer) >= self.minibatchSize:
+#             miniBatch = random.sample(replayBuffer, self.minibatchSize)
+#             actorModel, criticModel = self.updateModelsByMiniBatch(actorModel, criticModel, miniBatch)
+#
+#         if pointer % self.paramUpdateInterval == 0:
+#             actorModel = self.updateParameter(actorModel)
+#             criticModel = self.updateParameter(criticModel)
+#
+#         return reward, nextState, actorModel, criticModel, replayBuffer, pointer, terminal
+#
+#
+# class RunEpisode:
+#     def __init__(self, reset, runTimeStep, maxTimeStep):
+#         self.reset = reset
+#         self.runTimeStep = runTimeStep
+#         self.maxTimeStep = maxTimeStep
+#
+#     def __call__(self, actorModel, criticModel, replayBuffer, pointer):
+#         state = self.reset()
+#         episodeReward = 0
+#         for timeStep in range(self.maxTimeStep):
+#             reward, state, actorModel, criticModel, replayBuffer, pointer, terminal = self.runTimeStep(state, actorModel, criticModel, replayBuffer, pointer)
+#             if terminal:
+#                 print('terminal----------------------------------------------- timestep', timeStep)
+#                 break
+#             episodeReward += reward
+#         print('episodeReward: ', episodeReward)
+#         return actorModel, criticModel, replayBuffer, pointer, episodeReward
+#
+#
+# class DDPG:
+#     def __init__(self, initializeMemory, runEpisode, bufferSize, maxEpisode, print = True):
+#         self.bufferSize = bufferSize
+#         self.initializeMemory = initializeMemory
+#         self.runEpisode = runEpisode
+#         self.maxEpisode = maxEpisode
+#         self.print = print
+#
+#     def __call__(self, actorModel, criticModel):
+#         replayBuffer = self.initializeMemory(self.bufferSize)
+#         pointer = 0
+#         episodeRewardList = []
+#         meanRewardList = []
+#         for episode in range(self.maxEpisode):
+#             actorModel, criticModel, replayBuffer, pointer, episodeReward = self.runEpisode(actorModel, criticModel, replayBuffer, pointer)
+#             episodeRewardList.append(episodeReward)
+#             meanRewardList.append(np.mean(episodeRewardList))
+#
+#             if print:
+#                 print('episode', episode)
+#                 if episode == self.maxEpisode - 1:
+#                     print('mean episode reward: ', int(np.mean(episodeRewardList)))
+#
+#         plt.plot(list(range(self.maxEpisode)), episodeRewardList)
+#         plt.plot(list(range(self.maxEpisode)), meanRewardList)
+#         plt.show()
+#         dirName = os.path.dirname(__file__)
+#         plotPath = os.path.join(dirName, '..', 'demo')
+#         plt.savefig(os.path.join(plotPath, 'pendulum_with_newWeight' + str(2)))
+#
+#         return actorModel, criticModel
+#
+
+
+    # episdoe ,replaybuffer : share framework
+    # double pendulum
 
 
 class RunDDPGTimeStep:
-    def __init__(self, actOneStepWithNoise, addToMemory, updateModelsByMiniBatch, minibatchSize):
+    def __init__(self, actOneStepWithNoise, addToMemory, updateModelsByMiniBatch, minibatchSize,
+                 learningStartBufferSize, env = None):
         self.actOneStepWithNoise = actOneStepWithNoise
         self.addToMemory = addToMemory
         self.updateModelsByMiniBatch = updateModelsByMiniBatch
         self.minibatchSize = minibatchSize
+        self.learningStartBufferSize = learningStartBufferSize
+        self.runTime = 0
+        self.env = env
 
-    def __call__(self, timeStep, state, actorModel, criticModel, replayBuffer):
-        state, actionOutput, nextState = self.actOneStepWithNoise(timeStep, actorModel, state)
-        replayBuffer = self.addToMemory(replayBuffer, state, actionOutput, nextState)
-        if len(replayBuffer) >= self.minibatchSize:
+    def __call__(self, state, actorModel, criticModel, replayBuffer):
+        if self.env is not None:
+            self.env.render()
+        state, action, reward, nextState, terminal = self.actOneStepWithNoise(self.runTime, actorModel, state)##
+        replayBuffer = self.addToMemory(replayBuffer, state, action, reward, nextState)
+        self.runTime +=1
+        if len(replayBuffer) >= self.learningStartBufferSize:
             miniBatch = random.sample(replayBuffer, self.minibatchSize)
-            actorModel, criticModel = self.updateModelsByMiniBatch(actorModel, criticModel, miniBatch)
+            actorModel, criticModel = self.updateModelsByMiniBatch(actorModel, criticModel, miniBatch, self.runTime)
 
-        return nextState, actorModel, criticModel, replayBuffer
+        return reward, nextState, actorModel, criticModel, replayBuffer, terminal
 
 
 class RunEpisode:
-    def __init__(self, reset, isTerminal, runTimeStep, maxTimeStep):
+    def __init__(self, reset, runTimeStep, maxTimeStep):
         self.reset = reset
-        self.isTerminal = isTerminal
         self.runTimeStep = runTimeStep
         self.maxTimeStep = maxTimeStep
 
     def __call__(self, actorModel, criticModel, replayBuffer):
         state = self.reset()
+        episodeReward = 0
         for timeStep in range(self.maxTimeStep):
-            state, actorModel, criticModel, replayBuffer = self.runTimeStep(timeStep, state, actorModel, criticModel, replayBuffer)
-            if self.isTerminal(state):
+            reward, state, actorModel, criticModel, replayBuffer, terminal = self.runTimeStep(state, actorModel, criticModel, replayBuffer)
+            if terminal:
+                print('terminal----------------------------------------------- timestep', timeStep)
                 break
-        return actorModel, criticModel, replayBuffer
+            episodeReward += reward
+        print('episodeReward: ', episodeReward)
+        return actorModel, criticModel, replayBuffer, episodeReward
 
 
 class DDPG:
-    def __init__(self, initializeMemory, runEpisode, bufferSize, maxEpisode):
+    def __init__(self, runEpisode, bufferSize, maxEpisode, print = True):
         self.bufferSize = bufferSize
-        self.initializeMemory = initializeMemory
         self.runEpisode = runEpisode
         self.maxEpisode = maxEpisode
+        self.print = print
 
     def __call__(self, actorModel, criticModel):
-        replayBuffer = self.initializeMemory(self.bufferSize)
+        replayBuffer = deque(maxlen=self.bufferSize)
+        episodeRewardList = []
+        meanRewardList = []
         for episode in range(self.maxEpisode):
-            if episode % 50 == 0:
-                print(episode)
-            actorModel, criticModel, replayBuffer = self.runEpisode(actorModel, criticModel, replayBuffer)
+            actorModel, criticModel, replayBuffer, episodeReward = self.runEpisode(actorModel, criticModel, replayBuffer)
+            episodeRewardList.append(episodeReward)
+            meanRewardList.append(np.mean(episodeRewardList))
+
+            if print:
+                print('episode', episode)
+                if episode == self.maxEpisode - 1:
+                    print('mean episode reward: ', int(np.mean(episodeRewardList)))
+
+        plt.plot(list(range(self.maxEpisode)), episodeRewardList)
+        plt.plot(list(range(self.maxEpisode)), meanRewardList)
+        plt.show()
+        dirName = os.path.dirname(__file__)
+        plotPath = os.path.join(dirName, '..', 'demo')
+        plt.savefig(os.path.join(plotPath, 'pendulum_with_newWeight' + str(3)))
 
         return actorModel, criticModel
+
+
+

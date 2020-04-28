@@ -1,6 +1,7 @@
 import pygame as pg
 import os
 import numpy as np
+np.random.seed(1)
 
 def initializeScreen(fullScreen, screenWidth, screenHeight):
     pg.init()

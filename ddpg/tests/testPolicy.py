@@ -22,7 +22,8 @@ class TestEnv(unittest.TestCase):
         self.addActionNoise = AddActionNoise(actionNoise, noiseDecay, self.actionLow, self.actionHigh)
 
     @data((np.asarray([-3, 0, -5, 0]), 10, np.asarray((10, 0))),
-          (np.asarray([-3, 0, 0, 4]), 5, np.asarray((-3, -4)))
+          (np.asarray([-3, 0, 0, 4]), 5, np.asarray((-3, -4))),
+          (np.asarray([0, 0, 1, 0]), 1, np.asarray((-1, 0)))
           )
     @unpack
     def testHeatSeekingContinuesDeterministicPolicy(self, state, actionMagnitude, groundTruthWolfAction):
