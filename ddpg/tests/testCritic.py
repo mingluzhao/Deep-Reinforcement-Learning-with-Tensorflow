@@ -2,7 +2,8 @@ import sys
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg import *
+from src.ddpg_generic import *
+from RLframework.RLrun import *
 from src.policy import *
 
 @ddt
@@ -20,7 +21,8 @@ class TestCritic(unittest.TestCase):
         self.gamma = 0.95
         self.learningRateCritic = 0.001
 
-        self.updateParameters = UpdateParameters(self.tau)
+        updateInterval = 1
+        self.updateParameters = UpdateParameters(updateInterval, self.tau)
 
 
     @data(([[0]], [[1]]),
@@ -83,7 +85,9 @@ class TestCritic(unittest.TestCase):
         actionBatch = [[2, 2]]
         rewardBatch = [[2]]
         targetQValue = [[2]]
-        for i in range(20):
+
+        runTime = 20
+        for i in range(runTime):
             calculatedLoss, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
 
         criticGraph = criticModel.graph
@@ -91,7 +95,7 @@ class TestCritic(unittest.TestCase):
         targetParams_ = criticGraph.get_collection_ref("targetParams_")[0]
         trainParams, targetParams = criticModel.run([trainParams_,targetParams_])
 
-        updatedCriticModel = self.updateParameters(criticModel)
+        updatedCriticModel = self.updateParameters(criticModel, runTime)
 
         updatedCriticGraph = updatedCriticModel.graph
         updatedTrainParams_ = updatedCriticGraph.get_collection_ref("trainParams_")[0]

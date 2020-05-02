@@ -1,49 +1,23 @@
-import os
-import numpy as np
 import tensorflow as tf
 
 from src.ddpg import BuildActorModel, BuildCriticModel, actByPolicyTrain, \
     actByPolicyTarget, evaluateCriticTarget, TrainCritic, getActionGradients, TrainActor, \
     AddToMemory, initializeMemory, UpdateModelsByMiniBatch, RunDDPGTimeStep, RunEpisode, DDPG,\
     UpdateParameters, TrainCriticBySASRQ, TrainActorFromGradients, TrainActorOneStep
-from src.reward import RewardFunctionCompete
+from environment.chasingEnv.reward import RewardFunctionCompete
 from src.policy import AddActionNoise, HeatSeekingContinuousDeterministicPolicy, \
     ActByDDPG2D, ActOneStepWithNoise2D
-from src.envNoPhysics import Reset, TransitForNoPhysics, StayWithinBoundary, \
+from environment.chasingEnv.envNoPhysics import Reset, TransitForNoPhysics, StayWithinBoundary, \
     TransitWithSingleWolf, GetAgentPosFromState, IsTerminal
 
-from src.continuousVisualization import *
-from src.traj import *
+from environment.chasingEnv.continuousChasingVisualization import *
+from functionTools.trajectory import *
 from pygame.color import THECOLORS
 
 np.random.seed(1)
 tf.set_random_seed(1)
 
 visualize = True
-
-class GetSavePath:
-    def __init__(self, dataDirectory, extension, fixedParameters={}):
-        self.dataDirectory = dataDirectory
-        self.extension = extension
-        self.fixedParameters = fixedParameters
-
-    def __call__(self, parameters):
-        allParameters = dict(list(parameters.items()) + list(self.fixedParameters.items()))
-        sortedParameters = sorted(allParameters.items())
-        nameValueStringPairs = [parameter[0] + '=' + str(parameter[1]) for parameter in sortedParameters]
-
-        fileName = '_'.join(nameValueStringPairs) + self.extension
-        fileName = fileName.replace(" ", "")
-
-        path = os.path.join(self.dataDirectory, fileName)
-        return path
-
-
-def saveVariables(model, path):
-    graph = model.graph
-    saver = graph.get_collection_ref("saver")[0]
-    saver.save(model, path)
-    print("Model saved in {}".format(path))
 
 
 def main():

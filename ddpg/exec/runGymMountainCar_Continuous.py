@@ -1,9 +1,6 @@
-import tensorflow as tf
-import numpy as np
 import gym
-import time
 from src.ddpg import *
-from src.noise import *
+from environment.noise.noise import *
 
 
 class ActMountainWithNoise:

@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import functools as ft
 import env
-from src import reward
+from environment.chasingEnv import reward
 import tensorflow_probability as tfp
 import agentsEnv as ag
 import pygame as pg

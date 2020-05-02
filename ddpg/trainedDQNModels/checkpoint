@@ -1,0 +1,2 @@
+model_checkpoint_path: "epsilonDecay=0.9995_epsilonMin=0.1_gamma=0.9_learningRate=0.001_maxEpisode=300_maxTimeStep=200_minibatchSize=64.ckpt"
+all_model_checkpoint_paths: "epsilonDecay=0.9995_epsilonMin=0.1_gamma=0.9_learningRate=0.001_maxEpisode=300_maxTimeStep=200_minibatchSize=64.ckpt"

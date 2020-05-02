@@ -64,32 +64,7 @@ class ActOneStepWithNoise2D:
         return state, action, reward, nextState, terminal
 
 
-class ActByAngle:
-    def __init__(self,actionMagnitude):
-        self.actionMagnitude = actionMagnitude
 
-    def __call__(self, actionAngle):
-        positiveX = np.array([1, 0])* self.actionMagnitude
-        positiveY = np.array([0, 1])* self.actionMagnitude
-        action = np.cos(actionAngle) * positiveX + np.sin(actionAngle) * positiveY
-        return action
-
-
-class HeatSeekingContinuousDeterministicPolicy:
-    def __init__(self, getPredatorPos, getPreyPos, actionMagnitude):
-        self.getPredatorPos = getPredatorPos
-        self.getPreyPos = getPreyPos
-        self.actionMagnitude = actionMagnitude
-
-    def __call__(self, state):
-        action = np.array(self.getPreyPos(state)) - np.array(self.getPredatorPos(state))
-        actionL2Norm = np.linalg.norm(action, ord=2)
-        if actionL2Norm != 0:
-            action = action / actionL2Norm
-            action *= self.actionMagnitude
-
-        actionTuple = tuple(action)
-        return actionTuple
 
 
 class ActByDDPG1D:
@@ -116,3 +91,37 @@ class ActByDDPG2D:
         sheepAction = self.actByPolicyTrain(self.actorModel, stateBatch)[0]
 
         return sheepAction
+
+
+class ActInGymWithNoise:
+    def __init__(self, actionRange, actByPolicyTrain, getNoise, env):
+        self.actionRange = abs(actionRange)
+        self.actByPolicyTrain = actByPolicyTrain
+        self.getNoise = getNoise
+        self.env = env
+
+    def __call__(self, actorModel, state, runStep):#
+        noise = self.getNoise(runStep)
+        stateBatch = np.asarray(state).reshape(1, -1)
+        actionPerfect = self.actByPolicyTrain(actorModel, stateBatch)[0]
+        action = np.clip(noise + actionPerfect, -self.actionRange, self.actionRange)
+        nextState, reward, terminal, info = self.env.step(action)
+
+        return state, action, reward, nextState, terminal
+
+
+class ActDDPGOneStepWithNoise:
+    def __init__(self, actionLow, actionHigh, actByPolicyTrain, getNoise):
+        self.actionLow = actionLow
+        self.actionHigh = actionHigh
+        self.actByPolicyTrain = actByPolicyTrain
+        self.getNoise = getNoise
+
+    def __call__(self, modelList, observation, runTime):
+        actorModel, criticModel = modelList
+        noise = self.getNoise(runTime)
+        actionPerfect = self.actByPolicyTrain(actorModel, observation)[0]
+        noisyAction = np.clip(noise + actionPerfect, self.actionLow, self.actionHigh)
+
+        return noisyAction
+

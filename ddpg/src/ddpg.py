@@ -56,8 +56,8 @@ class BuildActorModel:
         self.actionDim = actionDim
         self.actionRange = actionRange
 
-    def __call__(self, trainingLayerWidths, targetLayerWidths, summaryPath="./tbdata"):
-        print("Generating Actor NN Model with training layers: {}, target layers: {}".format(trainingLayerWidths, targetLayerWidths))
+    def __call__(self, layersWidths, summaryPath="./tbdata"):
+        print("Generating Actor NN Model with layers: {}".format(layersWidths))
         graph = tf.Graph()
         with graph.as_default():
 
@@ -78,8 +78,8 @@ class BuildActorModel:
             initBias = tf.constant_initializer(0.1)
             with tf.variable_scope("trainHidden"):
                 activation_ = states_
-                for i in range(len(trainingLayerWidths)):
-                    fcLayer = tf.layers.Dense(units=trainingLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
+                for i in range(len(layersWidths)):
+                    fcLayer = tf.layers.Dense(units=layersWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
                                               bias_initializer=initBias, name="fc{}".format(i+1), trainable = True)
                     # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
                     activation_ = fcLayer(activation_)
@@ -91,7 +91,7 @@ class BuildActorModel:
                 tf.add_to_collection("trainActivation_", trainActivation_)
 
                 outputFCLayer = tf.layers.Dense(units=self.actionDim, activation= tf.nn.tanh, kernel_initializer=initWeight,
-                                                bias_initializer=initBias,name="fc{}".format(len(trainingLayerWidths) + 1), trainable = True)
+                                                bias_initializer=initBias,name="fc{}".format(len(layersWidths) + 1), trainable = True)
                 # trainActivationOutput_ = tf.layers.batch_normalization(outputFCLayer(trainActivation_))
 
                 trainActivationOutput_ = outputFCLayer(trainActivation_)
@@ -102,8 +102,8 @@ class BuildActorModel:
 
             with tf.variable_scope("targetHidden"):
                 activation_ = states_
-                for i in range(len(targetLayerWidths)):
-                    fcLayer = tf.layers.Dense(units=targetLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
+                for i in range(len(layersWidths)):
+                    fcLayer = tf.layers.Dense(units= layersWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
                                               bias_initializer=initBias, name="fc{}".format(i+1), trainable = False)
                     activation_ = fcLayer(activation_)
                     # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
@@ -113,7 +113,7 @@ class BuildActorModel:
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
                 targetActivation_ = tf.identity(activation_, name="output")
                 outputFCLayer = tf.layers.Dense(units=self.actionDim, activation=tf.nn.tanh, kernel_initializer=initWeight,
-                                                bias_initializer=initBias,name="fc{}".format(len(trainingLayerWidths) + 1), trainable = False)
+                                                bias_initializer=initBias,name="fc{}".format(len(layersWidths) + 1), trainable = False)
                 targetActivationOutput_ = outputFCLayer(targetActivation_)
                 # targetActivationOutput_ = tf.layers.batch_normalization(outputFCLayer(targetActivation_))
 
@@ -166,8 +166,8 @@ class BuildCriticModel:
         self.numStateSpace = numStateSpace
         self.actionDim = actionDim
 
-    def __call__(self, trainingLayerWidths, targetLayerWidths, summaryPath="./tbdata"):
-        print("Generating Critic NN Model with training layers: {}, target layers: {}".format(trainingLayerWidths, targetLayerWidths))
+    def __call__(self, layersWidths , summaryPath="./tbdata"):
+        print("Generating Actor NN Model with layers: {}".format(layersWidths))
         graph = tf.Graph()
         with graph.as_default():
 
@@ -199,8 +199,8 @@ class BuildCriticModel:
             initBias = tf.constant_initializer(0.1)
             with tf.variable_scope("trainHidden"):
                 activation_ = states_
-                for i in range(len(trainingLayerWidths)-1):
-                    fcLayer = tf.layers.Dense(units=trainingLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
+                for i in range(len(layersWidths)-1):
+                    fcLayer = tf.layers.Dense(units=layersWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
                                               bias_initializer=initBias, name="fc{}".format(i+1), trainable = True)
                     activation_ = fcLayer(activation_)
                     # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
@@ -210,9 +210,9 @@ class BuildCriticModel:
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
                 trainActivation_ = tf.identity(activation_, name="output")
 
-                secondLastFCUnit = trainingLayerWidths[-2] if len(trainingLayerWidths) >= 2 else self.numStateSpace
+                secondLastFCUnit = layersWidths[-2] if len(layersWidths) >= 2 else self.numStateSpace
 
-                lastFCUnit = trainingLayerWidths[-1]
+                lastFCUnit = layersWidths[-1]
                 trainStateFCToLastFCWeights_ = tf.get_variable(name='trainStateFCToLastFCWeights_', shape=[secondLastFCUnit,lastFCUnit], initializer=initWeight)
                 trainActionFCToLastFCWeights_ = tf.get_variable(name='trainActionFCToLastFCWeights_', shape=[self.actionDim, lastFCUnit], initializer=initWeight)
                 trainActionLastFCBias_ = tf.get_variable(name='trainActionLastFCBias_', shape=[lastFCUnit], initializer=initBias)
@@ -239,8 +239,8 @@ class BuildCriticModel:
 
             with tf.variable_scope("targetHidden"):
                 activation_ = states_
-                for i in range(len(targetLayerWidths)-1):
-                    fcLayer = tf.layers.Dense(units=targetLayerWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
+                for i in range(len( layersWidths)-1):
+                    fcLayer = tf.layers.Dense(units= layersWidths[i], activation=tf.nn.relu, kernel_initializer=initWeight,
                                               bias_initializer=initBias, name="fc{}".format(i+1), trainable = False)
                     activation_ = fcLayer(activation_)
                     # activation_ = tf.layers.batch_normalization(fcLayer(activation_))
@@ -250,8 +250,8 @@ class BuildCriticModel:
                     tf.add_to_collections(["activations", f"activation/{activation_.name}"], activation_)
                 targetActivation_ = tf.identity(activation_, name="output")
 
-                secondLastFCUnit = trainingLayerWidths[-2] if len(trainingLayerWidths) >= 2 else self.numStateSpace
-                lastFCUnit = targetLayerWidths[-1] # 5
+                secondLastFCUnit = layersWidths[-2] if len(layersWidths) >= 2 else self.numStateSpace
+                lastFCUnit =  layersWidths[-1] # 5
                 targetStateFCToLastFCWeights_ = tf.get_variable(name='targetStateFCToLastFCWeights_', shape=[secondLastFCUnit, lastFCUnit], initializer=initWeight)
                 targetActionFCToLastFCWeights_ = tf.get_variable(name='targetActionFCToLastFCWeights_', shape=[self.actionDim, lastFCUnit], initializer=initWeight)
                 targetActionLastFCBias_ = tf.get_variable(name='targetActionLastFCBias_', shape=[lastFCUnit], initializer=initBias)
@@ -547,7 +547,7 @@ class UpdateModelsByMiniBatch:
 
 class RunDDPGTimeStep:
     def __init__(self, actOneStepWithNoise, addToMemory, updateModelsByMiniBatch, minibatchSize,
-                 learningStartBufferSize, env = None):
+                 learningStartBufferSize, env = None, render = False):
         self.actOneStepWithNoise = actOneStepWithNoise
         self.addToMemory = addToMemory
         self.updateModelsByMiniBatch = updateModelsByMiniBatch
@@ -555,11 +555,12 @@ class RunDDPGTimeStep:
         self.learningStartBufferSize = learningStartBufferSize
         self.runTime = 0
         self.env = env
+        self.render = render
 
     def __call__(self, state, actorModel, criticModel, replayBuffer):
-        if self.env is not None:
+        if self.render:
             self.env.render()
-        state, action, reward, nextState, terminal = self.actOneStepWithNoise(self.runTime, actorModel, state)##
+        state, action, reward, nextState, terminal = self.actOneStepWithNoise(actorModel, state, self.runTime)##
         replayBuffer = self.addToMemory(replayBuffer, state, action, reward, nextState)
         self.runTime +=1
         if len(replayBuffer) >= self.learningStartBufferSize:
@@ -596,7 +597,8 @@ class DDPG:
         self.print = print
 
     def __call__(self, actorModel, criticModel):
-        replayBuffer = deque(maxlen=self.bufferSize)
+        # print(self.bufferSize)
+        replayBuffer = deque(maxlen=int(self.bufferSize))
         episodeRewardList = []
         meanRewardList = []
         for episode in range(self.maxEpisode):
@@ -609,14 +611,14 @@ class DDPG:
                 if episode == self.maxEpisode - 1:
                     print('mean episode reward: ', int(np.mean(episodeRewardList)))
 
-        plt.plot(list(range(self.maxEpisode)), episodeRewardList)
-        plt.plot(list(range(self.maxEpisode)), meanRewardList)
-        plt.show()
-        dirName = os.path.dirname(__file__)
-        plotPath = os.path.join(dirName, '..', 'demo')
-        plt.savefig(os.path.join(plotPath, 'pendulum_with_newWeight' + str(3)))
+        # plt.plot(list(range(self.maxEpisode)), episodeRewardList)
+        # plt.plot(list(range(self.maxEpisode)), meanRewardList)
+        # plt.show()
+        # dirName = os.path.dirname(__file__)
+        # plotPath = os.path.join(dirName, '..', 'demo')
+        # plt.savefig(os.path.join(plotPath, 'pendulum_with_newWeight' + str(3)))
 
-        return actorModel, criticModel
+        return episodeRewardList, meanRewardList, actorModel, criticModel
 
 
 

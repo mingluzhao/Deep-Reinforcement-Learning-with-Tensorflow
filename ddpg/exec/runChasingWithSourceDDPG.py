@@ -11,15 +11,13 @@ gym 0.8.0
 """
 
 import tensorflow as tf
-import numpy as np
 import time
-from src.envNoPhysics import *
-from src.policy import *
-from src.reward import *
-from src.traj import *
-from src.continuousVisualization import *
-import pandas as pd
+from environment.chasingEnv.envNoPhysics import *
+from environment.chasingEnv.reward import *
+from functionTools.trajectory import *
+from environment.chasingEnv.continuousChasingVisualization import *
 from pygame.color import THECOLORS
+from functionTools.loadSaveModel import saveToPickle
 
 np.random.seed(1)
 tf.set_random_seed(1)

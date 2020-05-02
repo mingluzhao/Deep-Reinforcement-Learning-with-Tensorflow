@@ -1,61 +1,169 @@
 import pandas as pd
 import pylab as plt
-import numpy as np
-import seaborn as sns
+from collections import OrderedDict
+from src.ddpg_generic import *
+from RLframework.RLrun import *
+from src.policy import ActDDPGOneStepWithNoise
+from functionTools.loadSaveModel import *
+import os
+from environment.noise.noise import GetExponentialDecayGaussNoise
+from environment.gymEnv.pendulumEnv import *
 
-def evaluateModel(modelDf):
-    reward = np.random.uniform(-1, 1)
-    resultSe = pd.Series({'reward':reward})
-    return resultSe
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-def drawHeatmapPlot(plotDf, ax):
-    plotDf = plotDf.reset_index().pivot(columns= 'sheepXPosition', index = 'sheepYPosition', values = 'reward')
-    sns.heatmap(plotDf, ax = ax)
+ENV_NAME = 'Pendulum-v0'
+env = gym.make(ENV_NAME)
+env = env.unwrapped
+seed = 1
 
-def drawLinePlot(plotDf, ax):
-    for sheepYPosition, subDf in plotDf.groupby('sheepYPosition'):
-        subDf = subDf.droplevel('sheepYPosition')
-        subDf.plot.line(ax = ax, label = 'sheepYPosition = {}'.format(sheepYPosition), y = 'reward', marker = 'o')
+class EvaluateNoiseAndMemorySize:
+    def __init__(self, actorModel, criticModel, getNoiseWithDiffVar, actInGymWithDiffNoise,
+                 runDDPGTimeStepWithDiffNoise, runEpisodeWithDiffNoise, ddpgWithDiffNoiseAndDiffMemorySize,
+                 getSavePath, saveModel = True):
+        self.modelList = [actorModel, criticModel]
+        self.getNoiseWithDiffVar = getNoiseWithDiffVar
+        self.actInGymWithDiffNoise = actInGymWithDiffNoise
+        self.runDDPGTimeStepWithDiffNoise = runDDPGTimeStepWithDiffNoise
+        self.runEpisodeWithDiffNoise = runEpisodeWithDiffNoise
+        self.ddpgWithDiffNoiseAndDiffMemorySize = ddpgWithDiffNoiseAndDiffMemorySize
+        self.getSavePath = getSavePath
+        self.saveModel = saveModel
+
+    def __call__(self, df):
+        noiseVariance = df.index.get_level_values('noiseInitVariance')[0]
+        memorySize = df.index.get_level_values('memorySize')[0]
+
+        getNoise = self.getNoiseWithDiffVar(noiseVariance)
+        actInGymWithNoise = self.actInGymWithDiffNoise(getNoise)
+        runDDPGTimeStep = self.runDDPGTimeStepWithDiffNoise(actInGymWithNoise)
+        runDDPGEpisode = self.runEpisodeWithDiffNoise(runDDPGTimeStep)
+        ddpg = self.ddpgWithDiffNoiseAndDiffMemorySize(memorySize, runDDPGEpisode)
+
+        meanRewardList, trajectory, modelList = ddpg(self.modelList)
+        trainedActorModel, trainedCriticModel = modelList
+
+        timeStep = list(range(len(meanRewardList)))
+        resultSe = pd.Series({time: reward for time, reward in zip(timeStep, meanRewardList)})
+
+        # resultSe = pd.Series({'episodeReward': episodeRewardList, 'meanRewardList': meanRewardList})
+
+        if self.saveModel:
+            actorParameters = {'ActorMemorySize': memorySize, 'NoiseVariance': noiseVariance }
+            criticParameters ={'CriticMemorySize': memorySize, 'NoiseVariance': noiseVariance }
+            actorPath = self.getSavePath(actorParameters)
+            criticPath = self.getSavePath(criticParameters)
+            with trainedActorModel.as_default():
+                saveVariables(trainedActorModel, actorPath)
+            with trainedCriticModel.as_default():
+                saveVariables(trainedCriticModel, criticPath)
+
+        return resultSe
+
 
 def main():
-    wolfXPosition = [-10, -5, 0, 5, 10]
-    wolfYPosition = [-10, -5, 0, 5, 10]
-    sheepXPosition = [-20, -10, 0, 10, 20]
-    sheepYPosition = [-20, -10, 0, 10, 20]
+    stateDim = env.observation_space.shape[0]
+    actionDim = env.action_space.shape[0]
+    actionHigh = env.action_space.high
+    actionLow = env.action_space.low
+    actionBound = (actionHigh - actionLow)/2
+    
+    fixedParameters = OrderedDict()
+    fixedParameters['batchSize'] = 128
+    fixedParameters['learningRateActor'] = 1e-4
+    fixedParameters['learningRateCritic'] = 1e-4
+    fixedParameters['maxEpisode'] = 200
+    fixedParameters['maxRunSteps'] = 200
+    fixedParameters['tau'] = 0.01
+    fixedParameters['gamma'] = 0.9
+    fixedParameters['actorLayerWidths'] = [30]
+    fixedParameters['criticLayerWidths'] = [30]
+    fixedParameters['stateDim'] = stateDim
+    fixedParameters['actionDim'] = actionDim
+    fixedParameters['actionBound'] = actionBound
+    fixedParameters['actionHigh'] = actionHigh
+    fixedParameters['actionLow'] = actionLow
+    fixedParameters['paramUpdateInterval'] = 1
+    fixedParameters['varianceDiscount'] = .9995
+    fixedParameters['noiseDecayStartStep'] = 10000
+    fixedParameters['learningStartStep'] = fixedParameters['batchSize']
 
-    levelValues = [wolfXPosition, wolfYPosition, sheepXPosition, sheepYPosition]
-    levelNames = ["wolfXPosition", "wolfYPosition", "sheepXPosition", "sheepYPosition"]
+    independentVariables = OrderedDict()
+    # independentVariables['noiseInitVariance'] = [1, 2, 3, 4]
+    # independentVariables['memorySize'] = [1000, 5000, 10000, 20000]
+    independentVariables['noiseInitVariance'] = [1, 4]
+    independentVariables['memorySize'] = [1000, 20000]
 
-    modelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
 
-    toSplitFrame = pd.DataFrame(index = modelIndex)
+    buildActorModel = BuildActorModel(fixedParameters['stateDim'], fixedParameters['actionDim'], fixedParameters['actionBound'])
+    actorWriter, actorModel = buildActorModel(fixedParameters['actorLayerWidths'])
 
-    modelResultDf = toSplitFrame.groupby(levelNames).apply(evaluateModel)
+    buildCriticModel = BuildCriticModel(fixedParameters['stateDim'], fixedParameters['actionDim'])
+    criticWriter, criticModel = buildCriticModel(fixedParameters['criticLayerWidths'])
 
-    fig = plt.figure()
-    plotLevels = ['sheepXPosition', 'sheepYPosition']
-    plotRowNum = len(wolfYPosition)
-    plotColNum = len(wolfXPosition)
-    plotCounter = 1
+    trainCriticBySASRQ = TrainCriticBySASRQ(fixedParameters['learningRateCritic'], fixedParameters['gamma'], criticWriter)
+    trainCritic = TrainCritic(actByPolicyTarget, evaluateCriticTarget, trainCriticBySASRQ)
 
-    for (key, plotDf) in modelResultDf.groupby(['wolfYPosition', 'wolfXPosition']):
-        plotDf.index = plotDf.index.droplevel(['wolfYPosition', 'wolfXPosition'])
-        ax = fig.add_subplot(plotRowNum, plotColNum, plotCounter)
-        #drawHeatmapPlot(plotDf, ax)
-        drawLinePlot(plotDf, ax)
-        plotCounter+=1
+    trainActorFromGradients = TrainActorFromGradients(fixedParameters['learningRateActor'], actorWriter)
+    trainActorOneStep = TrainActorOneStep(actByPolicyTrain, trainActorFromGradients, getActionGradients)
+    trainActor = TrainActor(trainActorOneStep)
 
-    fig.text(x = 0.5, y = 0.04, s = 'wolfXPosition', ha = 'center', va = 'center')
-    fig.text(x = 0.05, y = 0.5, s = 'wolfYPosition', ha = 'center', va = 'center', rotation=90)
+    updateParameters = UpdateParameters(fixedParameters['paramUpdateInterval'], fixedParameters['tau'])
+    trainModels = TrainDDPGModels(updateParameters, trainActor, trainCritic)
 
+
+    getNoiseWithDiffVar = lambda var: GetExponentialDecayGaussNoise(var, fixedParameters['varianceDiscount'], fixedParameters['noiseDecayStartStep'])
+    actOneStepWithDiffNoise = lambda getNoiseWithDiffVar: ActDDPGOneStepWithNoise(fixedParameters['actionLow'], fixedParameters['actionHigh'], actByPolicyTrain, getNoiseWithDiffVar)
+
+    transit = TransitGymPendulum()
+    getReward = RewardGymPendulum(angle_normalize)
+    runDDPGTimeStepWithDiffNoise = lambda actWithNoise: RunTimeStep(actWithNoise, transit, getReward, isTerminalGymPendulum, addToMemory,
+                 trainModels, fixedParameters['batchSize'], fixedParameters['learningStartStep'], observe)
+
+    reset = ResetGymPendulum(seed, observe)
+    runEpisodeWithDiffNoise = lambda runDDPGTimeStepWithDiffNoise: RunEpisode(reset, runDDPGTimeStepWithDiffNoise, fixedParameters['maxRunSteps'])
+
+    ddpgWithDiffNoiseAndDiffMemorySize = lambda memorySize, runEpisodeWithDiffNoise: RunAlgorithm(runEpisodeWithDiffNoise, memorySize, fixedParameters['maxEpisode'])
+
+    modelSaveDirectory = "../trainedDDPGModels"
+    modelSaveExtension = '.ckpt'
+    getSavePath = GetSavePath(modelSaveDirectory, modelSaveExtension)
+
+    modelList = [actorModel, criticModel]
+    actorModel, criticModel = resetTargetParamToTrainParam(modelList)
+
+    evaluate = EvaluateNoiseAndMemorySize(actorModel, criticModel, getNoiseWithDiffVar, actOneStepWithDiffNoise,
+                 runDDPGTimeStepWithDiffNoise, runEpisodeWithDiffNoise, ddpgWithDiffNoiseAndDiffMemorySize,
+                 getSavePath, saveModel=True)
+
+    env.close()
+
+
+    ####################################################################################################################################
+
+    levelNames = list(independentVariables.keys())
+    levelValues = list(independentVariables.values())
+    levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
+    toSplitFrame = pd.DataFrame(index=levelIndex)
+    resultDF = toSplitFrame.groupby(levelNames).apply(evaluate)
+
+
+    nCols = len(independentVariables['noiseInitVariance'])
+    nRows = len(independentVariables['memorySize'])
+    numplot = 1
+    axs = []
+    figure = plt.figure(figsize=(12, 10))
+    for keyCol, outterSubDf in resultDF.groupby('memorySize'):
+        for keyRow, innerSubDf in outterSubDf.groupby('noiseInitVariance'):
+            subplot = figure.add_subplot(nRows, nCols, numplot)
+            axs.append(subplot)
+            numplot += 1
+            plt.ylim([-1600, 50])
+            innerSubDf.T.plot(ax=subplot)
+
+    dirName = os.path.dirname(__file__)
+    plotPath = os.path.join(dirName, '..', 'demo')
+    plt.savefig(os.path.join(plotPath, 'pendulumEvaluation'))
     plt.show()
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
