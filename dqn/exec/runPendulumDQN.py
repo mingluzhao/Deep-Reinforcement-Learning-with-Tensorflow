@@ -12,29 +12,30 @@ env = env.unwrapped
 
 def main():
     stateDim = env.observation_space.shape[0]
-    actionDim = 11
+    actionDim = 3
     buildModel = BuildModel(stateDim, actionDim)
-    layersWidths = [20]
+    layersWidths = [32, 32]
     writer, model = buildModel(layersWidths)
     modelList = resetTargetParamToTrainParam([model])
 
-    learningRate = 0.001
-    gamma = 0.9
+    learningRate = 0.0001
+    gamma = 0.99
     trainModelBySASRQ = TrainModelBySASRQ(learningRate, gamma, writer)
 
-    paramUpdateInterval = 100
+    paramUpdateInterval = 300
     updateParameters = UpdateParameters(paramUpdateInterval)
     trainModels = TrainDQNModel(getTargetQValue, trainModelBySASRQ, updateParameters)
 
-    epsilonMax = 1
-    epsilonDecay = 0.9995
-    epsilonMin = 0.1
+    epsilonMax = 0.9
+    epsilonDecay = 0.0002
+    epsilonMin = 0
     actByTrainNetEpsilonGreedy = ActByTrainNetEpsilonGreedy(epsilonMax, epsilonMin, epsilonDecay, getTrainQValue)
 
-    minibatchSize = 64
-    learningStartBufferSize = 64
-    transit = TransitGymPendulum()
-    getReward = RewardGymPendulum(angle_normalize)
+    minibatchSize = 128
+    learningStartBufferSize = minibatchSize
+    processAction = ProcessDiscretePendulumAction(actionDim)
+    transit = TransitGymPendulum(processAction)
+    getReward = RewardGymPendulum(angle_normalize, processAction)
     runDQNTimeStep = RunTimeStep(actByTrainNetEpsilonGreedy, transit, getReward, isTerminalGymPendulum, addToMemory,
                  trainModels, minibatchSize, learningStartBufferSize, observe)
 
@@ -42,8 +43,8 @@ def main():
     maxTimeStep = 200
     runEpisode = RunEpisode(reset, runDQNTimeStep, maxTimeStep)
 
-    bufferSize = 3000
-    maxEpisode = 300
+    bufferSize = 100000
+    maxEpisode = 200
     dqn = RunAlgorithm(runEpisode, bufferSize, maxEpisode)
     meanRewardList, trajectory, modelList = dqn(modelList)
     trainedModel = modelList[0]

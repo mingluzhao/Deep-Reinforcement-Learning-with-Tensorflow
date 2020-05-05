@@ -42,8 +42,7 @@ def addToMemory(buffer, state, action, reward, nextState):
 
 
 class RunTimeStep:
-    def __init__(self, actOneStep,
-                 transit, getReward, isTerminal, addToMemory,
+    def __init__(self, actOneStep, transit, getReward, isTerminal, addToMemory,
                  trainModels, minibatchSize, learningStartBufferSize, observe = None):
         self.actOneStep = actOneStep
 
@@ -115,6 +114,7 @@ class RunEpisode:
             reward, state, modelList, replayBuffer, terminal, trajectory = \
                 self.runTimeStep(state, modelList, replayBuffer, trajectory)
             if terminal:
+                print('------------terminal-----------------')
                 break
             episodeReward += reward
         print('episodeReward: ', episodeReward)

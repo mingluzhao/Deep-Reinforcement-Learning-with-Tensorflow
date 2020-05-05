@@ -4,7 +4,6 @@ import random
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-
 class ActByTrainNetEpsilonGreedy:
     def __init__(self, epsilonMax, epsilonMin, epsilonDecay, getTrainQValue):
         self.epsilonMax = epsilonMax
@@ -14,16 +13,15 @@ class ActByTrainNetEpsilonGreedy:
 
     def __call__(self, modelList, stateBatch, runTime):
         model = modelList[0]
-        epsilonResult = self.epsilonMax * self.epsilonDecay ** runTime
-        epsilon = epsilonResult if epsilonResult > self.epsilonMin else self.epsilonMin
-
+        epsilonResult = self.epsilonMin + self.epsilonDecay * runTime
+        epsilon = epsilonResult if epsilonResult < self.epsilonMax else self.epsilonMax
         trainQVal = self.getTrainQValue(model, stateBatch)
 
-        if np.random.uniform() > epsilon:
+        if np.random.uniform() < epsilon:
             action = np.argmax(trainQVal)
         else:
             action = random.randrange(len(trainQVal[0]))
-        action = action
+
         return [action]
 
 

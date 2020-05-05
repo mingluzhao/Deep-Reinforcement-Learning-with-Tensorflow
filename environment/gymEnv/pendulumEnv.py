@@ -6,15 +6,17 @@ from os import path
 
 
 class TransitGymPendulum:
-    def __init__(self):
+    def __init__(self, processAction = None):
         self.max_speed = 8
         self.max_torque = 2.
         self.dt = .05
         self.g = 10
         self.m = 1.
         self.l = 1.
+        self.processAction = processAction
 
     def __call__(self, state, action):
+        action = self.processAction(action) if self.processAction is not None else action
         th, thdot = state  # th := theta
         action = np.clip(action, -self.max_torque, self.max_torque)[0]
         newthdot = thdot + (-3 * self.g / (2 * self.l) * np.sin(th + np.pi) + 3. / (self.m * self.l ** 2) * action) * self.dt
@@ -25,16 +27,19 @@ class TransitGymPendulum:
 
 
 class RewardGymPendulum:
-    def __init__(self, angle_normalize):
+    def __init__(self, angle_normalize, processAction = None):
         self.angle_normalize = angle_normalize
         self.max_torque = 2.
+        self.processAction = processAction
 
     def __call__(self, state, action):
+        action = self.processAction(action) if self.processAction is not None else action
         action = np.clip(action, -self.max_torque, self.max_torque)[0]
         th, thdot = state  # th := theta
         costs = self.angle_normalize(th) ** 2 + .1 * thdot ** 2 + .001 * (action ** 2)
         reward = -costs
         return reward
+
 
 def isTerminalGymPendulum(stateInfo):
     return False
@@ -59,6 +64,16 @@ class ResetGymPendulum:
 
 def angle_normalize(x):
     return (((x+np.pi) % (2*np.pi)) - np.pi)
+
+
+class ProcessDiscretePendulumAction:
+    def __init__(self, discreteActionSpaceSize):
+        self.actionSpace = discreteActionSpaceSize
+
+    def __call__(self, action):
+        floatAction = (np.array(action) - (self.actionSpace - 1) / 2) / ((self.actionSpace - 1) / 4)
+        # [-2 ~ 2] float actions
+        return np.array(floatAction)
 
 
 class VisualizeGymPendulum:

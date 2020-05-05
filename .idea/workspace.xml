@@ -2,34 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="32e38a5f-0d38-4134-96a8-ea720b1cb818" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ddpg/exec/runPendulumDDPGWithGym.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/visualize/visualizePendulum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/maddpg.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/maddpg.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DDPG psedocode.png" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/DDPG psedocode.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/env/envNoPhysics.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/evaluatePendulum.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/evaluatePendulum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/generateDDPGChasingTraj1D.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj2D.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/generateDDPGChasingTraj2D.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/runChasingWithSourceDDPG.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/runChasingWithSourceDDPG.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/runGymMountainCar_Continuous.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/exec/runGymMountainCar_Continuous.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/runGymPendulum.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/try.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/exec/visualizeContinuousChasing.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualize/visualizeContinuousChasing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/src/continuousVisualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/chasingEnv/continuousChasingVisualization.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/src/ddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/src/ddpg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/src/noise.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/noise/noise.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/src/policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/src/policy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/src/reward.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/chasingEnv/reward.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/src/traj.py" beforeDir="false" afterPath="$PROJECT_DIR$/functionTools/trajectory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/tests/testActor.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/tests/testActor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/tests/testCritic.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/tests/testCritic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/tests/testEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/chasingEnv/tests/testEnvNoPhysics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/tests/testPolicy.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/chasingEnv/tests/testChasingPolicy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/tests/testReward.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/chasingEnv/tests/testReward.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/tests/testddpgNNStructure.py" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/tests/testddpgNNStructure.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/references/A2C.py" beforeDir="false" afterPath="$PROJECT_DIR$/references/A2C.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RLframework/RLrun.py" beforeDir="false" afterPath="$PROJECT_DIR$/RLframework/RLrun.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDQNModels/checkpoint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDQNModels/epsilonDecay=0.9995_epsilonMin=0.1_gamma=0.9_learningRate=0.001_maxEpisode=300_maxTimeStep=200_minibatchSize=64.ckpt.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDQNModels/epsilonDecay=0.9995_epsilonMin=0.1_gamma=0.9_learningRate=0.001_maxEpisode=300_maxTimeStep=200_minibatchSize=64.ckpt.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/trainedDQNModels/epsilonDecay=0.9995_epsilonMin=0.1_gamma=0.9_learningRate=0.001_maxEpisode=300_maxTimeStep=200_minibatchSize=64.ckpt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dqn/exec/runPendulumDQN.py" beforeDir="false" afterPath="$PROJECT_DIR$/dqn/exec/runPendulumDQN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dqn/src/dqn.py" beforeDir="false" afterPath="$PROJECT_DIR$/dqn/src/dqn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dqn/trajectory/pendulumDQNTrajectory.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/dqn/trajectory/pendulumDQNTrajectory.pickle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment/gymEnv/pendulumEnv.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/gymEnv/pendulumEnv.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maddpg/maddpg_openai/experiments/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/maddpg/maddpg_openai/experiments/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/common/distributions.py" beforeDir="false" afterPath="$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/common/distributions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/trainer/maddpg.py" beforeDir="false" afterPath="$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/trainer/maddpg.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,124 +26,97 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RLframework/RLrun.py">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_tag.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="49" column="30" lean-forward="true" selection-start-line="49" selection-start-column="30" selection-end-line="49" selection-end-column="30" />
+            <state relative-caret-position="380">
+              <caret line="19" column="24" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="24" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#2494#3553#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/environment/gymEnv/multiAgentEnv.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2680">
+              <caret line="134" column="29" lean-forward="true" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/rendering.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-496">
+              <caret line="160" column="31" lean-forward="true" selection-start-line="160" selection-start-column="31" selection-end-line="160" selection-end-column="31" />
+              <folding>
+                <element signature="e#31#62#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/experiments/train.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="246">
+              <caret line="62" column="23" selection-start-line="62" selection-start-column="23" selection-end-line="62" selection-end-column="23" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/environment.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="386">
+              <caret line="20" column="14" lean-forward="true" selection-start-line="20" selection-start-column="14" selection-end-line="20" selection-end-column="14" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/trainer/maddpg.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="205">
+              <caret line="118" column="52" selection-start-line="118" selection-start-column="41" selection-end-line="118" selection-end-column="52" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/common/tf_util.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1007">
+              <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/environment/gymEnv/continousMountainCarEnv.py">
+        <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/core.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="394">
-              <caret line="110" column="48" lean-forward="true" selection-start-line="110" selection-start-column="48" selection-end-line="110" selection-end-column="48" />
+            <state relative-caret-position="349">
+              <caret line="185" column="55" lean-forward="true" selection-start-line="185" selection-start-column="55" selection-end-line="185" selection-end-column="55" />
               <folding>
-                <element signature="e#0#29#0" expanded="true" />
-                <element signature="e#116#1017#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/environment/gymEnv/gymContinousMountainCarEnv.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="279">
-              <caret line="157" column="38" lean-forward="true" selection-start-line="157" selection-start-column="38" selection-end-line="157" selection-end-column="38" />
-              <folding>
-                <element signature="e#441#452#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/environment/gymEnv/tests/testContinuousMountainCarEnv.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="17" column="24" lean-forward="true" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/exec/runPendulumDDPG.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="301">
-              <caret line="96" lean-forward="true" selection-start-line="96" selection-end-line="96" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dqn/exec/runPendulumDQN.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="245">
-              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
-              <folding>
-                <element signature="e#0#25#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dqn/src/dqn.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="184" selection-start-line="184" selection-end-line="189" selection-end-column="54" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-                <element signature="e#179#860#0" />
-                <element signature="e#906#1114#0" />
-                <element signature="e#1160#1373#0" />
-                <element signature="e#1441#1772#0" />
-                <element signature="e#1829#8728#0" />
-                <element signature="e#2208#2738#0" />
-                <element signature="e#2806#3036#0" />
-                <element signature="e#3220#4623#0" />
-                <element signature="e#4693#6101#0" />
-                <element signature="e#7361#7449#0" />
-                <element signature="e#10941#10942#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dqn/tests/testDQN.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="477">
-              <caret line="80" column="43" selection-start-line="80" selection-start-column="43" selection-end-line="80" selection-end-column="43" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/tests/testCritic.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="324">
-              <caret line="67" selection-start-line="67" selection-end-line="71" selection-end-column="88" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_generic.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="346" column="8" selection-start-line="346" selection-start-column="8" selection-end-line="346" selection-end-column="33" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
+                <element signature="e#695#1298#0" />
+                <element signature="e#1363#1423#0" />
               </folding>
             </state>
           </provider>
@@ -175,17 +134,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>CartPole</find>
-      <find>seed</find>
-      <find>size</find>
-      <find>actOne</find>
-      <find>norm</find>
-      <find>saver</find>
-      <find>normalization</find>
-      <find>pointer</find>
-      <find>initializeMemory</find>
-      <find>targetLayerWidths</find>
-      <find>criticTrainingLayerWidths</find>
       <find>action_bound</find>
       <find>actorLayerWidths</find>
       <find>memorySize</find>
@@ -204,7 +152,18 @@
       <find>model</find>
       <find>max</find>
       <find>flush</find>
+      <find>action</find>
+      <find>print</find>
+      <find>processAction</find>
       <find>isT</find>
+      <find>entities</find>
+      <find>num_adversaries</find>
+      <find>get_trainers</find>
+      <find>make_env</find>
+      <find>display</find>
+      <find>dim_p</find>
+      <find>Agent</find>
+      <find>color</find>
     </findStrings>
     <replaceStrings>
       <replace>test</replace>
@@ -233,25 +192,11 @@
     </replaceStrings>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/maddpg/maddpg_openai" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/generateDDPGTraj2D.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/runCartPoleWithGym.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/runCartpoleWithGym.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/runGymCartpole.py" />
-        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_55.py" />
-        <option value="$PROJECT_DIR$/ddpg/src/ddpg_withSeparateParamUpdate.py" />
-        <option value="$PROJECT_DIR$/ddpg/src/ddpg_withModifiedCritic.py" />
-        <option value="$PROJECT_DIR$/ddpg/src/modelEval.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/env/gymPendulumEnv.py" />
-        <option value="$PROJECT_DIR$/ddpg/exec/env/pendulumEnv.py" />
-        <option value="$PROJECT_DIR$/ddpg/tests/testEnv.py" />
-        <option value="$PROJECT_DIR$/ddpg/env/gymPendulumEnv.py" />
-        <option value="$PROJECT_DIR$/ddpg/tests/testPendulumEnv.py" />
         <option value="$PROJECT_DIR$/ddpg/env/pendulumEnv.py" />
         <option value="$PROJECT_DIR$/ddpg/exec/runGynDQN.py" />
         <option value="$PROJECT_DIR$/ddpg/exec/runGymDQN.py" />
@@ -282,13 +227,27 @@
         <option value="$PROJECT_DIR$/ddpg/src/ddpg_generic.py" />
         <option value="$PROJECT_DIR$/ddpg/exec/runPendulumDDPG.py" />
         <option value="$PROJECT_DIR$/ddpg/exec/evaluatePendulum.py" />
-        <option value="$PROJECT_DIR$/RLframework/RLrun.py" />
-        <option value="$PROJECT_DIR$/dqn/exec/runPendulumDQN.py" />
-        <option value="$PROJECT_DIR$/dqn/src/dqn.py" />
         <option value="$PROJECT_DIR$/dqn/tests/testDQN.py" />
         <option value="$PROJECT_DIR$/environment/gymEnv/continousMountainCarEnv.py" />
         <option value="$PROJECT_DIR$/environment/gymEnv/gymContinousMountainCarEnv.py" />
         <option value="$PROJECT_DIR$/environment/gymEnv/tests/testContinuousMountainCarEnv.py" />
+        <option value="$PROJECT_DIR$/environment/gymEnv/gymDiscreteMountainCarEnv.py" />
+        <option value="$PROJECT_DIR$/environment/gymEnv/tests/testDiscreteMountainCarEnv.py" />
+        <option value="$PROJECT_DIR$/environment/gymEnv/discreteMountainCarEnv.py" />
+        <option value="$PROJECT_DIR$/dqn/src/dqn.py" />
+        <option value="$PROJECT_DIR$/environment/gymEnv/pendulumEnv.py" />
+        <option value="$PROJECT_DIR$/dqn/exec/runMountCarDiscreteDQN.py" />
+        <option value="$PROJECT_DIR$/RLframework/RLrun.py" />
+        <option value="$PROJECT_DIR$/dqn/exec/runPendulumDQN.py" />
+        <option value="$PROJECT_DIR$/maddpg/exec.py" />
+        <option value="$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple.py" />
+        <option value="$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/common/distributions.py" />
+        <option value="$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/trainer/maddpg.py" />
+        <option value="$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/environment.py" />
+        <option value="$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_tag.py" />
+        <option value="$PROJECT_DIR$/environment/gymEnv/multiAgentEnv.py" />
+        <option value="$PROJECT_DIR$/environment/gymEnv/chasingGymEnv.py" />
+        <option value="$PROJECT_DIR$/maddpg/maddpg_openai/experiments/train.py" />
       </list>
     </option>
   </component>
@@ -297,6 +256,7 @@
     <option name="width" value="915" />
     <option name="height" value="900" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -318,37 +278,7 @@
             <path>
               <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
               <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="ddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
               <item name="dqn" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="dqn" type="462c0819:PsiDirectoryNode" />
-              <item name="exec" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="dqn" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="dqn" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
@@ -358,67 +288,13 @@
             <path>
               <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
               <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="environment" type="462c0819:PsiDirectoryNode" />
-              <item name="gymEnv" type="462c0819:PsiDirectoryNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
               <item name="maddpg" type="462c0819:PsiDirectoryNode" />
-              <item name="RLframework" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="maddpg" type="b5f07198:RTreeStructureProvider$1" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="maddpg" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="dqn" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="maddpg" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="dqn" type="462c0819:PsiDirectoryNode" />
-              <item name="exec" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="maddpg" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="environment" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="maddpg" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="environment" type="462c0819:PsiDirectoryNode" />
-              <item name="gymEnv" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-              <item name="&lt; Python 3.7 &gt;" type="70bed36:NamedLibraryElementNode" />
-              <item name="maddpg" type="b5f07198:RTreeStructureProvider$1" />
-              <item name="environment" type="462c0819:PsiDirectoryNode" />
-              <item name="gymEnv" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
+              <item name="maddpg" type="462c0819:PsiDirectoryNode" />
+              <item name="maddpg_openai" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="maddpg" type="b2602c69:ProjectViewProjectNode" />
@@ -435,7 +311,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/environment/gymEnv/tests" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/maddpg" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -449,13 +325,14 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/maddpg" />
       <recent name="$PROJECT_DIR$/visualize" />
       <recent name="$PROJECT_DIR$/environment/chasingEnv" />
       <recent name="$PROJECT_DIR$/dqn/src" />
       <recent name="$PROJECT_DIR$/dqn/exec" />
-      <recent name="$PROJECT_DIR$/functionTools" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/maddpg" />
       <recent name="$PROJECT_DIR$/environment/gymEnv/tests" />
       <recent name="$PROJECT_DIR$/ddpg/exec" />
       <recent name="$PROJECT_DIR$/ddpg/tests" />
@@ -473,29 +350,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.testMountainCarEnv">
-    <configuration name="buildSheepDDPG" type="PythonConfigurationType" factoryName="Python">
-      <module name="maddpg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg/exec" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.openAImaddpg">
     <configuration name="ddpgMountainCar" type="PythonConfigurationType" factoryName="Python">
       <module name="maddpg" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -562,6 +417,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="openAImaddpg" type="PythonConfigurationType" factoryName="Python">
+      <module name="maddpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/maddpg/maddpg_openai/experiments" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/maddpg/maddpg_openai/experiments/train.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="runGymPendulum" type="PythonConfigurationType" factoryName="Python">
       <module name="maddpg" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -576,6 +453,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ddpg/exec/runPendulumDDPGWithGym.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="runMountCarDiscreteDQN" type="PythonConfigurationType" factoryName="Python">
+      <module name="maddpg" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/dqn/exec" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/dqn/exec/runMountCarDiscreteDQN.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -707,7 +606,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/environment/gymEnv/tests/testContinuousMountainCarEnv.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/environment/gymEnv/tests/testDiscreteMountainCarEnv.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -760,30 +659,8 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="visualize" type="PythonConfigurationType" factoryName="Python">
-      <module name="maddpg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ddpg/exec" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/visualize/visualizeContinuousChasing.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
-      <item itemvalue="Python.buildSheepDDPG" />
+      <item itemvalue="Python.runMountCarDiscreteDQN" />
       <item itemvalue="Python.runPendulumDQN" />
       <item itemvalue="Python.testCritic" />
       <item itemvalue="Python.testDQN" />
@@ -795,7 +672,7 @@
       <item itemvalue="Python.testDDPGStructure" />
       <item itemvalue="Python.try" />
       <item itemvalue="Python.ddpgMountainCar" />
-      <item itemvalue="Python.visualize" />
+      <item itemvalue="Python.openAImaddpg" />
       <item itemvalue="Python.runPendulumDDPG" />
     </list>
   </component>
@@ -811,12 +688,12 @@
       <updated>1584475655431</updated>
       <workItem from="1584475657671" duration="115797000" />
       <workItem from="1586360760445" duration="57145000" />
-      <workItem from="1587220373193" duration="135822000" />
+      <workItem from="1587220373193" duration="161675000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="308764000" />
+    <option name="totallyTimeSpent" value="334617000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -829,14 +706,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.31916428" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30475503" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.22564735" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985591" visible="true" weight="0.08014797" />
+      <window_info anchor="bottom" id="Find" order="1" visible="true" weight="0.06288533" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985591" weight="0.1541307" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49927953" weight="0.24784216" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -850,7 +726,7 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" weight="0.370317" />
+      <window_info anchor="right" id="SciView" order="3" weight="0.25288185" />
       <window_info anchor="right" id="R Graphics" order="4" />
       <window_info anchor="right" id="R Packages" order="5" />
       <window_info anchor="right" id="Database" order="6" />
@@ -901,21 +777,21 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/maddpg$visualize.coverage" NAME="visualize Coverage Results" MODIFIED="1587262507024" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$visualize.coverage" NAME="openAImaddpg Coverage Results" MODIFIED="1588643179553" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/maddpg/maddpg_openai/experiments" />
     <SUITE FILE_PATH="coverage/maddpg$saveTraj.coverage" NAME="generateTraj Coverage Results" MODIFIED="1586358933300" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$testPolicy.coverage" NAME="testPolicy Coverage Results" MODIFIED="1587261252389" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
     <SUITE FILE_PATH="coverage/maddpg$functionReferences.coverage" NAME="functionReferences Coverage Results" MODIFIED="1585331966902" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg" />
     <SUITE FILE_PATH="coverage/maddpg$testEnv.coverage" NAME="testEnv Coverage Results" MODIFIED="1586971561135" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
     <SUITE FILE_PATH="coverage/maddpg$generateTraj.coverage" NAME="generateTraj2D Coverage Results" MODIFIED="1587154601516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$testCritic.coverage" NAME="testCritic Coverage Results" MODIFIED="1588297399978" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
-    <SUITE FILE_PATH="coverage/maddpg$buildSheepDDPG.coverage" NAME="buildSheepDDPG Coverage Results" MODIFIED="1587315309976" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$buildSheepDDPG.coverage" NAME="runMountCarDiscreteDQN Coverage Results" MODIFIED="1588560085780" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/dqn/exec" />
     <SUITE FILE_PATH="coverage/maddpg$try.coverage" NAME="runPendulumDDPG Coverage Results" MODIFIED="1588309431401" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$buildSheepDDPGModel.coverage" NAME="buildSheepDDPGModel Coverage Results" MODIFIED="1587232448612" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$morvanDDPG.coverage" NAME="expDDPGinChasing Coverage Results" MODIFIED="1587274609486" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$testActor.coverage" NAME="testDQN Coverage Results" MODIFIED="1588354699715" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/dqn/tests" />
     <SUITE FILE_PATH="coverage/maddpg$generateTraj2D.coverage" NAME="try Coverage Results" MODIFIED="1588288154872" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$evaluatePendulum.coverage" NAME="evaluatePendulum Coverage Results" MODIFIED="1588310215724" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
-    <SUITE FILE_PATH="coverage/maddpg$testPendulumEnv.coverage" NAME="testMountainCarEnv Coverage Results" MODIFIED="1588439534442" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/environment/gymEnv/tests" />
+    <SUITE FILE_PATH="coverage/maddpg$testPendulumEnv.coverage" NAME="testMountainCarEnv Coverage Results" MODIFIED="1588477811404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/environment/gymEnv/tests" />
     <SUITE FILE_PATH="coverage/maddpg$mountainCar.coverage" NAME="mountainCar Coverage Results" MODIFIED="1587965522194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$testOneStepDDPG.coverage" NAME="testCritic Coverage Results" MODIFIED="1587153717498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
     <SUITE FILE_PATH="coverage/maddpg$testReward.coverage" NAME="testReward Coverage Results" MODIFIED="1586971557728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
@@ -923,7 +799,7 @@
     <SUITE FILE_PATH="coverage/maddpg$cartPole.coverage" NAME="runGymPendulum Coverage Results" MODIFIED="1588283553003" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$testDDPG.coverage" NAME="testDDPG Coverage Results" MODIFIED="1586305871885" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
     <SUITE FILE_PATH="coverage/maddpg$ddpg_refactored.coverage" NAME="buildSheepDDPGModel Coverage Results" MODIFIED="1586321162538" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
-    <SUITE FILE_PATH="coverage/maddpg$runGymDQN.coverage" NAME="runPendulumDQN Coverage Results" MODIFIED="1588350239266" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/maddpg$runGymDQN.coverage" NAME="runPendulumDQN Coverage Results" MODIFIED="1588565470429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
@@ -988,306 +864,6 @@ plt.show()</expression-string>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/ddpg/trainedDDPGModels/checkpoint">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20">
-          <caret line="1" column="40" selection-start-line="1" selection-start-column="40" selection-end-line="1" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/gym/envs/registration.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="411">
-          <caret line="25" column="68" selection-start-line="25" selection-start-column="68" selection-end-line="25" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/chasingEnv/envNoPhysics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="2" column="17" lean-forward="true" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/tensorflow/python/training/saver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="369">
-          <caret line="1316" lean-forward="true" selection-start-line="1316" selection-end-line="1316" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_55.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1940">
-          <caret line="97" column="92" selection-start-line="97" selection-start-column="92" selection-end-line="97" selection-end-column="92" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_batchNorm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7148">
-          <caret line="77" column="63" selection-start-line="77" selection-start-column="50" selection-end-line="77" selection-end-column="63" />
-          <folding>
-            <element signature="e#1#24#0" expanded="true" />
-            <element signature="e#6625#6666#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="507" column="36" selection-start-line="507" selection-start-column="36" selection-end-line="507" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#19114#20559#0" />
-            <element signature="e#21750#22694#0" />
-            <element signature="e#22727#23311#0" />
-            <element signature="e#23336#23854#0" />
-            <element signature="e#24471#24496#0" />
-            <element signature="e#24962#24986#0" />
-            <element signature="e#32053#32213#0" />
-            <element signature="e#31773#31832#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_withModifiedCritic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="75" selection-start-line="75" selection-end-line="76" selection-end-column="53" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGChasingTraj2D.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1123">
-          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/chasingEnv/reward.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGChasingTraj1D.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-            <element signature="e#564#1234#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/pandas/core/groupby/ops.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="189" selection-start-line="189" selection-end-line="189" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/DDPG psedocode.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/references/onlineDDPG.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="322" column="34" selection-start-line="322" selection-start-column="34" selection-end-line="322" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#6004#7717#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/references/A2C.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="185" column="28" lean-forward="true" selection-start-line="185" selection-start-column="28" selection-end-line="185" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/numpy/core/overrides.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="45" selection-start-line="45" selection-end-line="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/gymEnv/tests/testPendulumEnv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="75" column="12" lean-forward="true" selection-start-line="75" selection-end-line="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/gymEnv/gymPendulumEnv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="92" column="37" selection-start-line="92" selection-start-column="37" selection-end-line="92" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/tensorflow/python/framework/op_def_library.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="546" selection-start-line="546" selection-end-line="546" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/anaconda3/lib/python3.7/site-packages/tensorflow/python/client/session.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="1127" selection-start-line="1127" selection-end-line="1127" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/runGymMountainCar_Continuous.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="72" column="59" lean-forward="true" selection-start-line="72" selection-start-column="59" selection-end-line="72" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/gymEnv/pendulumEnv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="64" column="22" selection-start-line="63" selection-start-column="6" selection-end-line="64" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-            <element signature="e#135#943#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/buildSheepDDPGModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2623">
-          <caret line="22" column="11" selection-start-line="22" selection-start-column="11" selection-end-line="22" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/chasingEnv/tests/testChasingPolicy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="5" column="50" selection-start-line="5" selection-start-column="50" selection-end-line="5" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/modelEval.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/chasingEnv/continuousChasingVisualization.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2420">
-          <caret line="121" column="37" lean-forward="true" selection-start-line="121" selection-start-column="37" selection-end-line="121" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/chasingEnv/chasingPolicy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="13" column="34" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/functionTools/trajectory.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="440">
-          <caret line="22" selection-start-line="22" selection-end-line="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/exec/runChasingWithSourceDDPG.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4300">
-          <caret line="357" column="42" lean-forward="true" selection-start-line="357" selection-start-column="42" selection-end-line="357" selection-end-column="42" />
-          <folding>
-            <element signature="e#237#260#0" expanded="true" />
-            <element signature="e#1095#4354#0" />
-            <element signature="e#4462#7519#0" />
-            <element signature="e#7601#8188#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/visualize/visualizeContinuousChasing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="18" column="17" lean-forward="true" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/visualize/visualizePendulum.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/functionTools/loadSaveModel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="3" column="18" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/chasingEnv/tests/testEnvNoPhysics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="820">
-          <caret line="41" selection-start-line="41" selection-end-line="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/noise/noise.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="12" column="29" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/src/policy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
@@ -1355,47 +931,6 @@ plt.show()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dqn/exec/runPendulumDQN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="245">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
-          <folding>
-            <element signature="e#0#25#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_generic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="346" column="8" selection-start-line="346" selection-start-column="8" selection-end-line="346" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dqn/src/dqn.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="184" selection-start-line="184" selection-end-line="189" selection-end-column="54" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-            <element signature="e#179#860#0" />
-            <element signature="e#906#1114#0" />
-            <element signature="e#1160#1373#0" />
-            <element signature="e#1441#1772#0" />
-            <element signature="e#1829#8728#0" />
-            <element signature="e#2208#2738#0" />
-            <element signature="e#2806#3036#0" />
-            <element signature="e#3220#4623#0" />
-            <element signature="e#4693#6101#0" />
-            <element signature="e#7361#7449#0" />
-            <element signature="e#10941#10942#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/tests/testActor.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="866">
@@ -1420,27 +955,6 @@ plt.show()</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/RLframework/RLrun.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="49" column="30" lean-forward="true" selection-start-line="49" selection-start-column="30" selection-end-line="49" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#2494#3553#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/environment/gymEnv/gymContinousMountainCarEnv.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="157" column="38" lean-forward="true" selection-start-line="157" selection-start-column="38" selection-end-line="157" selection-end-column="38" />
-          <folding>
-            <element signature="e#441#452#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/environment/gymEnv/tests/testContinuousMountainCarEnv.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="230">
@@ -1448,13 +962,369 @@ plt.show()</expression-string>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/gymDiscreteMountainCarEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="417">
+          <caret line="55" column="21" lean-forward="true" selection-start-line="55" selection-start-column="21" selection-end-line="55" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/gymContinousMountainCarEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="283">
+          <caret line="157" column="38" lean-forward="true" selection-start-line="157" selection-start-column="38" selection-end-line="157" selection-end-column="38" />
+          <folding>
+            <element signature="e#441#452#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/environment/gymEnv/continousMountainCarEnv.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="110" column="48" lean-forward="true" selection-start-line="110" selection-start-column="48" selection-end-line="110" selection-end-column="48" />
+        <state relative-caret-position="380">
+          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
           <folding>
             <element signature="e#0#29#0" expanded="true" />
             <element signature="e#116#1017#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/tests/testDiscreteMountainCarEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="244">
+          <caret line="90" lean-forward="true" selection-start-line="90" selection-end-line="90" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/discreteMountainCarEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="385">
+          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dqn/src/dqn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="44" lean-forward="true" selection-start-line="11" selection-start-column="44" selection-end-line="11" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <element signature="e#906#1114#0" />
+            <element signature="e#1441#1772#0" />
+            <element signature="e#1829#8728#0" />
+            <element signature="e#2208#2738#0" />
+            <element signature="e#2806#3036#0" />
+            <element signature="e#3220#4623#0" />
+            <element signature="e#4693#6101#0" />
+            <element signature="e#7361#7449#0" />
+            <element signature="e#10941#10942#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RLframework/RLrun.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="147">
+          <caret line="71" column="51" selection-start-line="71" selection-start-column="51" selection-end-line="71" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dqn/exec/runMountCarDiscreteDQN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="34" column="22" lean-forward="true" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/pendulumEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="76" selection-start-line="76" selection-end-line="76" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dqn/exec/runPendulumDQN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="39" column="33" lean-forward="true" selection-start-line="39" selection-start-column="33" selection-end-line="39" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_generic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="241">
+          <caret line="170" column="26" lean-forward="true" selection-start-line="170" selection-start-column="26" selection-end-line="170" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/exec.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="147">
+          <caret line="35" column="26" selection-start-line="35" selection-start-column="26" selection-end-line="35" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#3097#3636#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2">
+          <caret line="132" column="9" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/replay_buffer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="17" column="22" selection-start-line="17" selection-start-column="22" selection-end-line="17" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/tf_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3730">
+          <caret line="15" column="38" selection-start-line="15" selection-start-column="38" selection-end-line="15" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_reference.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-482">
+          <caret line="26" column="31" selection-start-line="26" selection-start-column="31" selection-end-line="26" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_spread.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-238">
+          <caret line="23" column="32" selection-start-line="23" selection-start-column="32" selection-end-line="23" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_speaker_listener.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_push.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_crypto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_world_comm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="470">
+          <caret line="175" column="31" lean-forward="true" selection-start-line="175" selection-start-column="31" selection-end-line="175" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_adversary.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/simple.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="3" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/common/distributions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="8" column="7" lean-forward="true" selection-start-line="8" selection-start-column="7" selection-end-line="8" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenario.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/policy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/multi_discrete.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" column="30" lean-forward="true" selection-start-line="14" selection-start-column="30" selection-end-line="14" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/trainer/replay_buffer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/common/tf_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1007">
+          <caret line="108" lean-forward="true" selection-start-line="108" selection-end-line="108" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/chasingGymEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="63" column="29" lean-forward="true" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/maddpg/trainer/maddpg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="118" column="52" selection-start-line="118" selection-start-column="41" selection-end-line="118" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/experiments/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="62" column="23" selection-start-line="62" selection-start-column="23" selection-end-line="62" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/environment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="386">
+          <caret line="20" column="14" lean-forward="true" selection-start-line="20" selection-start-column="14" selection-end-line="20" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/environment/gymEnv/multiAgentEnv.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2680">
+          <caret line="134" column="29" lean-forward="true" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/scenarios/simple_tag.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="380">
+          <caret line="19" column="24" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/rendering.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-496">
+          <caret line="160" column="31" lean-forward="true" selection-start-line="160" selection-start-column="31" selection-end-line="160" selection-end-column="31" />
+          <folding>
+            <element signature="e#31#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="349">
+          <caret line="185" column="55" lean-forward="true" selection-start-line="185" selection-start-column="55" selection-end-line="185" selection-end-column="55" />
+          <folding>
+            <element signature="e#695#1298#0" />
+            <element signature="e#1363#1423#0" />
           </folding>
         </state>
       </provider>
