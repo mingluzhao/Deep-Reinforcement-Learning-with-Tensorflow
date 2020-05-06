@@ -4,7 +4,6 @@ import random
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-
 def resetTargetParamToTrainParam(modelList):
     updatedModels = []
     for model in modelList:
@@ -15,37 +14,33 @@ def resetTargetParamToTrainParam(modelList):
     return updatedModels
 
 
-class UpdateParameters:
-    def __init__(self, paramUpdateInterval, tau = None):
-        self.paramUpdateInterval = paramUpdateInterval
-        self.tau = tau
-
-    def __call__(self, model, runTime = None):
-        if runTime is None or runTime % self.paramUpdateInterval == 0:
-            graph = model.graph
-            updateParam_ = graph.get_collection_ref("updateParam_")[0]
-            if self.tau is not None:
-                # soft replace
-                tau_ = graph.get_collection_ref("tau_")[0]
-                model.run(updateParam_, feed_dict={tau_: self.tau})
-            else:
-                # hard replace
-                model.run(updateParam_)
-        return model
-
-
 def addToMemory(buffer, state, action, reward, nextState):
     experience = (state, action, reward, nextState)
     buffer.append(experience)
     return buffer
 
 
+class UpdateParameters:
+    def __init__(self, paramUpdateInterval, tau = None):
+        self.paramUpdateInterval = paramUpdateInterval
+        self.tau = tau # soft replace
+
+    def __call__(self, model, runTime):
+        if runTime % self.paramUpdateInterval == 0:
+            graph = model.graph
+            updateParam_ = graph.get_collection_ref("updateParam_")[0]
+            if self.tau is not None:
+                tau_ = graph.get_collection_ref("tau_")[0]
+                model.run(updateParam_, feed_dict={tau_: self.tau})
+            else:
+                model.run(updateParam_)
+        return model
+
 
 class RunTimeStep:
     def __init__(self, actOneStep, transit, getReward, isTerminal, addToMemory,
                  trainModels, minibatchSize, learningStartBufferSize, observe = None):
         self.actOneStep = actOneStep
-
         self.transit = transit
         self.getReward = getReward
         self.isTerminal = isTerminal
@@ -62,9 +57,9 @@ class RunTimeStep:
         observation = np.asarray(observation).reshape(1, -1)
         action = self.actOneStep(modelList, observation, runTime)
 
+        terminal = self.isTerminal(state)
         nextState = self.transit(state, action)
         reward = self.getReward(state, action)
-        terminal = self.isTerminal(nextState)
         nextObservation = self.observe(nextState) if self.observe is not None else nextState
         replayBuffer = self.addToMemory(replayBuffer, observation, action, reward, nextObservation)
         trajectory.append((state, action))
@@ -113,10 +108,10 @@ class RunEpisode:
         for timeStep in range(self.maxTimeStep):
             reward, state, modelList, replayBuffer, terminal, trajectory = \
                 self.runTimeStep(state, modelList, replayBuffer, trajectory)
+            episodeReward += reward
             if terminal:
                 print('------------terminal-----------------')
                 break
-            episodeReward += reward
         print('episodeReward: ', episodeReward)
         return modelList, replayBuffer, episodeReward, trajectory
 

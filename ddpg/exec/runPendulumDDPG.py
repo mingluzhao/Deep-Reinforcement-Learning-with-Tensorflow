@@ -1,24 +1,31 @@
-from src.ddpg_generic import *
-from RLframework.RLrun import *
+import matplotlib.pyplot as plt
+import gym
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+    BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients,\
+    TrainActorOneStep, TrainActor, TrainDDPGModels
+from RLframework.RLrun import resetTargetParamToTrainParam, addToMemory, UpdateParameters, RunTimeStep, \
+    RunEpisode, RunAlgorithm
 from src.policy import ActDDPGOneStepWithNoise
 from environment.noise.noise import GetExponentialDecayGaussNoise
-from environment.gymEnv.pendulumEnv import *
-from functionTools.loadSaveModel import *
-import matplotlib.pyplot as plt
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, isTerminalGymPendulum, \
+    observe, angle_normalize, VisualizeGymPendulum, ResetGymPendulum
+from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
 
 maxEpisode = 200
 maxTimeStep = 200
-learningRateActor = 0.001    # learning rate for actor
-learningRateCritic = 0.001    # learning rate for critic
-gamma = 0.9     # reward discount
+learningRateActor = 0.001
+learningRateCritic = 0.001
+gamma = 0.9
 tau=0.01
-bufferSize = 20000
+bufferSize = 10000
 minibatchSize = 128
 seed = 1
 
 ENV_NAME = 'Pendulum-v0'
-env = gym.make('Pendulum-v0')
+env = gym.make(ENV_NAME)
 env = env.unwrapped
 
 def main():
@@ -35,7 +42,6 @@ def main():
     buildCriticModel = BuildCriticModel(stateDim, actionDim)
     criticLayerWidths = [30]
     criticWriter, criticModel = buildCriticModel(criticLayerWidths)
-
 
     trainCriticBySASRQ = TrainCriticBySASRQ(learningRateCritic, gamma, criticWriter)
     trainCritic = TrainCritic(actByPolicyTarget, evaluateCriticTarget, trainCriticBySASRQ)
@@ -76,8 +82,9 @@ def main():
     modelIndex = 0
     actorFixedParam = {'actorModel': modelIndex}
     criticFixedParam = {'criticModel': modelIndex}
-    parameters = {'maxEpisode': maxEpisode, 'maxTimeStep': maxTimeStep, 'minibatchSize': minibatchSize, 'gamma': gamma,
-                                 'learningRateActor': learningRateActor, 'learningRateCritic': learningRateCritic, 'noiseVar': noiseInitVariance, 'varDiscout': varianceDiscount}
+    parameters = {'env': ENV_NAME, 'Eps': maxEpisode, 'timeStep': maxTimeStep, 'batch': minibatchSize,
+                  'gam': gamma, 'lrActor': learningRateActor, 'lrCritic': learningRateCritic,
+                  'noiseVar': noiseInitVariance, 'varDiscout': varianceDiscount}
 
     modelSaveDirectory = "../trainedDDPGModels"
     modelSaveExtension = '.ckpt'

@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg_generic import *
+from src.ddpg import *
 from RLframework.RLrun import *
 from src.policy import *
 
@@ -115,7 +115,7 @@ class TestCritic(unittest.TestCase):
     # def testActionGradients(self, stateBatch, actionBatch):
     #     criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths, self.criticTargetLayerWidths)
     #     criticGraph = criticModel.graph
-    #
+
     #     actionGradients_ = criticGraph.get_collection_ref("actionGradients_")[0]
     #     states_ = criticGraph.get_collection_ref("states_")[0]
     #     action_ = criticGraph.get_collection_ref("action_")[0]

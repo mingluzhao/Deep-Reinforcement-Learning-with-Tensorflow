@@ -1,7 +1,7 @@
 import pandas as pd
 import pylab as plt
 from collections import OrderedDict
-from src.ddpg_generic import *
+from src.ddpg import *
 from RLframework.RLrun import *
 from src.policy import ActDDPGOneStepWithNoise
 from functionTools.loadSaveModel import *
@@ -45,8 +45,6 @@ class EvaluateNoiseAndMemorySize:
         timeStep = list(range(len(meanRewardList)))
         resultSe = pd.Series({time: reward for time, reward in zip(timeStep, meanRewardList)})
 
-        # resultSe = pd.Series({'episodeReward': episodeRewardList, 'meanRewardList': meanRewardList})
-
         if self.saveModel:
             actorParameters = {'ActorMemorySize': memorySize, 'NoiseVariance': noiseVariance }
             criticParameters ={'CriticMemorySize': memorySize, 'NoiseVariance': noiseVariance }
@@ -88,11 +86,8 @@ def main():
     fixedParameters['learningStartStep'] = fixedParameters['batchSize']
 
     independentVariables = OrderedDict()
-    # independentVariables['noiseInitVariance'] = [1, 2, 3, 4]
-    # independentVariables['memorySize'] = [1000, 5000, 10000, 20000]
-    independentVariables['noiseInitVariance'] = [1, 4]
-    independentVariables['memorySize'] = [1000, 20000]
-
+    independentVariables['noiseInitVariance'] = [1, 2, 3, 4]
+    independentVariables['memorySize'] = [1000, 5000, 10000, 20000]
 
     buildActorModel = BuildActorModel(fixedParameters['stateDim'], fixedParameters['actionDim'], fixedParameters['actionBound'])
     actorWriter, actorModel = buildActorModel(fixedParameters['actorLayerWidths'])

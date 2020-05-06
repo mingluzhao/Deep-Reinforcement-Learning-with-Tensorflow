@@ -18,33 +18,6 @@ class AddActionNoise():
 
         return action
 
-#
-# class ActAngleWithNoise:
-#     def __init__(self, actByModel, addActionNoise):
-#         self.actByModel = actByModel
-#         self.addActionNoise = addActionNoise
-#
-#     def __call__(self, actorModel, stateBatch, timeStep):
-#         actionPerfect = self.actByModel(actorModel, stateBatch)
-#         actionAngle = self.addActionNoise(actionPerfect, timeStep)
-#         return actionAngle
-
-
-class ActOneStepWithNoise1D:
-    def __init__(self, actByModel, addActionNoise, actByAngle, transitionFunction):
-        self.actByModel = actByModel
-        self.addActionNoise = addActionNoise
-        self.actByAngle = actByAngle
-        self.transitionFunction = transitionFunction
-
-    def __call__(self, timeStep, actorModel, state):
-        stateBatch = np.asarray(state).reshape(1, -1)
-        actionPerfect = self.actByModel(actorModel, stateBatch)
-        actionOutput = self.addActionNoise(actionPerfect, timeStep)
-        action = self.actByAngle(actionOutput)[0]
-        nextState = self.transitionFunction(state, action)
-        return state, actionOutput, nextState
-
 
 class ActOneStepWithNoise2D:
     def __init__(self, actByModel, addActionNoise, transitionFunction, rewardFunction, isTerminal):
@@ -62,9 +35,6 @@ class ActOneStepWithNoise2D:
         reward = np.array([self.rewardFunction(state) for state in stateBatch])
         terminal = self.isTerminal(nextState)
         return state, action, reward, nextState, terminal
-
-
-
 
 
 class ActByDDPG1D:

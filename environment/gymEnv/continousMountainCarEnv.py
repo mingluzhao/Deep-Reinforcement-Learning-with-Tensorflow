@@ -35,7 +35,12 @@ class RewardMountCarContin:
 
     def __call__(self, state, action):
         done = self.isTerminal(state)
-        reward = 100.0 if done else 0
+        if done:
+            reward = 100
+            print("done, reward = 100")
+        else:
+            reward = 0
+        # reward = 100.0 if done else 0
         reward -= math.pow(action[0], 2) * 0.1
 
         return reward
@@ -58,12 +63,17 @@ class IsTerminalMountCarContin:
 
 
 class ResetMountCarContin:
-    def __init__(self, seed):
+    def __init__(self, seed = None, low = -0.6, high = -0.4):
         self.seed = seed
+        self.low = low
+        self.high = high
 
     def __call__(self):
-        np_random, seed = seeding.np_random(self.seed)
-        state = np.array([np_random.uniform(low=-0.6, high=-0.4), 0])
+        if self.seed is not None:
+            np_random, seed = seeding.np_random(self.seed)
+            state = np.array([np_random.uniform(self.low, self.high), 0])
+        else:
+            state = np.array([random.uniform(self.low, self.high), 0])
 
         return state
 

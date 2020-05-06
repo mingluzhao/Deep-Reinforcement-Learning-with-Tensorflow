@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg_generic import *
+from src.ddpg import *
 from RLframework.RLrun import *
 from src.policy import *
 

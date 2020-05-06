@@ -1,141 +1,125 @@
+import matplotlib.pyplot as plt
 import gym
-from src.ddpg import *
-from environment.noise.noise import *
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+    BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients,\
+    TrainActorOneStep, TrainActor, TrainDDPGModels
+from RLframework.RLrun import resetTargetParamToTrainParam, addToMemory, UpdateParameters, RunTimeStep, \
+    RunEpisode, RunAlgorithm
+from src.policy import ActDDPGOneStepWithNoise
+from environment.noise.noise import GetExponentialDecayGaussNoise
+from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
+from environment.gymEnv.continousMountainCarEnv import *
 
 
-class ActMountainWithNoise:
-    def __init__(self, noise, actionRange, actByPolicyTrain):
-        self.noise = noise
-        self.actionRange = abs(actionRange)
-        self.actByPolicyTrain = actByPolicyTrain
-
-    def __call__(self, pointer, actorModel, state):
-        stateBatch = np.asarray(state).reshape(1, -1)
-        actionPerfect = self.actByPolicyTrain(actorModel, stateBatch)[0]
-        addedNoise = self.noise.sample()
-        action = actionPerfect + self.noise.epsilon * addedNoise
-        nextState, reward, terminal, info = env.step(action)
-        self.noise.update()
-
-        return state, action, reward, nextState, terminal
-
-
-# class ActInGymWithNoise:
-#     def __init__(self, var, varianceDiscount, actionRange, actByPolicyTrain):
-#         self.var = var
-#         self.varianceDiscount = varianceDiscount
-#         self.actionRange = abs(actionRange)
-#         self.actByPolicyTrain = actByPolicyTrain
-#
-#     def __call__(self, pointer, actorModel, state):
-#         var = self.var
-#         if pointer > MEMORY_CAPACITY:
-#             var = self.var* self.varianceDiscount ** (pointer - MEMORY_CAPACITY)
-#         stateBatch = np.asarray(state).reshape(1, -1)
-#         actionPerfect = self.actByPolicyTrain(actorModel, stateBatch)[0]
-#         action = np.clip(np.random.normal(actionPerfect, var), -self.actionRange, self.actionRange)
-#         nextState, reward, terminal, info = env.step(action)
-#
-#         return state, action, reward, nextState, terminal
-
-# class ActInGymWithNoise:
-#     def __init__(self, actionRange, getNoise, actByPolicyTrain):
-#         self.actionRange = actionRange
-#         self.getNoise = getNoise
-#         self.actByPolicyTrain = actByPolicyTrain
-#
-#     def __call__(self, actorModel, state, oldNoise):
-#         stateBatch = np.asarray(state).reshape(1, -1)
-#         actionPerfect = self.actByPolicyTrain(actorModel, stateBatch)[0]
-#         noise = self.getNoise(oldNoise, actionPerfect)
-#         action = np.clip(actionPerfect + noise, -self.actionRange, self.actionRange)
-#         nextState, reward, terminal, info = env.step(action)
-#
-#         return state, action, reward, nextState, terminal, noise
-
-# class ActPendulumWithNoise:
-#     def __init__(self, var, varianceDiscount, actionRange, actByPolicyTrain):
-#         self.var = var
-#         self.varianceDiscount = varianceDiscount
-#         self.actionRange = abs(actionRange)
-#         self.actByPolicyTrain = actByPolicyTrain
-#
-#     def __call__(self, actorModel, state):
-#         var = self.var
-#         stateBatch = np.asarray(state).reshape(1, -1)
-#         actionPerfect = self.actByPolicyTrain(actorModel, stateBatch)[0]
-#         action = np.clip(np.random.normal(actionPerfect, var), -self.actionRange, self.actionRange)
-#         nextState, reward, terminal, info = env.step(action)
-#
-#         return state, action, reward, nextState, terminal
-
-#####################  hyper parameters  ####################
-
-MAX_EPISODES = 200
-MAX_EP_STEPS = 1000
-LR_A = 1e-2    # learning rate for actor
-LR_C = 5e-3  # learning rate for critic
-GAMMA = 0.99     # reward discount
+maxEpisode = 300
+maxTimeStep = 1000
+learningRateActor = 1e-2    # learning rate for actor
+learningRateCritic = 5e-3  # learning rate for critic
+gamma = 0.99     # reward discount
 tau=0.001
-MEMORY_CAPACITY = 1000000
-BATCH_SIZE = 64
-learningStartBufferSize = 20000
+bufferSize = 100000
+minibatchSize = 64
 
-RENDER = True
-OUTPUT_GRAPH = True
-# ENV_NAME = 'CartPole-v0'
+seed = 1
 
 ENV_NAME = 'MountainCarContinuous-v0'
-
 env = gym.make(ENV_NAME)
 env = env.unwrapped
-seed = 14
-env.seed(seed)
 
 def main():
-    state_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.shape[0]
-    action_bound = env.action_space.high
+    stateDim = env.observation_space.shape[0]
+    actionDim = env.action_space.shape[0]
+    actionHigh = env.action_space.high
+    actionLow = env.action_space.low
+    actionBound = (actionHigh - actionLow)/2
 
-    buildActorModel = BuildActorModel(state_dim, action_dim, action_bound)
-    actorTrainingLayerWidths = [256, 128]
-    actorTargetLayerWidths = actorTrainingLayerWidths
-    actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
+    buildActorModel = BuildActorModel(stateDim, actionDim, actionBound)
+    actorLayerWidths = [256, 128]
+    actorWriter, actorModel = buildActorModel(actorLayerWidths)
 
-    buildCriticModel = BuildCriticModel(state_dim, action_dim)
-    criticTrainingLayerWidths = [256, 128]
-    criticTargetLayerWidths = criticTrainingLayerWidths
-    criticWriter, criticModel = buildCriticModel(criticTrainingLayerWidths, criticTargetLayerWidths)
+    buildCriticModel = BuildCriticModel(stateDim, actionDim)
+    criticLayerWidths = [256, 128]
+    criticWriter, criticModel = buildCriticModel(criticLayerWidths)
 
-    updateParameters = UpdateParameters(tau)
-
-    trainCriticBySASRQ = TrainCriticBySASRQ(LR_C, GAMMA, criticWriter)
+    trainCriticBySASRQ = TrainCriticBySASRQ(learningRateCritic, gamma, criticWriter)
     trainCritic = TrainCritic(actByPolicyTarget, evaluateCriticTarget, trainCriticBySASRQ)
 
-    trainActorFromGradients = TrainActorFromGradients(LR_A, actorWriter)
+    trainActorFromGradients = TrainActorFromGradients(learningRateActor, actorWriter)
     trainActorOneStep = TrainActorOneStep(actByPolicyTrain, trainActorFromGradients, getActionGradients)
     trainActor = TrainActor(trainActorOneStep)
 
-    updateModelsByMiniBatch = UpdateModelsByMiniBatch(trainActor, trainCritic)
-
-    noise = OUNoise(action_dim, seed, mu=0., theta=0.15, sigma=0.2)
-    actOneStepWithNoise = ActMountainWithNoise(noise, action_bound, actByPolicyTrain)
-    rewardScalingFactor = 1
-    addToMemory = AddToMemory(rewardScalingFactor)
     paramUpdateInterval = 1
-    runDDPGTimeStep = RunDDPGTimeStep(actOneStepWithNoise, addToMemory, updateModelsByMiniBatch,
-                                      updateParameters, BATCH_SIZE, learningStartBufferSize, paramUpdateInterval, env)
+    updateParameters = UpdateParameters(paramUpdateInterval, tau)
+    trainModels = TrainDDPGModels(updateParameters, trainActor, trainCritic)
 
-    reset = lambda: env.reset()
-    runEpisode = RunEpisode(reset, runDDPGTimeStep, MAX_EP_STEPS)
+    noiseInitVariance = 2  # control exploration
+    varianceDiscount = .99995
+    noiseDecayStartStep = bufferSize
+    getNoise = GetExponentialDecayGaussNoise(noiseInitVariance, varianceDiscount, noiseDecayStartStep)
+    actOneStepWithNoise = ActDDPGOneStepWithNoise(actionLow, actionHigh, actByPolicyTrain, getNoise)
 
-    ddpg = DDPG(initializeMemory, runEpisode, MEMORY_CAPACITY, MAX_EPISODES)
-    trainedActorModel, trainedCriticModel = ddpg(actorModel, criticModel)
+    learningStartBufferSize = minibatchSize
+    transit = TransitGymMountCarContinuous()
+    isTerminal = IsTerminalMountCarContin()
+    getReward = RewardMountCarContin(isTerminal)
 
-    env.close()
+    runDDPGTimeStep = RunTimeStep(actOneStepWithNoise, transit, getReward, isTerminal, addToMemory,
+                 trainModels, minibatchSize, learningStartBufferSize)
+
+    resetLow = 0
+    resetHigh = 0.4
+    reset = ResetMountCarContin(seed = None, low = resetLow, high = resetHigh)
+    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep)
+
+    ddpg = RunAlgorithm(runEpisode, bufferSize, maxEpisode)
+
+    modelList = [actorModel, criticModel]
+    modelList = resetTargetParamToTrainParam(modelList)
+    meanRewardList, trajectory, trainedModelList = ddpg(modelList)
+
+    trainedActorModel, trainedCriticModel = trainedModelList
+
+# save Model
+    modelIndex = 0
+    actorFixedParam = {'actorModel': modelIndex}
+    criticFixedParam = {'criticModel': modelIndex}
+    parameters = {'env': ENV_NAME, 'Eps': maxEpisode, 'timeStep': maxTimeStep, 'batch': minibatchSize,
+                  'gam': gamma, 'lrActor': learningRateActor, 'lrCritic': learningRateCritic,
+                  'noiseVar': noiseInitVariance, 'varDiscout': varianceDiscount, 'resetLow': resetLow, 'High': resetHigh}
+
+    modelSaveDirectory = "../trainedDDPGModels"
+    modelSaveExtension = '.ckpt'
+    getActorSavePath = GetSavePath(modelSaveDirectory, modelSaveExtension, actorFixedParam)
+    getCriticSavePath = GetSavePath(modelSaveDirectory, modelSaveExtension, criticFixedParam)
+    savePathActor = getActorSavePath(parameters)
+    savePathCritic = getCriticSavePath(parameters)
+
+    with actorModel.as_default():
+        saveVariables(trainedActorModel, savePathActor)
+    with criticModel.as_default():
+        saveVariables(trainedCriticModel, savePathCritic)
+
+    dirName = os.path.dirname(__file__)
+    trajectoryPath = os.path.join(dirName, '..', 'trajectory', 'mountCarTrajectory.pickle')
+    saveToPickle(trajectory, trajectoryPath)
+
+# demo& plot
+    showDemo = True
+    if showDemo:
+        visualize = VisualizeMountCarContin()
+        visualize(trajectory)
+
+    plotResult = True
+    if plotResult:
+        plt.plot(list(range(maxEpisode)), meanRewardList)
+        plt.show()
 
 
 if __name__ == '__main__':
     main()
+
 
 

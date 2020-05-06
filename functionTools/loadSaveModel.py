@@ -36,3 +36,10 @@ def loadFromPickle(path):
     object = pickle.load(pickleIn)
     pickleIn.close()
     return object
+
+def restoreVariables(model, path):
+    graph = model.graph
+    saver = graph.get_collection_ref("saver")[0]
+    saver.restore(model, path)
+    print("Model restored from {}".format(path))
+    return model

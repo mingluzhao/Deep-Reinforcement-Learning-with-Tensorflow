@@ -4,11 +4,13 @@ DIRNAME = os.path.dirname(__file__)
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 from environment.chasingEnv.envNoPhysics import *
-from src.ddpg_withModifiedCritic import *
+from src.ddpg import *
 from src.policy import *
 from functionTools.trajectory import *
 from environment.chasingEnv.continuousChasingVisualization import *
 from pygame.color import THECOLORS
+from functionTools.loadSaveModel import *
+from functionTools.trajectory import *
 
 import pandas as pd
 pd.set_option('display.max_rows', None)
@@ -16,20 +18,6 @@ pd.set_option('display.max_columns', None)
 
 np.random.seed(1)
 tf.set_random_seed(1)
-
-def restoreVariables(model, path):
-    graph = model.graph
-    saver = graph.get_collection_ref("saver")[0]
-    saver.restore(model, path)
-    print("Model restored from {}".format(path))
-    return model
-
-
-def loadFromPickle(path):
-    pickleIn = open(path, 'rb')
-    object = pickle.load(pickleIn)
-    pickleIn.close()
-    return object
 
 def main():
     np.random.seed(1)
@@ -46,10 +34,8 @@ def main():
     actionDim = 2
     
     buildActorModel = BuildActorModel(numStateSpace, actionDim, actionRange)
-    # actorTrainingLayerWidths = [20, 20]
-    actorTrainingLayerWidths = [64, 64, 64]
-    actorTargetLayerWidths = actorTrainingLayerWidths
-    actorWriter, actorModel = buildActorModel(actorTrainingLayerWidths, actorTargetLayerWidths)
+    actorLayerWidths = [64, 64, 64]
+    actorWriter, actorModel = buildActorModel(actorLayerWidths)
 
     # sheep NN Policy
     sheepActModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'actorModel=0_dimension=2_gamma=0.95_learningRateActor=0.01_learningRateCritic=0.01_maxEpisode=5000_maxTimeStep=25_minibatchSize=1024_wolfSpeed=3.ckpt')
