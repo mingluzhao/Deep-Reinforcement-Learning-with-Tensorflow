@@ -1,6 +1,6 @@
-### Deep-Reinforcement-Learning-with-Tensorflow
+## Deep-Reinforcement-Learning-with-Tensorflow
 
-#### Table of Contents
+### Table of Contents
 
 * [RLframework](https://github.com/lucyzhao1999/Deep-Reinforcement-Learning-with-Tensorflow/tree/master/RLframework)
     * Algorithm
@@ -23,7 +23,7 @@
     * **trajectory**
 * [Visualization](https://github.com/lucyzhao1999/Deep-Reinforcement-Learning-with-Tensorflow/tree/master/visualize)
 
-#### Required Packages
+### Required Packages
 
 * [gym 0.10.5](http://gym.openai.com/docs/)
 * [tensorflow 1.13.1](https://www.tensorflow.org/install/pip)
