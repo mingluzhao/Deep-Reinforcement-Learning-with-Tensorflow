@@ -1,4 +1,4 @@
-### Deep-Reinforcement-Learning-with-Tensorflow
+## Deep-Reinforcement-Learning-with-Tensorflow
 
 #### Table of Contents
 
