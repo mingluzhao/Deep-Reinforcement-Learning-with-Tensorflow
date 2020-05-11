@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="32e38a5f-0d38-4134-96a8-ea720b1cb818" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/ddpg/plots/pendulumEvaluation.png" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/plots/pendulumEvaluation.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.data-00000-of-00001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.index" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.data-00000-of-00001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.index" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ddpg/trainedDDPGModels/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/trainedDDPGModels/checkpoint" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environment/noise/noise.py" beforeDir="false" afterPath="$PROJECT_DIR$/environment/noise/noise.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ddpg/DDPG psedocode.png" beforeDir="false" afterPath="$PROJECT_DIR$/ddpg/DDPGpseudocode.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualize/visualizePendulum.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,7 +19,7 @@
         <entry file="file://$PROJECT_DIR$/ddpg/exec/evaluatePendulum_ref.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="333">
-              <caret line="118" column="36" lean-forward="true" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="36" />
+              <caret line="118" column="36" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="36" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -32,11 +27,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/environment/noise/noise.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="340">
+              <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="FIRST">
+              <first_editor relative-caret-position="483">
+                <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -156,7 +163,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/environment/gymEnv/discreteMountainCarEnv.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_62.py" />
         <option value="$PROJECT_DIR$/maddpg/maddpg_openai/multiagent/core.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_64.py" />
@@ -207,14 +213,14 @@
         <option value="$PROJECT_DIR$/environment/chasingEnv/reward.py" />
         <option value="$PROJECT_DIR$/RLframework/testRLRun.py" />
         <option value="$PROJECT_DIR$/environment/noise/noise.py" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
     <option name="x" value="525" />
-    <option name="y" value="23" />
     <option name="width" value="915" />
-    <option name="height" value="808" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -234,6 +240,11 @@
               <item name="Deep-Reinforcement-Learning-with-Tensorflow" type="b2602c69:ProjectViewProjectNode" />
               <item name="Deep-Reinforcement-Learning-with-Tensorflow" type="462c0819:PsiDirectoryNode" />
               <item name="ddpg" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Deep-Reinforcement-Learning-with-Tensorflow" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Deep-Reinforcement-Learning-with-Tensorflow" type="462c0819:PsiDirectoryNode" />
+              <item name="visualize" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -765,12 +776,12 @@
       <workItem from="1588698807703" duration="18241000" />
       <workItem from="1588747540443" duration="4828000" />
       <workItem from="1588802983077" duration="84567000" />
-      <workItem from="1589219349113" duration="1390000" />
+      <workItem from="1589219349113" duration="3286000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="448391000" />
+    <option name="totallyTimeSpent" value="450287000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -783,13 +794,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16426513" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16930836" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.36374846" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49783862" visible="true" weight="0.20345253" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49783862" weight="0.20345253" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49927953" weight="0.26880395" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -799,7 +811,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5021614" side_tool="true" weight="0.61528975" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49927953" weight="0.19358817" />
-      <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.49927953" weight="0.5055487" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="12" sideWeight="0.49927953" visible="true" weight="0.23057953" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -978,7 +990,7 @@ plt.show()</expression-string>
     <entry file="file://$PROJECT_DIR$/dqn/src/dqn.py" />
     <entry file="file://$PROJECT_DIR$/ddpg/src/ddpg_ref2.py" />
     <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGChasingTraj2D.py" />
-    <entry file="file://$PROJECT_DIR$/ddpg/DDPG psedocode.png">
+    <entry file="file://$PROJECT_DIR$/ddpg/DDPGpseudocode.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/exec/generateDDPGChasingTraj1D.py" />
@@ -993,9 +1005,6 @@ plt.show()</expression-string>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/exec/runChasingWithSourceDDPG.py" />
-    <entry file="file://$PROJECT_DIR$/ddpg/plots/pendulumEvaluation.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/ddpg/exec/runMountainCarContinuousDDPG.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
@@ -1206,17 +1215,30 @@ plt.show()</expression-string>
     <entry file="file://$PROJECT_DIR$/ddpg/exec/evaluatePendulum_ref.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="333">
-          <caret line="118" column="36" lean-forward="true" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="36" />
+          <caret line="118" column="36" selection-start-line="118" selection-start-column="36" selection-end-line="118" selection-end-column="36" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ddpg/plots/pendulumEvaluation.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/environment/noise/noise.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+        <state relative-caret-position="340">
+          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="FIRST">
+          <first_editor relative-caret-position="483">
+            <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
