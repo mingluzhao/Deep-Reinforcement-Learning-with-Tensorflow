@@ -1,7 +1,11 @@
 import os
 import numpy as np
-DIRNAME = os.path.dirname(__file__)
+import sys
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
+dirName = os.path.dirname(__file__)
+sys.path.append(os.path.join(dirName, '..', '..'))
+sys.path.append(os.path.join(dirName, '..'))
+
 
 from src.ddpg import actByPolicyTrain, BuildActorModel
 from environment.chasingEnv.reward import RewardFunctionCompete

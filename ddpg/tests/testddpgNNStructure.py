@@ -1,5 +1,10 @@
+import os
 import sys
-sys.path.append("..")
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+dirName = os.path.dirname(__file__)
+sys.path.append(os.path.join(dirName, '..', '..'))
+sys.path.append(os.path.join(dirName, '..'))
+
 import unittest
 from ddt import ddt, data, unpack
 from src.ddpg import *
