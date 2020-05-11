@@ -10,9 +10,8 @@
     * **exec**: to execute training tasks
     * **tests**
     * **trainedDDPGModels**
-    * **trajectory**
     * **plots**
-    * **chasingDemos**: saved demo pictures from the chasing task 
+    * **Demos**: Demos for task Pendulum-v0 and MountainCarContinuous-v0
 * [Environment](https://github.com/lucyzhao1999/Deep-Reinforcement-Learning-with-Tensorflow/tree/master/environment)
     * **chasingEnvironment**: simple constrained wolf-sheep chasing scenario
     * **gymEnv**: environment adapted from [Gym by OpenAI](https://gym.openai.com)
