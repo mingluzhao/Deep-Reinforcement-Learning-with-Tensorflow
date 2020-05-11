@@ -31,7 +31,7 @@ class TransitMountCarDiscrete:
         return nextState
 
 
-def rewardMountCarDiscrete(state, action):
+def rewardMountCarDiscrete(state, action, nextState):
     return -1.0
 
 def modifiedRewardMountCarDiscrete(state, action):

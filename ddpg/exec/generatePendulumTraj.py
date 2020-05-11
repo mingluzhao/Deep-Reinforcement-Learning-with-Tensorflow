@@ -1,41 +1,19 @@
 import os
-
+import gym
 DIRNAME = os.path.dirname(__file__)
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-from src.ddpg import *
-from functionTools.trajectory import *
-from functionTools.loadSaveModel import *
-from environment.gymEnv.pendulumEnv import *
-import gym
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+from src.ddpg import actByPolicyTrain, BuildActorModel
+from functionTools.trajectory import SampleTrajectory
+from functionTools.loadSaveModel import restoreVariables
+from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, isTerminalGymPendulum, \
+    observe, angle_normalize, VisualizeGymPendulum, ResetGymPendulum
+from src.policy import ActDDPGOneStep
 
-
-maxEpisode = 200
-maxTimeStep = 200
-learningRateActor = 0.001    # learning rate for actor
-learningRateCritic = 0.001    # learning rate for critic
-gamma = 0.9     # reward discount
-tau=0.01
-bufferSize = 20000
-minibatchSize = 128
 seed = None
-
 ENV_NAME = 'Pendulum-v0'
 env = gym.make(ENV_NAME)
 env = env.unwrapped
-
-class ActWithoutNoise:
-    def __init__(self, actByPolicyTrain, actorModel, observe = None):
-        self.actByPolicyTrain = actByPolicyTrain
-        self.actorModel = actorModel
-        self.observe = observe
-
-    def __call__(self, states):
-        states = self.observe(states) if self.observe is not None else states
-        stateBatch = np.asarray(states).reshape(1, -1)
-        action = self.actByPolicyTrain(self.actorModel, stateBatch)[0]
-        return action
 
 def main():
     stateDim = env.observation_space.shape[0]
@@ -49,23 +27,27 @@ def main():
     actorWriter, actorModel = buildActorModel(actorLayerWidths)
 
     dirName = os.path.dirname(__file__)
-    actorModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'actorModel=0_gamma=0.9_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=200_maxTimeStep=200_minibatchSize=128_noiseVar=3_varDiscout=0.9995.ckpt')
+    actorModelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'Eps=200_actorModel=0_batch=128_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt')
     restoreVariables(actorModel, actorModelPath)
-    policy = ActWithoutNoise(actByPolicyTrain, actorModel, observe)
+    actOneStep = ActDDPGOneStep(actionLow, actionHigh, actByPolicyTrain, actorModel, getNoise = None)
+    policy = lambda state: actOneStep(observe(state))
 
     isTerminal = isTerminalGymPendulum
-    reset = ResetGymPendulum(seed, observe)
+    reset = ResetGymPendulum(seed)
     transit = TransitGymPendulum()
+    rewardFunc = RewardGymPendulum(angle_normalize)
 
-    maxRunningSteps = 10000        # max possible length of the trajectory/episode
-    sampleTrajectory = SampleTrajectoryWithActions(maxRunningSteps, transit, isTerminal, reset)
-    trajectory = sampleTrajectory(policy) # trajectory only contains states, need to add actions for each state
+    for i in range(20):
+        maxRunningSteps = 200
+        sampleTrajectory = SampleTrajectory(maxRunningSteps, transit, isTerminal, rewardFunc, reset)
+        trajectory = sampleTrajectory(policy)
 
-    # demo& plot
-    showDemo = True
-    if showDemo:
-        visualize = VisualizeGymPendulum()
-        visualize(trajectory)
+        # plots& plot
+        showDemo = True
+        if showDemo:
+            visualize = VisualizeGymPendulum()
+            visualize(trajectory)
+
 
 if __name__ == '__main__':
     main()

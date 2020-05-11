@@ -1,8 +1,9 @@
 import sys
 sys.path.append("..")
+import numpy as np
 import unittest
 from ddt import ddt, data, unpack
-from environment.chasingEnv.envNoPhysics import *
+from environment.chasingEnv.envNoPhysics import Reset, StayWithinBoundary, TransitForNoPhysics, GetAgentPosFromState
 
 @ddt
 class TestEnv(unittest.TestCase):

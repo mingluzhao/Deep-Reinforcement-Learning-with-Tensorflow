@@ -41,16 +41,19 @@ class OUNoise:
 
 
 class GetExponentialDecayGaussNoise:
-    def __init__(self, noiseInitVariance, varianceDiscount, noiseDecayStartStep):
+    def __init__(self, noiseInitVariance, varianceDiscount, noiseDecayStartStep, minVar = 0):
         self.noiseInitVariance = noiseInitVariance
         self.varianceDiscount = varianceDiscount
         self.noiseDecayStartStep = noiseDecayStartStep
+        self.minVar = minVar
 
     def __call__(self, runStep):
-        if runStep == 1:
-            print('initialVariance', self.noiseInitVariance)
         var = self.noiseInitVariance
         if runStep > self.noiseDecayStartStep:
             var = self.noiseInitVariance* self.varianceDiscount ** (runStep - self.noiseDecayStartStep)
+            var = max(var, self.minVar)
         noise = np.random.normal(0, var)
+        if runStep % 1000 == 0:
+            print('noise Variance', var)
+
         return noise

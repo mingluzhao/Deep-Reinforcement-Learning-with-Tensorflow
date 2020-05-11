@@ -8,7 +8,7 @@ class TransitGymPendulum:
         self.max_speed = 8
         self.max_torque = 2.
         self.dt = .05
-        self.g = 10
+        self.g = 10.0
         self.m = 1.
         self.l = 1.
         self.processAction = processAction
@@ -17,6 +17,7 @@ class TransitGymPendulum:
         action = self.processAction(action) if self.processAction is not None else action
         th, thdot = state  # th := theta
         action = np.clip(action, -self.max_torque, self.max_torque)[0]
+
         newthdot = thdot + (-3 * self.g / (2 * self.l) * np.sin(th + np.pi) + 3. / (self.m * self.l ** 2) * action) * self.dt
         newth = th + newthdot * self.dt
         newthdot = np.clip(newthdot, -self.max_speed, self.max_speed)
@@ -30,7 +31,7 @@ class RewardGymPendulum:
         self.max_torque = 2.
         self.processAction = processAction
 
-    def __call__(self, state, action):
+    def __call__(self, state, action, nextState):
         action = self.processAction(action) if self.processAction is not None else action
         action = np.clip(action, -self.max_torque, self.max_torque)[0]
         th, thdot = state  # th := theta
@@ -49,9 +50,8 @@ def observe(state):
 
 
 class ResetGymPendulum:
-    def __init__(self, seed, observe):
+    def __init__(self, seed):
         self.seed = seed
-        self.observe = observe
 
     def __call__(self):
         np_random, seed = seeding.np_random(self.seed )
@@ -79,7 +79,7 @@ class VisualizeGymPendulum:
         self.viewer = None
         self.max_torque = 2.
 
-    def __call__(self, trajectory): #[([state1, obs1], action1), ([state2, obs2], action2)...]
+    def __call__(self, trajectory):
         mode = 'human'
         for timeStep in range(len(trajectory)):
             state = trajectory[timeStep][0]

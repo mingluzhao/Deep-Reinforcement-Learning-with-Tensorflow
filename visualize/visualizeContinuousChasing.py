@@ -66,7 +66,7 @@ def main():
     currentDir = os.getcwd()
     parentDir = os.path.abspath(os.path.join(currentDir, os.pardir))
     imageFolderName = 'DemoAfterChange'
-    saveImageDir = os.path.join(os.path.join(parentDir, 'demo'), imageFolderName)
+    saveImageDir = os.path.join(os.path.join(parentDir, 'plots'), imageFolderName)
     if not os.path.exists(saveImageDir):
         os.makedirs(saveImageDir)
 

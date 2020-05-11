@@ -4,9 +4,9 @@ class RewardFunctionCompete():
         self.deathPenalty = deathPenalty
         self.isTerminal = isTerminal
 
-    def __call__(self, state):
+    def __call__(self, state, action, nextState):
         reward = self.aliveBonus
-        if self.isTerminal(state):
+        if self.isTerminal(nextState):
             reward += self.deathPenalty
 
         return reward

@@ -4,6 +4,7 @@ import unittest
 from ddt import ddt, data, unpack
 from environment.gymEnv.gymDiscreteMountainCarEnv import *
 from environment.gymEnv.discreteMountainCarEnv import *
+import random
 
 @ddt
 class TestPendulumEnv(unittest.TestCase):
@@ -59,10 +60,10 @@ class TestPendulumEnv(unittest.TestCase):
     @data(([[1, 1], 1]),
           ([[1, 1], 0]),
           ([[10,10], 1]),
-          ([[0.01, 0.02], 1])
+          ([[0.45, 0.3], 1])
           )
     @unpack
-    def checkTerminal(self, state, action):
+    def testTerminal(self, state, action):
         env = MountainCarEnv()
         env.seed(self.seed)
         env.state = state
@@ -80,7 +81,7 @@ class TestPendulumEnv(unittest.TestCase):
     @data(([[1, 1], 1]),
           ([[1, 1], 0]),
           ([[10,10], 1]),
-          ([[0.01, 0.02], 1])
+          ([[0.45, 0.3], 1])
           )
     @unpack
     def testReward(self, state, action):
@@ -91,10 +92,40 @@ class TestPendulumEnv(unittest.TestCase):
 
         getReward = rewardMountCarDiscrete
         action = [action]
-        reward = getReward(state, action)
+        transit = TransitMountCarDiscrete()
+        nextState = transit(state, action)
+        reward = getReward(state, action, nextState)
 
         self.assertEqual(reward_gym, reward)
 
+    def testTrajectory(self):
+        env = MountainCarEnv()
+        env.seed(self.seed)
+        env.reset()
+
+        reset = ResetMountCarDiscrete(self.seed)
+        state = reset()
+
+        self.assertEqual(tuple(state), tuple(env.state))
+
+        transit = TransitMountCarDiscrete()
+        isTerminal = IsTerminalMountCarDiscrete()
+        getReward = rewardMountCarDiscrete
+
+        for timeStep in range(10000):
+            action = random.randrange(2)
+            nextState_gym, reward_gym, terminal_gym, info = env.step(action)
+
+            action = [action]
+            nextState = transit(state, action)
+            reward = getReward(state, action, nextState)
+            terminal = isTerminal(nextState)
+
+            self.assertEqual(tuple(nextState), tuple(nextState_gym))
+            self.assertEqual(reward, reward_gym)
+            self.assertEqual(terminal, terminal_gym)
+
+            state = nextState
 
 if __name__ == '__main__':
     unittest.main()

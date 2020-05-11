@@ -4,6 +4,7 @@ import unittest
 from ddt import ddt, data, unpack
 from environment.gymEnv.gymPendulumEnv import *
 from environment.gymEnv.pendulumEnv import *
+import random
 
 @ddt
 class TestPendulumEnv(unittest.TestCase):
@@ -22,7 +23,7 @@ class TestPendulumEnv(unittest.TestCase):
         env.seed(self.seed)
         initialObs_gym = env.reset()
 
-        reset = ResetGymPendulum(self.seed, observe)
+        reset = ResetGymPendulum(self.seed)
         initState = reset()
         initObservation = observe(initState)
 
@@ -38,7 +39,7 @@ class TestPendulumEnv(unittest.TestCase):
         env.reset()
         nextObs_gym, reward_gym, terminal, info = env.step(action)
 
-        reset = ResetGymPendulum(self.seed, observe)
+        reset = ResetGymPendulum(self.seed)
         state = reset()
 
         transit = TransitGymPendulum()
@@ -48,7 +49,7 @@ class TestPendulumEnv(unittest.TestCase):
         self.assertEqual(tuple(nextObs_gym), tuple(nextObservation))
 
 
-    @data(([[1, 2], [1]]),
+    @data(([[1, 0], [1]]),
           ([[10,10], [10]]))
     @unpack
     def testTransition(self, state, action):
@@ -73,12 +74,37 @@ class TestPendulumEnv(unittest.TestCase):
         env.state = state
         nextObs_gym, reward_gym, terminal, info = env.step(action)
 
+        transit = TransitGymPendulum()
+        nextState = transit(state, action)
         getReward = RewardGymPendulum(angle_normalize)
-        reward = getReward(state, action)
+        reward = getReward(state, action, nextState)
 
         self.assertEqual(reward_gym, reward)
 
+    def testTrajectory(self):
+        env = PendulumEnv()
+        env.seed(self.seed)
+        env.reset()
 
+        reset = ResetGymPendulum(self.seed)
+        state = reset()
+
+        self.assertEqual(tuple(state), tuple(env.state))
+
+        transit = TransitGymPendulum()
+        getReward = RewardGymPendulum(angle_normalize)
+
+        for timeStep in range(10000):
+            action = [random.random() * random.randrange(2)]
+            nextState = transit(state, action)
+            nextObservation = observe(nextState)
+            reward = getReward(state, action, nextState)
+            nextObs_gym, reward_gym, terminal_gym, info = env.step(action)
+
+            self.assertEqual(tuple(nextObservation), tuple(nextObs_gym))
+            self.assertEqual(reward, reward_gym)
+
+            state = nextState
 
 
 

@@ -1,5 +1,4 @@
 import numpy as np
-from collections import deque
 import random
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
@@ -14,19 +13,14 @@ def resetTargetParamToTrainParam(modelList):
     return updatedModels
 
 
-def addToMemory(buffer, state, action, reward, nextState):
-    experience = (state, action, reward, nextState)
-    buffer.append(experience)
-    return buffer
-
-
 class UpdateParameters:
     def __init__(self, paramUpdateInterval, tau = None):
         self.paramUpdateInterval = paramUpdateInterval
-        self.tau = tau # soft replace
+        self.tau = tau
+        self.runTime = 0
 
-    def __call__(self, model, runTime):
-        if runTime % self.paramUpdateInterval == 0:
+    def __call__(self, model):
+        if self.runTime % self.paramUpdateInterval == 0:
             graph = model.graph
             updateParam_ = graph.get_collection_ref("updateParam_")[0]
             if self.tau is not None:
@@ -34,111 +28,117 @@ class UpdateParameters:
                 model.run(updateParam_, feed_dict={tau_: self.tau})
             else:
                 model.run(updateParam_)
+        self.runTime += 1
+
         return model
 
 
-class RunTimeStep:
-    def __init__(self, actOneStep, transit, getReward, isTerminal, addToMemory,
-                 trainModels, minibatchSize, learningStartBufferSize, observe = None):
-        self.actOneStep = actOneStep
+class SampleOneStep:
+    def __init__(self, transit, getReward):
         self.transit = transit
         self.getReward = getReward
-        self.isTerminal = isTerminal
-        self.observe = observe
-        self.addToMemory = addToMemory
-        self.trainModels = trainModels
-        self.minibatchSize = minibatchSize
-        self.learningStartBufferSize = learningStartBufferSize
-        self.observe = observe
 
-    def __call__(self, state, modelList, replayBuffer, trajectory):
-        runTime = len(trajectory)
-        observation = self.observe(state) if self.observe is not None else state
-        observation = np.asarray(observation).reshape(1, -1)
-        action = self.actOneStep(modelList, observation, runTime)
-
-        terminal = self.isTerminal(state)
+    def __call__(self, state, action):
         nextState = self.transit(state, action)
-        reward = self.getReward(state, action)
-        nextObservation = self.observe(nextState) if self.observe is not None else nextState
-        replayBuffer = self.addToMemory(replayBuffer, observation, action, reward, nextObservation)
-        trajectory.append((state, action))
+        reward = self.getReward(state, action, nextState)
 
-        if runTime >= self.learningStartBufferSize:
-            miniBatch = random.sample(replayBuffer, self.minibatchSize)
-            modelList = self.trainModels(modelList, miniBatch, runTime)
-
-        return reward, nextState, modelList, replayBuffer, terminal, trajectory
+        return reward, nextState
 
 
-class RunTimeStepEnv:
-    def __init__(self, actOneStep, addToMemory, trainModels, minibatchSize, learningStartBufferSize, env):
-        self.actOneStep = actOneStep
-        self.addToMemory = addToMemory
-        self.trainModels = trainModels
-        self.minibatchSize = minibatchSize
-        self.learningStartBufferSize = learningStartBufferSize
+class SampleOneStepUsingGym:
+    def __init__(self, env):
         self.env = env
 
-    def __call__(self, state, modelList, replayBuffer, trajectory):
-        self.env.render()
-        runTime = len(trajectory)
-        state = np.asarray(state).reshape(1, -1)
-        action = self.actOneStep(modelList, state, runTime)
+    def __call__(self, state, action):
         nextState, reward, terminal, info = self.env.step(action)
-        replayBuffer = self.addToMemory(replayBuffer, state, action, reward, nextState)
-        trajectory.append((state, action))
 
+        return reward, nextState
+
+
+class SampleFromMemory:
+    def __init__(self, minibatchSize):
+        self.minibatchSize = minibatchSize
+
+    def __call__(self, memoryBuffer):
+        sample = random.sample(memoryBuffer, self.minibatchSize)
+        return sample
+
+
+class LearnFromBuffer:
+    def __init__(self, learningStartBufferSize, sampleFromMemory, trainModels):
+        self.learningStartBufferSize = learningStartBufferSize
+        self.sampleFromMemory = sampleFromMemory
+        self.trainModels = trainModels
+
+    def __call__(self, replayBuffer, runTime):
         if runTime >= self.learningStartBufferSize:
-            miniBatch = random.sample(replayBuffer, self.minibatchSize)
-            modelList = self.trainModels(modelList, miniBatch, runTime)
+            miniBatch = self.sampleFromMemory(replayBuffer)
+            self.trainModels(miniBatch)
 
-        return reward, nextState, modelList, replayBuffer, terminal, trajectory
+
+class RunTimeStep:
+    def __init__(self, actOneStep, sampleOneStep, learnFromBuffer, observe = None):
+        self.actOneStep = actOneStep
+        self.sampleOneStep = sampleOneStep
+        self.learnFromBuffer = learnFromBuffer
+        self.observe = observe
+
+    def __call__(self, state, replayBuffer, trajectory):
+        runTime = len(trajectory)
+        observation = self.observe(state) if self.observe is not None else state
+        action = self.actOneStep(observation, runTime)
+        reward, nextState = self.sampleOneStep(state, action)
+        nextObservation = self.observe(nextState) if self.observe is not None else nextState
+        replayBuffer.append((observation, action, reward, nextObservation))
+        trajectory.append((state, action, reward, nextState))
+        self.learnFromBuffer(replayBuffer, runTime)
+
+        return reward, nextState, replayBuffer, trajectory
 
 
 class RunEpisode:
-    def __init__(self, reset, runTimeStep, maxTimeStep):
+    def __init__(self, reset, runTimeStep, maxTimeStep, isTerminal):
         self.reset = reset
         self.runTimeStep = runTimeStep
         self.maxTimeStep = maxTimeStep
+        self.isTerminal = isTerminal
 
-    def __call__(self, modelList, replayBuffer, trajectory):
+    def __call__(self, replayBuffer, trajectory):
         state = self.reset()
         episodeReward = 0
         for timeStep in range(self.maxTimeStep):
-            reward, state, modelList, replayBuffer, terminal, trajectory = \
-                self.runTimeStep(state, modelList, replayBuffer, trajectory)
+            reward, state, replayBuffer, trajectory = self.runTimeStep(state, replayBuffer, trajectory)
             episodeReward += reward
+            terminal = self.isTerminal(state)
             if terminal:
-                print('------------terminal-----------------')
+                print('------------terminal----------------- timeStep: ', timeStep)
                 break
-        print('episodeReward: ', episodeReward)
-        return modelList, replayBuffer, episodeReward, trajectory
+        print('episodeReward: ', episodeReward, 'runSteps: ', len(trajectory))
+        return replayBuffer, episodeReward, trajectory
+
 
 
 class RunAlgorithm:
-    def __init__(self, runEpisode, bufferSize, maxEpisode, print = True):
-        self.bufferSize = bufferSize
+    def __init__(self, runEpisode, maxEpisode, print = True):
         self.runEpisode = runEpisode
         self.maxEpisode = maxEpisode
         self.print = print
 
-    def __call__(self, modelList):
-        replayBuffer = deque(maxlen=int(self.bufferSize))
+    def __call__(self, replayBuffer):
         episodeRewardList = []
         meanRewardList = []
         trajectory = []
         for episode in range(self.maxEpisode):
-            modelList, replayBuffer, episodeReward, trajectory = self.runEpisode(modelList, replayBuffer, trajectory)
+            replayBuffer, episodeReward, trajectory = self.runEpisode(replayBuffer, trajectory)
             episodeRewardList.append(episodeReward)
             meanRewardList.append(np.mean(episodeRewardList))
 
             if print:
-                print('episode', episode)
+                print('EPISODE ', episode)
+                print('mean episode reward', np.mean(episodeRewardList))
                 if episode == self.maxEpisode - 1:
                     print('mean episode reward: ', int(np.mean(episodeRewardList)))
 
-        return meanRewardList, trajectory, modelList
-
+        return meanRewardList, trajectory
 
 

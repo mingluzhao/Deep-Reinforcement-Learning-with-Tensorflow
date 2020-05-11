@@ -11,10 +11,11 @@ class ActByTrainNetEpsilonGreedy:
         self.epsilonDecay = epsilonDecay
         self.getTrainQValue = getTrainQValue
 
-    def __call__(self, modelList, stateBatch, runTime):
+    def __call__(self, modelList, states, runTime):
         model = modelList[0]
         epsilonResult = self.epsilonMin + self.epsilonDecay * runTime
         epsilon = epsilonResult if epsilonResult < self.epsilonMax else self.epsilonMax
+        stateBatch = np.asarray(states).reshape(1, -1)
         trainQVal = self.getTrainQValue(model, stateBatch)
 
         if np.random.uniform() < epsilon:

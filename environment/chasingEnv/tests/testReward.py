@@ -22,12 +22,12 @@ class TestEnv(unittest.TestCase):
         self.rewardSheep = RewardFunctionCompete(sheepAliveBonus, sheepTerminalPenalty, isTerminal)
 
     @data(
-        ([10, 10, 10, 10], 1/20 - 1),
-        ([0, 0, 10, 10], 1/20)
+        ([10, 10, 10, 10], [1], [10, 10, 10, 10], 1/20 - 1),
+        ([0, 0, 10, 10], [1], [0, 0, 10, 10],  1/20)
     )
     @unpack
-    def testReward(self, state, trueReward):
-        reward = self.rewardSheep(state)
+    def testReward(self, state, action, nextState, trueReward):
+        reward = self.rewardSheep(state, action, nextState)
         self.assertEqual(reward, trueReward)
 
 if __name__ == '__main__':

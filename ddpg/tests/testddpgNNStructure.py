@@ -15,7 +15,7 @@ class TestBuildActorModel(unittest.TestCase):
         self.buildCriticModel = BuildCriticModel(self.numStateSpace, self.actionDim)
 
     def testBuildActorModelWithEmptyInput(self):
-        actorWriter, model  = self.buildActorModel([], [])
+        actorWriter, model  = self.buildActorModel([])
         groundTruthShapes = [[4, 1], [4, 1]]
 
         actorGraph = model.graph
@@ -33,13 +33,13 @@ class TestBuildActorModel(unittest.TestCase):
         generatedActivationShapes = [b_.shape.as_list() for b_ in activations_]
         self.assertEqual(generatedActivationShapes, activationShapes)
 
-    @data(([10], [10], [[4, 10], [10, 1], [4, 10], [10, 1]]),
-          ([10, 15], [10, 15], [[4, 10], [10, 15], [15, 1], [4, 10], [10, 15], [15, 1]]),
-          ([10, 15, 16], [10, 15, 16], [[4, 10], [10, 15], [15, 16], [16, 1], [4, 10], [10, 15], [15, 16], [16, 1]])
+    @data(([10], [[4, 10], [10, 1], [4, 10], [10, 1]]),
+          ([10, 15], [[4, 10], [10, 15], [15, 1], [4, 10], [10, 15], [15, 1]]),
+          ([10, 15, 16], [[4, 10], [10, 15], [15, 16], [16, 1], [4, 10], [10, 15], [15, 16], [16, 1]])
           )
     @unpack
-    def testBuildActorModelWithInput(self, trainingLayerWidths, targetLayerWidths, groundTruthShapes):
-        actorWriter, model = self.buildActorModel(trainingLayerWidths, targetLayerWidths)
+    def testBuildActorModelWithInput(self, layerWidths, groundTruthShapes):
+        actorWriter, model = self.buildActorModel(layerWidths)
         actorGraph = model.graph
         weights_ = actorGraph.get_collection("weights")
         generatedWeightShapes = [w_.shape.as_list() for w_ in weights_]
@@ -56,12 +56,12 @@ class TestBuildActorModel(unittest.TestCase):
         self.assertEqual(generatedActivationShapes, activationShapes)
 
 
-    @data(([3, 5], [3, 5], [[4, 3], [3, 5], [1, 5], [5, 1], [4, 3], [3, 5], [1, 5], [5, 1]]),
-          ([3, 6, 7], [3, 6, 7], [[4, 3], [3, 6], [6, 7], [1, 7], [7, 1],[4, 3], [3, 6], [6, 7], [1, 7], [7, 1]])
+    @data(([3, 5], [[4, 3], [3, 5], [1, 5], [5, 1], [4, 3], [3, 5], [1, 5], [5, 1]]),
+          ([3, 6, 7], [[4, 3], [3, 6], [6, 7], [1, 7], [7, 1],[4, 3], [3, 6], [6, 7], [1, 7], [7, 1]])
           )
     @unpack
-    def testBuildCriticModel(self, trainingLayerWidths, targetLayerWidths, groundTruthShapes):
-        criticWriter, model = self.buildCriticModel(trainingLayerWidths, targetLayerWidths)
+    def testBuildCriticModel(self, layerWidths, groundTruthShapes):
+        criticWriter, model = self.buildCriticModel(layerWidths)
         criticGraph = model.graph
         weights_ = criticGraph.get_collection("weights")
         generatedWeightShapes = [w_.shape.as_list() for w_ in weights_]
@@ -90,9 +90,8 @@ class TestBuildActorModel(unittest.TestCase):
           )
     @unpack
     def testActByTrainModelWithEmptyInputLayerWidths(self, states, miniBatchSize):
-        trainingLayerWidths = []
-        targetLayerWidths = []
-        actorWriter, actorModel = self.buildActorModel(trainingLayerWidths, targetLayerWidths)
+        layerWidths = []
+        actorWriter, actorModel = self.buildActorModel(layerWidths)
 
         stateBatch = np.asarray(states).reshape(miniBatchSize, -1)
         actionAngleTrainModelOutput = actByPolicyTrain(actorModel, stateBatch)
@@ -106,13 +105,6 @@ class TestBuildActorModel(unittest.TestCase):
         actionAngleGroundTruth = np.tanh(activ) * np.pi
 
         self.assertAlmostEqual(float(actionAngleTrainModelOutput), float(actionAngleGroundTruth), places=2)
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

@@ -1,10 +1,10 @@
 import sys
+import numpy as np
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg import *
-from RLframework.RLrun import *
-from src.policy import *
+from src.ddpg import BuildCriticModel, TrainCriticBySASRQ
+from RLframework.RLrun import UpdateParameters
 
 @ddt
 class TestCritic(unittest.TestCase):
@@ -14,8 +14,7 @@ class TestCritic(unittest.TestCase):
         actionDim = 2
         
         self.buildCriticModel = BuildCriticModel(numStateSpace, actionDim)
-        self.criticTrainingLayerWidths = [100, 100]
-        self.criticTargetLayerWidths = self.criticTrainingLayerWidths
+        self.criticLayerWidths = [100, 100]
 
         self.tau = 0.01
         self.gamma = 0.95
@@ -30,7 +29,7 @@ class TestCritic(unittest.TestCase):
           )
     @unpack
     def testValueTargetCalculation(self, rewardBatch, qValue):
-        criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths, self.criticTargetLayerWidths)
+        criticWriter, criticModel = self.buildCriticModel(self.criticLayerWidths)
         criticGraph = criticModel.graph
 
         yi_ = criticGraph.get_collection_ref("yi_")[0]
@@ -49,7 +48,7 @@ class TestCritic(unittest.TestCase):
           )
     @unpack
     def testCriticLossCalculation(self, stateBatch, actionBatch, rewardBatch, targetQValue):
-        criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths, self.criticTargetLayerWidths)
+        criticWriter, criticModel = self.buildCriticModel(self.criticLayerWidths)
         trainCriticBySASRQ = TrainCriticBySASRQ(self.learningRateCritic, self.gamma, criticWriter)
 
         criticGraph = criticModel.graph
@@ -70,7 +69,7 @@ class TestCritic(unittest.TestCase):
           )
     @unpack
     def testCriticImprovement(self, stateBatch, actionBatch, rewardBatch, targetQValue):
-        criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths, self.criticTargetLayerWidths)
+        criticWriter, criticModel = self.buildCriticModel(self.criticLayerWidths)
         trainCriticBySASRQ = TrainCriticBySASRQ(self.learningRateCritic, self.gamma, criticWriter)
         lossWithTrain1, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
         lossWithTrain2, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
@@ -78,8 +77,8 @@ class TestCritic(unittest.TestCase):
         self.assertTrue(lossWithTrain1 > lossWithTrain2)
 
 
-    def testUpdateCriticParams(self):
-        criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths, self.criticTargetLayerWidths)
+    def testDDPGUpdateCriticParams(self):
+        criticWriter, criticModel = self.buildCriticModel(self.criticLayerWidths)
         trainCriticBySASRQ = TrainCriticBySASRQ(self.learningRateCritic, self.gamma, criticWriter)
         stateBatch = [[1, 1, 1, 1]]
         actionBatch = [[2, 2]]
@@ -95,7 +94,7 @@ class TestCritic(unittest.TestCase):
         targetParams_ = criticGraph.get_collection_ref("targetParams_")[0]
         trainParams, targetParams = criticModel.run([trainParams_,targetParams_])
 
-        updatedCriticModel = self.updateParameters(criticModel, runTime)
+        updatedCriticModel = self.updateParameters(criticModel)
 
         updatedCriticGraph = updatedCriticModel.graph
         updatedTrainParams_ = updatedCriticGraph.get_collection_ref("trainParams_")[0]
@@ -106,40 +105,6 @@ class TestCritic(unittest.TestCase):
         difference = np.array(updatedTargetParams) - calUpdatedTargetParam
 
         [self.assertEqual(np.mean(paramDiff), 0) for paramDiff in difference]
-
-    #
-    # @data(([[1,1,1,1]], [[2,2]]),
-    #       ([[1,1,1,1], [2,2,2,2]], [[2, 2], [3, 2]])
-    #       )
-    # @unpack
-    # def testActionGradients(self, stateBatch, actionBatch):
-    #     criticWriter, criticModel = self.buildCriticModel(self.criticTrainingLayerWidths, self.criticTargetLayerWidths)
-    #     criticGraph = criticModel.graph
-
-    #     actionGradients_ = criticGraph.get_collection_ref("actionGradients_")[0]
-    #     states_ = criticGraph.get_collection_ref("states_")[0]
-    #     action_ = criticGraph.get_collection_ref("action_")[0]
-    #
-    #     trainActionWeights_ = criticGraph.get_collection_ref("weight/trainActionFCToLastFCWeights_")[0]
-    #     finalFCWeights_ = criticGraph.get_collection_ref('weight/trainHidden/dense/kernel:0')[0]
-    #     trainLastFCZ_ = criticGraph.get_collection_ref('trainLastFCZ_')[0]
-    #
-    #     actionGradients, trainActionWeights, trainLastFCZ, finalFCWeights = \
-    #         criticModel.run([actionGradients_, trainActionWeights_, trainLastFCZ_, finalFCWeights_],
-    #                                                     feed_dict= {states_: stateBatch, action_: actionBatch})
-    #
-    #     reluGradients = trainActionWeights
-    #     reluGradients[trainLastFCZ < 0 ] = 0  # relu gradient  = 1 for value > 0, 0 for <0
-    #
-    #     trueActionGradients = np.sum(np.matmul(reluGradients, finalFCWeights))
-    #     difference = np.concatenate(np.array(trueActionGradients) - actionGradients)
-    #     diff = np.concatenate(yiCalculated - groundTruthYi)
-    #     [self.assertAlmostEqual(diff, 0, places = 2) for diff in difference]
-    #
-
-
-
-
 
 
 if __name__ == '__main__':

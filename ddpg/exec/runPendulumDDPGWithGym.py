@@ -1,22 +1,25 @@
 import matplotlib.pyplot as plt
 import gym
 import os
+from collections import deque
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
-    BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients,\
-    TrainActorOneStep, TrainActor, TrainDDPGModels
-from RLframework.RLrun import resetTargetParamToTrainParam, addToMemory, UpdateParameters, RunTimeStepEnv, \
-    RunEpisode, RunAlgorithm
-from src.policy import ActDDPGOneStepWithNoise
+    BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
+    TrainActor, TrainDDPGModels
+from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStepUsingGym, SampleFromMemory,\
+    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm
+from src.policy import ActDDPGOneStep
+
 from environment.noise.noise import GetExponentialDecayGaussNoise
+from environment.gymEnv.pendulumEnv import isTerminalGymPendulum
 
 
 maxEpisode = 200
 maxTimeStep = 200
 learningRateActor = 0.001
 learningRateCritic = 0.001
-gamma = 0.9     # reward discount
+gamma = 0.9
 tau=0.01
 bufferSize = 10000
 minibatchSize = 128
@@ -53,49 +56,42 @@ def main():
     paramUpdateInterval = 1
     updateParameters = UpdateParameters(paramUpdateInterval, tau)
 
-    trainModels = TrainDDPGModels(updateParameters, trainActor, trainCritic)
+    modelList = [actorModel, criticModel]
+    actorModel, criticModel = resetTargetParamToTrainParam(modelList)
+    trainModels = TrainDDPGModels(updateParameters, trainActor, trainCritic, actorModel, criticModel)
 
-    noiseInitVariance = 3  # control exploration
+    noiseInitVariance = 3
     varianceDiscount = .9995
     noiseDecayStartStep = bufferSize
     getNoise = GetExponentialDecayGaussNoise(noiseInitVariance, varianceDiscount, noiseDecayStartStep)
-    actOneStepWithNoise = ActDDPGOneStepWithNoise(actionLow, actionHigh, actByPolicyTrain, getNoise)
+    actOneStepWithNoise = ActDDPGOneStep(actionLow, actionHigh, actByPolicyTrain, actorModel, getNoise)
 
     learningStartBufferSize = minibatchSize
-    runDDPGTimeStep = RunTimeStepEnv(actOneStepWithNoise, addToMemory, trainModels, minibatchSize, learningStartBufferSize, env)
+    sampleFromMemory = SampleFromMemory(minibatchSize)
+    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, sampleFromMemory, trainModels)
+
+    sampleOneStep = SampleOneStepUsingGym(env)
+    runDDPGTimeStep = RunTimeStep(actOneStepWithNoise, sampleOneStep, learnFromBuffer)
 
     reset = lambda: env.reset()
-    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep)
+    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep, isTerminalGymPendulum)
 
-    ddpg = RunAlgorithm(runEpisode, bufferSize, maxEpisode)
-    modelList = [actorModel, criticModel]
-    modelList = resetTargetParamToTrainParam(modelList)
-    meanRewardList, trajectory, trainedModelList = ddpg(modelList)
+    ddpg = RunAlgorithm(runEpisode, maxEpisode)
 
-    trainedActorModel, trainedCriticModel = trainedModelList
+    replayBuffer = deque(maxlen=int(bufferSize))
+    meanRewardList, trajectory = ddpg(replayBuffer)
+
+    trainedActorModel, trainedCriticModel = trainModels.getTrainedModels()
 
     env.close()
 
+    plotResult = True
+    if plotResult:
+        plt.plot(list(range(maxEpisode)), meanRewardList)
+        plt.show()
 
 if __name__ == '__main__':
     main()
-
-
-# parameters [30], [30]:
-#     cartPole example:
-#         MYDDPG: mean episode reward:  -645, -578, -633
-#         EXP: -622, -620, -616
-#     chasing example:
-#         MYDDPG: (1, -1)
-#         EXP: output action always (-1, 1)
-#
-# parameters [20, 20], [100, 100]:
-#     cartPole example:
-#         my model: -515, -541, -534
-#         exp model:
-#     chasing example
-#         my model: always [-1, -1]
-#         exp model:
 
 
 

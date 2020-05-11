@@ -1,7 +1,5 @@
 import numpy as np
 
-np.random.seed(1)
-
 class Reset():
     def __init__(self, xBoundary, yBoundary, numOfAgent):
         self.xBoundary = xBoundary
@@ -18,15 +16,8 @@ class Reset():
 
         return np.array(initState)
 
-#
-# def samplePosition(xBoundary, yBoundary):
-#     positionX = np.random.uniform(xBoundary[0], xBoundary[1])
-#     positionY = np.random.uniform(yBoundary[0], yBoundary[1])
-#     position = [positionX, positionY]
-#     return position
 
-
-class TransitForNoPhysics():
+class TransitForNoPhysics:
     def __init__(self, stayWithinBoundary):
         self.stayWithinBoundary = stayWithinBoundary
 

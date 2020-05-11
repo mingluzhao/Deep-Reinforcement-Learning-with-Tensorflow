@@ -33,24 +33,17 @@ class RewardMountCarContin:
     def __init__(self, isTerminal):
         self.isTerminal = isTerminal
 
-    def __call__(self, state, action):
-        done = self.isTerminal(state)
-        if done:
-            reward = 100
-            print("done, reward = 100")
-        else:
-            reward = 0
-        # reward = 100.0 if done else 0
+    def __call__(self, state, action, nextState):
+        done = self.isTerminal(nextState)
+        reward = 100.0 if done else 0
         reward -= math.pow(action[0], 2) * 0.1
 
         return reward
 
 
-
-
 class IsTerminalMountCarContin:
     def __init__(self):
-        self.goal_position = 0.45 # was 0.5 in gym, 0.45 in Arnaud de Broissia's version
+        self.goal_position = 0.45
         self.goal_velocity = 0
 
     def __call__(self, state):
@@ -74,15 +67,15 @@ class ResetMountCarContin:
             state = np.array([np_random.uniform(self.low, self.high), 0])
         else:
             state = np.array([random.uniform(self.low, self.high), 0])
-
         return state
+
 
 class VisualizeMountCarContin:
     def __init__(self):
         self.min_position = -1.2
         self.max_position = 0.6
         self._height = lambda xs: np.sin(3 * xs)*.45+.55
-        self.goal_position = 0.45 # was 0.5 in gym, 0.45 in Arnaud de Broissia's version
+        self.goal_position = 0.45
         self.viewer = None
 
     def __call__(self, trajectory):

@@ -1,18 +1,21 @@
 import matplotlib.pyplot as plt
 import gym
 import os
+from collections import deque
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
-    BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients,\
-    TrainActorOneStep, TrainActor, TrainDDPGModels
-from RLframework.RLrun import resetTargetParamToTrainParam, addToMemory, UpdateParameters, RunTimeStep, \
-    RunEpisode, RunAlgorithm
-from src.policy import ActDDPGOneStepWithNoise
+    BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
+    TrainActor, TrainDDPGModels
+from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
+    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm
+from src.policy import ActDDPGOneStep
+from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
+
 from environment.noise.noise import GetExponentialDecayGaussNoise
 from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, isTerminalGymPendulum, \
     observe, angle_normalize, VisualizeGymPendulum, ResetGymPendulum
-from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
+
 
 maxEpisode = 200
 maxTimeStep = 200
@@ -53,30 +56,35 @@ def main():
     paramUpdateInterval = 1
     updateParameters = UpdateParameters(paramUpdateInterval, tau)
 
-    trainModels = TrainDDPGModels(updateParameters, trainActor, trainCritic)
+    modelList = [actorModel, criticModel]
+    actorModel, criticModel = resetTargetParamToTrainParam(modelList)
+    trainModels = TrainDDPGModels(updateParameters, trainActor, trainCritic, actorModel, criticModel)
 
-    noiseInitVariance = 3  # control exploration
+    noiseInitVariance = 3
     varianceDiscount = .9995
     noiseDecayStartStep = bufferSize
     getNoise = GetExponentialDecayGaussNoise(noiseInitVariance, varianceDiscount, noiseDecayStartStep)
-    actOneStepWithNoise = ActDDPGOneStepWithNoise(actionLow, actionHigh, actByPolicyTrain, getNoise)
+    actOneStepWithNoise = ActDDPGOneStep(actionLow, actionHigh, actByPolicyTrain, actorModel, getNoise)
 
     learningStartBufferSize = minibatchSize
+    sampleFromMemory = SampleFromMemory(minibatchSize)
+    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, sampleFromMemory, trainModels)
+
     transit = TransitGymPendulum()
     getReward = RewardGymPendulum(angle_normalize)
-    runDDPGTimeStep = RunTimeStep(actOneStepWithNoise, transit, getReward, isTerminalGymPendulum, addToMemory,
-                 trainModels, minibatchSize, learningStartBufferSize, observe)
+    sampleOneStep = SampleOneStep(transit, getReward)
 
-    reset = ResetGymPendulum(seed, observe)
-    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep)
+    runDDPGTimeStep = RunTimeStep(actOneStepWithNoise, sampleOneStep, learnFromBuffer, observe)
 
-    ddpg = RunAlgorithm(runEpisode, bufferSize, maxEpisode)
+    reset = ResetGymPendulum(seed)
+    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep, isTerminalGymPendulum)
 
-    modelList = [actorModel, criticModel]
-    modelList = resetTargetParamToTrainParam(modelList)
-    meanRewardList, trajectory, trainedModelList = ddpg(modelList)
+    ddpg = RunAlgorithm(runEpisode, maxEpisode)
 
-    trainedActorModel, trainedCriticModel = trainedModelList
+    replayBuffer = deque(maxlen=int(bufferSize))
+    meanRewardList, trajectory = ddpg(replayBuffer)
+
+    trainedActorModel, trainedCriticModel = trainModels.getTrainedModels()
 
 # save Model
     modelIndex = 0
@@ -99,11 +107,11 @@ def main():
         saveVariables(trainedCriticModel, savePathCritic)
 
     dirName = os.path.dirname(__file__)
-    trajectoryPath = os.path.join(dirName, '..', 'trajectory', 'pendulumTrajectory.pickle')
+    trajectoryPath = os.path.join(dirName, '..', 'trajectory', 'pendulumTrajectory1.pickle')
     saveToPickle(trajectory, trajectoryPath)
 
-# demo& plot
-    showDemo = True
+# plots& plot
+    showDemo = False
     if showDemo:
         visualize = VisualizeGymPendulum()
         visualize(trajectory)

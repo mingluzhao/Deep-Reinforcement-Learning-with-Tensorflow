@@ -5,8 +5,8 @@ import os
 import matplotlib.pyplot as plt
 from functionTools.loadSaveModel import saveToPickle, GetSavePath, saveVariables
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
+from collections import deque
 
-seed = 1
 env = gym.make('MountainCar-v0')
 env = env.unwrapped
 
@@ -14,7 +14,7 @@ def main():
     stateDim = env.observation_space.shape[0]
     actionDim = env.action_space.n
     buildModel = BuildModel(stateDim, actionDim)
-    layersWidths = [64, 64]
+    layersWidths = [30]
     writer, model = buildModel(layersWidths)
     modelList = resetTargetParamToTrainParam([model])
 
@@ -31,27 +31,29 @@ def main():
     epsilonMin = 0
     actByTrainNetEpsilonGreedy = ActByTrainNetEpsilonGreedy(epsilonMax, epsilonMin, epsilonDecay, getTrainQValue)
 
+    minibatchSize = 128
+    learningStartBufferSize = minibatchSize
+    sampleFromMemory = SampleFromMemory(minibatchSize)
+    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, sampleFromMemory, trainModels)
 
-    minibatchSize = 32
-    learningStartBufferSize = 1000
     transit = TransitMountCarDiscrete()
-    # getReward = modifiedRewardMountCarDiscrete
     getReward = rewardMountCarDiscrete
     isTerminal = IsTerminalMountCarDiscrete()
-    runDQNTimeStep = RunTimeStep(actByTrainNetEpsilonGreedy, transit, getReward, isTerminal, addToMemory,
-                 trainModels, minibatchSize, learningStartBufferSize)
+    sampleOneStep = SampleOneStep(transit, getReward, isTerminal)
 
-    resetLowPos = -1
-    resetHighPos = -0.8
-    reset = ResetMountCarDiscrete(seed, resetLowPos, resetHighPos)
+    runDQNTimeStep = RunTimeStep(actByTrainNetEpsilonGreedy, sampleOneStep, learnFromBuffer)
+
+    reset = ResetMountCarDiscrete(seed = None)
     maxTimeStep = 2000
     runEpisode = RunEpisode(reset, runDQNTimeStep, maxTimeStep)
 
     bufferSize = 3000
-    maxEpisode = 50
-    dqn = RunAlgorithm(runEpisode, bufferSize, maxEpisode)
-    meanRewardList, trajectory, modelList = dqn(modelList)
-    trainedModel = modelList[0]
+    maxEpisode = 300
+
+    replayBuffer = deque(maxlen=int(bufferSize))
+    dqn = RunAlgorithm(runEpisode, maxEpisode)
+    meanRewardList, trajectory, trainedModelList = dqn(replayBuffer, modelList)
+    trainedModel = trainedModelList[0]
 
 # save Model
     parameters = {'maxEpisode': maxEpisode, 'maxTimeStep': maxTimeStep, 'minibatchSize': minibatchSize, 'gamma': gamma,
@@ -74,7 +76,7 @@ def main():
         plt.plot(list(range(maxEpisode)), meanRewardList)
         plt.show()
 
-    showDemo = True
+    showDemo = False
     if showDemo:
         visualize = VisualizeMountCarDiscrete()
         visualize(trajectory[-50000: ])

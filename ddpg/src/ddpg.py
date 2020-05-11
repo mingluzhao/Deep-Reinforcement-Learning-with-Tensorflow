@@ -397,21 +397,19 @@ class TrainActor:
 
 
 class TrainDDPGModels:
-    def __init__(self, updateParameters, trainActor, trainCritic):
+    def __init__(self, updateParameters, trainActor, trainCritic, actorModel, criticModel):
         self.updateParameters = updateParameters
         self.trainActor = trainActor
         self.trainCritic = trainCritic
+        self.actorModel = actorModel
+        self.criticModel = criticModel
 
-    def __call__(self, modelList, miniBatch, runTime):
-        actorModel, criticModel = modelList
-        criticLoss, trainedCriticModel = self.trainCritic(actorModel, criticModel, miniBatch)
-        trainedActorModel = self.trainActor(actorModel, trainedCriticModel, miniBatch)
+    def __call__(self, miniBatch):
+        criticLoss, self.criticModel = self.trainCritic(self.actorModel, self.criticModel, miniBatch)
+        self.actorModel = self.trainActor(self.actorModel, self.criticModel, miniBatch)
 
-        trainedActorModel = self.updateParameters(trainedActorModel, runTime)
-        trainedCriticModel = self.updateParameters(trainedCriticModel, runTime)
+        self.actorModel = self.updateParameters(self.actorModel)
+        self.criticModel = self.updateParameters(self.criticModel)
 
-        modelList = [trainedActorModel, trainedCriticModel]
-        return modelList
-
-
-
+    def getTrainedModels(self):
+        return [self.actorModel, self.criticModel]
