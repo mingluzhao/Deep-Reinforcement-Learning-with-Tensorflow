@@ -1,0 +1,2 @@
+model_checkpoint_path: "criticModel=0_dimension=2_gamma=0.95_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=20000_maxTimeStep=100_minibatchSize=32_wolfSpeed=0.1.ckpt"
+all_model_checkpoint_paths: "criticModel=0_dimension=2_gamma=0.95_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=20000_maxTimeStep=100_minibatchSize=32_wolfSpeed=0.1.ckpt"

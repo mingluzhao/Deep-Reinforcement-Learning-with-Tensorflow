@@ -16,18 +16,24 @@ class Reset():
 
         return np.array(initState)
 
+def getIntendedNextState(state, action):
+    numAgents = int(len(state) / 2)
+    newState = np.array(state) + np.array(action)
+    agentsPosition = [[newState[2 * id], newState[2 * id + 1]] for id in range(numAgents)]
+    return agentsPosition
+
 
 class TransitForNoPhysics:
-    def __init__(self, stayWithinBoundary):
+    def __init__(self, getIntendedNextState, stayWithinBoundary):
+        self.getIntendedNextState = getIntendedNextState
         self.stayWithinBoundary = stayWithinBoundary
 
     def __call__(self, state, action):
-        numAgents = int(len(state)/2)
-        newState = np.array(state) + np.array(action)
-        agentsPosition = [[newState[2 * id], newState[2 * id + 1]] for id in range(numAgents)]
+        agentsPosition = self.getIntendedNextState(state, action)
         checkedNextState = [self.stayWithinBoundary(position) for position in agentsPosition]
         nextState = np.concatenate(checkedNextState)
         return nextState
+
 
 class StayWithinBoundary:
     def __init__(self, xBoundary, yBoundary):
@@ -54,7 +60,7 @@ class TransitWithSingleWolf:
 
     def __call__(self, state, sheepAction):
         wolfAction = list(self.wolfPolicy(state))
-        allAgentsActions = wolfAction + list(sheepAction)
+        allAgentsActions = list(sheepAction) + wolfAction
         nextState = self.transit(state, allAgentsActions)
         return nextState
 
@@ -70,16 +76,36 @@ class GetAgentPosFromState:
 
 
 class IsTerminal():
-    def __init__(self, getPredatorPos, getPreyPos, minDistance):
+    def __init__(self, getPredatorPos, getPreyPos, minDistance, isBoundaryTerminal = None):
         self.getPredatorPos = getPredatorPos
         self.getPreyPos = getPreyPos
         self.minDistance = minDistance
+        self.isBoundaryTerminal = isBoundaryTerminal
 
     def __call__(self, state):
-        terminal = False
+        chasingTerminal = False
         preyPosition = self.getPreyPos(state)
         predatorPosition = self.getPredatorPos(state)
         L2Normdistance = np.linalg.norm((np.array(preyPosition) - np.array(predatorPosition)), ord=2)
         if L2Normdistance <= self.minDistance:
-            terminal = True
+            chasingTerminal = True
+
+        if self.isBoundaryTerminal is not None:
+            boundaryTerminal = self.isBoundaryTerminal(state)
+            terminal = chasingTerminal or boundaryTerminal
+            return terminal
+        else:
+            return chasingTerminal
+
+
+class IsBoundaryTerminal:
+    def __init__(self, xBoundary, yBoundary, getSheepPos):
+        self.getSheepPos = getSheepPos
+        self.xMin, self.xMax = xBoundary
+        self.yMin, self.yMax = yBoundary
+
+    def __call__(self, state):
+        sheepX, sheepY = self.getSheepPos(state)
+        terminal = (sheepX <= self.xMin) or (sheepX >= self.xMax) or (sheepY <= self.yMin) or (sheepY >= self.yMax)
         return terminal
+

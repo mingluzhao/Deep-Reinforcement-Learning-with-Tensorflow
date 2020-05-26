@@ -1,2 +1,2 @@
-model_checkpoint_path: "Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt"
-all_model_checkpoint_paths: "Eps=200_batch=128_criticModel=0_env=Pendulum-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=3_timeStep=200_varDiscout=0.9995.ckpt"
+model_checkpoint_path: "criticModel=0_dimension=2_gamma=0.95_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=5000_maxTimeStep=20_minibatchSize=32_wolfSpeed=1.ckpt"
+all_model_checkpoint_paths: "criticModel=0_dimension=2_gamma=0.95_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=5000_maxTimeStep=20_minibatchSize=32_wolfSpeed=1.ckpt"

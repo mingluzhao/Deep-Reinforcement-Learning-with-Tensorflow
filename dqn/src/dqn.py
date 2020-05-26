@@ -4,28 +4,6 @@ import random
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
-class ActByTrainNetEpsilonGreedy:
-    def __init__(self, epsilonMax, epsilonMin, epsilonDecay, getTrainQValue):
-        self.epsilonMax = epsilonMax
-        self.epsilonMin = epsilonMin
-        self.epsilonDecay = epsilonDecay
-        self.getTrainQValue = getTrainQValue
-
-    def __call__(self, modelList, states, runTime):
-        model = modelList[0]
-        epsilonResult = self.epsilonMin + self.epsilonDecay * runTime
-        epsilon = epsilonResult if epsilonResult < self.epsilonMax else self.epsilonMax
-        stateBatch = np.asarray(states).reshape(1, -1)
-        trainQVal = self.getTrainQValue(model, stateBatch)
-
-        if np.random.uniform() < epsilon:
-            action = np.argmax(trainQVal)
-        else:
-            action = random.randrange(len(trainQVal[0]))
-
-        return [action]
-
-
 def getTrainQValue(model, stateBatch):
     graph = model.graph
     states_ = graph.get_collection_ref("states_")[0]
@@ -200,113 +178,25 @@ class TrainModelBySASRQ:
 
 
 class TrainDQNModel:
-    def __init__(self, getTargetQValue, trainModelBySASRQ, updateParameters):
+    def __init__(self, getTargetQValue, trainModelBySASRQ, updateParameters, model):
         self.getTargetQValue = getTargetQValue
         self.trainModelBySASRQ = trainModelBySASRQ
         self.updateParameters = updateParameters
+        self.model = model
 
-    def __call__(self, modelList, miniBatch, runTime):
-        model = modelList[0] # single model to train
+    def __call__(self, miniBatch):
         states, actions, rewards, nextStates = list(zip(*miniBatch))
         stateBatch = np.asarray(states).reshape(len(miniBatch), -1)
         actionBatch = np.asarray(actions).reshape(len(miniBatch))
         nextStateBatch = np.asarray(nextStates).reshape(len(miniBatch), -1)
         rewardBatch = np.asarray(rewards).reshape(len(miniBatch))
 
-        targetNextStateQ = self.getTargetQValue(model, nextStateBatch)
-        loss, model = self.trainModelBySASRQ(model, stateBatch, actionBatch, rewardBatch, targetNextStateQ)
-        model = self.updateParameters(model, runTime)
+        targetNextStateQ = self.getTargetQValue(self.model, nextStateBatch)
+        loss, self.model = self.trainModelBySASRQ(self.model, stateBatch, actionBatch, rewardBatch, targetNextStateQ)
+        self.model = self.updateParameters(self.model)
 
-        return [model]
-
-#
-# def addToMemory(buffer, state, action, reward, nextState):
-#     experience = (state, action, reward, nextState)
-#     buffer.append(experience)
-#     return buffer
-#
-#
-# class RunDQNTimeStep:
-#     def __init__(self, actByTrainNetEpsilonGreedy,
-#                  transit, getReward, isTerminal,
-#                  addToMemory, observe, trainModel, minibatchSize,
-#                  learningStartBufferSize):
-#         self.actByTrainNetEpsilonGreedy = actByTrainNetEpsilonGreedy
-#
-#         self.transit = transit
-#         self.getReward = getReward
-#         self.isTerminal = isTerminal
-#         self.observe = observe
-#         self.addToMemory = addToMemory
-#         self.trainModel = trainModel
-#         self.minibatchSize = minibatchSize
-#         self.learningStartBufferSize = learningStartBufferSize
-#
-#     def __call__(self, state, model, replayBuffer, trajectory):
-#         runTime = len(trajectory)
-#
-#         observation = self.observe(state)
-#         observation = np.asarray(observation).reshape(1, -1)
-#         action = self.actByTrainNetEpsilonGreedy(model, observation, runTime)
-#
-#         nextState = self.transit(state, action)
-#         reward = self.getReward(state, action)
-#         terminal = self.isTerminal(nextState)
-#         trajectory.append((state, action))
-#         nextObservation = self.observe(nextState)
-#         replayBuffer = self.addToMemory(replayBuffer, observation, action, reward, nextObservation)
-#
-#         if runTime >= self.learningStartBufferSize:
-#             miniBatch = random.sample(replayBuffer, self.minibatchSize)
-#             model = self.trainModel(model, miniBatch, runTime)
-#
-#         return reward, nextState, model, replayBuffer, terminal, trajectory
-#
-#
-# class RunEpisode:
-#     def __init__(self, reset, runTimeStep, maxTimeStep):
-#         self.reset = reset
-#         self.runTimeStep = runTimeStep
-#         self.maxTimeStep = maxTimeStep
-#
-#     def __call__(self, model, replayBuffer, trajectory):
-#         state = self.reset()
-#         episodeReward = 0
-#         for timeStep in range(self.maxTimeStep):
-#             reward, state, model, replayBuffer, terminal, trajectory = \
-#                 self.runTimeStep(state, model, replayBuffer, trajectory)
-#             if terminal:
-#                 break
-#             episodeReward += reward
-#         print('episodeReward: ', episodeReward)
-#         return model, replayBuffer, episodeReward, trajectory
-#
-#
-# class DQN:
-#     def __init__(self, runEpisode, bufferSize, maxEpisode, print = True):
-#         self.bufferSize = bufferSize
-#         self.runEpisode = runEpisode
-#         self.maxEpisode = maxEpisode
-#         self.print = print
-#
-#     def __call__(self, model):
-#         replayBuffer = deque(maxlen=int(self.bufferSize))
-#         episodeRewardList = []
-#         meanRewardList = []
-#         trajectory = []
-#         for episode in range(self.maxEpisode):
-#             model, replayBuffer, episodeReward, trajectory = self.runEpisode(model, replayBuffer, trajectory)
-#             episodeRewardList.append(episodeReward)
-#             meanRewardList.append(np.mean(episodeRewardList))
-#
-#             if print:
-#                 print('episode', episode)
-#                 if episode == self.maxEpisode - 1:
-#                     print('mean episode reward: ', int(np.mean(episodeRewardList)))
-#
-#         return meanRewardList, trajectory, model
-#
-
+    def getTrainedModels(self):
+        return self.model
 
 
 

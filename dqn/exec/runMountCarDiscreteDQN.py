@@ -1,14 +1,29 @@
-from dqn.src.dqn import *
-from RLframework.RLrun import *
-from environment.gymEnv.discreteMountainCarEnv import *
-import os
 import matplotlib.pyplot as plt
-from functionTools.loadSaveModel import saveToPickle, GetSavePath, saveVariables
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+import gym
 from collections import deque
+import os
+import sys
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+dirName = os.path.dirname(__file__)
+sys.path.append(os.path.join(dirName, '..', '..'))
+sys.path.append(os.path.join(dirName, '..'))
+
+from dqn.src.policy import *
+from dqn.src.dqn import *
+from dqn.src.policy import ActByTrainNetEpsilonGreedy
+from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
+    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm
+from environment.gymEnv.discreteMountainCarEnv import TransitMountCarDiscrete, IsTerminalMountCarDiscrete, \
+    rewardMountCarDiscrete, ResetMountCarDiscrete, VisualizeMountCarDiscrete
+from functionTools.loadSaveModel import saveToPickle, GetSavePath, saveVariables
 
 env = gym.make('MountainCar-v0')
 env = env.unwrapped
+
+minibatchSize = 128
+bufferSize = 200000
+maxTimeStep = 2000
+maxEpisode = 1000
 
 def main():
     stateDim = env.observation_space.shape[0]
@@ -16,7 +31,6 @@ def main():
     buildModel = BuildModel(stateDim, actionDim)
     layersWidths = [30]
     writer, model = buildModel(layersWidths)
-    modelList = resetTargetParamToTrainParam([model])
 
     learningRate = 0.001
     gamma = 0.9
@@ -24,40 +38,42 @@ def main():
 
     paramUpdateInterval = 300
     updateParameters = UpdateParameters(paramUpdateInterval)
-    trainModels = TrainDQNModel(getTargetQValue, trainModelBySASRQ, updateParameters)
+    model = resetTargetParamToTrainParam([model])[0]
+    trainModels = TrainDQNModel(getTargetQValue, trainModelBySASRQ, updateParameters, model)
 
     epsilonMax = 0.9
-    epsilonDecay = 0.0002
+    epsilonIncrease = 0.00002
     epsilonMin = 0
-    actByTrainNetEpsilonGreedy = ActByTrainNetEpsilonGreedy(epsilonMax, epsilonMin, epsilonDecay, getTrainQValue)
+    decayStartStep = bufferSize
+    getEpsilon = GetEpsilon(epsilonMax, epsilonMin, epsilonIncrease, decayStartStep)
 
-    minibatchSize = 128
+    actGreedyByModel = ActGreedyByModel(getTrainQValue, model)
+    actRandom = ActRandom(actionDim)
+    actByTrainNetEpsilonGreedy = ActByTrainNetEpsilonGreedy(getEpsilon, actGreedyByModel, actRandom)
+
     learningStartBufferSize = minibatchSize
     sampleFromMemory = SampleFromMemory(minibatchSize)
     learnFromBuffer = LearnFromBuffer(learningStartBufferSize, sampleFromMemory, trainModels)
 
     transit = TransitMountCarDiscrete()
     getReward = rewardMountCarDiscrete
-    isTerminal = IsTerminalMountCarDiscrete()
-    sampleOneStep = SampleOneStep(transit, getReward, isTerminal)
+    sampleOneStep = SampleOneStep(transit, getReward)
 
     runDQNTimeStep = RunTimeStep(actByTrainNetEpsilonGreedy, sampleOneStep, learnFromBuffer)
 
-    reset = ResetMountCarDiscrete(seed = None)
-    maxTimeStep = 2000
-    runEpisode = RunEpisode(reset, runDQNTimeStep, maxTimeStep)
+    reset = ResetMountCarDiscrete(seed = None, low= -1, high= 0.4)
+    isTerminal = IsTerminalMountCarDiscrete()
+    runEpisode = RunEpisode(reset, runDQNTimeStep, maxTimeStep, isTerminal)
 
-    bufferSize = 3000
-    maxEpisode = 300
-
-    replayBuffer = deque(maxlen=int(bufferSize))
     dqn = RunAlgorithm(runEpisode, maxEpisode)
-    meanRewardList, trajectory, trainedModelList = dqn(replayBuffer, modelList)
-    trainedModel = trainedModelList[0]
+    replayBuffer = deque(maxlen=int(bufferSize))
+    meanRewardList, trajectory = dqn(replayBuffer)
+
+    trainedModel = trainModels.getTrainedModels()
 
 # save Model
     parameters = {'maxEpisode': maxEpisode, 'maxTimeStep': maxTimeStep, 'minibatchSize': minibatchSize, 'gamma': gamma,
-                  'learningRate': learningRate, 'epsilonDecay': epsilonDecay , 'epsilonMin': epsilonMin}
+                  'learningRate': learningRate, 'epsilonIncrease': epsilonIncrease , 'epsilonMin': epsilonMin}
 
     modelSaveDirectory = "../trainedDQNModels"
     modelSaveExtension = '.ckpt'
