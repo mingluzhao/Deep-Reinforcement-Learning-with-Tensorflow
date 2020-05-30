@@ -17,13 +17,13 @@ class TestPendulumEnv(unittest.TestCase):
         self.sheepsID = [0]
         self.wolvesID = [1, 2]
         self.blocksID = [3, 4]
-        self.isCollision = IsCollision(getPosFromState)
+        self.isCollision = IsCollision(getPosFromAgentState)
         self.entitiesSizeList = [0.1] * len(self.sheepsID) + [0.2] * len(self.wolvesID) + [0.5] * len(self.blocksID)
 
         self.rewardWolf = RewardWolf(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, collisionReward=10)
         self.punishForOutOfBound = PunishForOutOfBound()
-        self.rewardSheep = RewardSheep(self.wolvesID, self.sheepsID, self.entitiesSizeList, getPosFromState, self.isCollision, self.punishForOutOfBound,
-                     collisionPunishment=10)
+        self.rewardSheep = RewardSheep(self.wolvesID, self.sheepsID, self.entitiesSizeList, getPosFromAgentState, self.isCollision, self.punishForOutOfBound,
+                                       collisionPunishment=10)
 
         self.numTotalAgents = len(self.sheepsID) + len(self.wolvesID)
         self.numBlocks = len(self.blocksID)
@@ -104,7 +104,7 @@ class TestPendulumEnv(unittest.TestCase):
     @unpack
     def testObserve(self, agentID, trueObsShape):
         state = np.array([[0, 1, 1., 0.], [1,  0, 1.,0.], [1,  0, 1.,0.], [1,  0, 1.,0.], [1,  0, 1.,0.]])
-        observe = Observe(agentID, self.wolvesID, self.sheepsID, self.blocksID, getPosFromState, getVelFromAgentState)
+        observe = Observe(agentID, self.wolvesID, self.sheepsID, self.blocksID, getPosFromAgentState, getVelFromAgentState)
         obsShape = observe(state).shape
         self.assertEqual(obsShape, trueObsShape)
 

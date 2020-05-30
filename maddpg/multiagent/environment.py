@@ -1,8 +1,6 @@
 import gym
 from gym import spaces
-from gym.envs.registration import EnvSpec
 import numpy as np
-from maddpg.multiagent.multi_discrete import MultiDiscrete
 
 # environment for all agents in the multiagent world
 # currently code assumes that no agents will be created/destroyed at runtime!
@@ -46,11 +44,7 @@ class MultiAgentEnv(gym.Env):
             agent.action.c = np.zeros(self.world.dim_c)
 
         # rendering
-        self.shared_viewer = shared_viewer
-        if self.shared_viewer:
-            self.viewers = [None]
-        else:
-            self.viewers = [None] * self.n
+        self.viewer = None
         self._reset_render()
 
     def step(self, action_n): # takes actions of all agents
@@ -126,20 +120,56 @@ class MultiAgentEnv(gym.Env):
 
     # render environment
     # render environment
+    # def render(self, mode='human'):
+    #     from maddpg.multiagent import rendering
+    #     self.viewers = rendering.Viewer(700,700)
+    #
+    #     # create rendering geometry
+    #     if self.render_geoms is None:
+    #         # import rendering only if we need it (and don't import for headless machines)
+    #         #from gym.envs.classic_control import rendering
+    #         from maddpg.multiagent import rendering
+    #         self.render_geoms = []
+    #         self.render_geoms_xform = []
+    #         for entity in self.world.entities:
+    #             geom = rendering.make_circle(entity.size)
+    #             xform = rendering.Transform()
+    #             if 'agent' in entity.name:
+    #                 geom.set_color(*entity.color, alpha=0.5)
+    #             else:
+    #                 geom.set_color(*entity.color)
+    #             geom.add_attr(xform)
+    #             self.render_geoms.append(geom)
+    #             self.render_geoms_xform.append(xform)
+    #
+    #         # add geoms to viewer
+    #         self.viewers.geoms = []
+    #         for geom in self.render_geoms:
+    #             self.viewers.add_geom(geom)
+    #
+    #     results = []
+    #     # update bounds to center around agent
+    #     cam_range = 1
+    #     pos = np.zeros(self.world.dim_p)
+    #     self.viewers.set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
+    #     # update geometry positions
+    #     for e, entity in enumerate(self.world.entities):
+    #         self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+    #     # render to display or array
+    #     results.append(self.viewers.render(return_rgb_array = mode=='rgb_array'))
+    #
+    #     return results
+
+
+    # create receptor field locations in local coordinate frame
+
     def render(self, mode='human'):
-        for i in range(len(self.viewers)):
-            # create viewers (if necessary)
-            if self.viewers[i] is None:
-                # import rendering only if we need it (and don't import for headless machines)
-                #from gym.envs.classic_control import rendering
-                from maddpg.maddpg_openai.multiagent import rendering
-                self.viewers[i] = rendering.Viewer(700,700)
+        from maddpg.multiagent import rendering
+        if self.viewer is None:
+            self.viewer = rendering.Viewer(700,700)
 
         # create rendering geometry
         if self.render_geoms is None:
-            # import rendering only if we need it (and don't import for headless machines)
-            #from gym.envs.classic_control import rendering
-            from maddpg.maddpg_openai.multiagent import rendering
             self.render_geoms = []
             self.render_geoms_xform = []
             for entity in self.world.entities:
@@ -154,47 +184,28 @@ class MultiAgentEnv(gym.Env):
                 self.render_geoms_xform.append(xform)
 
             # add geoms to viewer
-            for viewer in self.viewers:
-                viewer.geoms = []
-                for geom in self.render_geoms:
-                    viewer.add_geom(geom)
+            self.viewer.geoms = []
+            for geom in self.render_geoms:
+                self.viewer.add_geom(geom)
 
         results = []
-        for i in range(len(self.viewers)):
-            from maddpg.maddpg_openai.multiagent import rendering
-            # update bounds to center around agent
-            cam_range = 1
-            if self.shared_viewer:
-                pos = np.zeros(self.world.dim_p)
-            else:
-                pos = self.agents[i].state.p_pos
-            self.viewers[i].set_bounds(pos[0]-cam_range,pos[0]+cam_range,pos[1]-cam_range,pos[1]+cam_range)
-            # update geometry positions
-            for e, entity in enumerate(self.world.entities):
-                self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
-            # render to display or array
-            results.append(self.viewers[i].render(return_rgb_array = mode=='rgb_array'))
+        # update bounds to center around agent
+        cam_range = 1
+        pos = np.zeros(self.world.dim_p)
+        self.viewer.set_bounds(pos[0]-cam_range, pos[0]+cam_range, pos[1]-cam_range, pos[1]+cam_range)
+        # update geometry positions
 
-        return results
+        currentState = []
 
+        for e, entity in enumerate(self.world.entities): # 4
+            self.render_geoms_xform[e].set_translation(*entity.state.p_pos)
+            currentState.append(list(entity.state.p_pos) + list(entity.state.p_vel))
+        # print(currentState)
+        # render to display or array
 
-    # create receptor field locations in local coordinate frame
-    def _make_receptor_locations(self, agent):
-        receptor_type = 'polar'
-        range_min = 0.05 * 2.0
-        range_max = 1.00
-        dx = []
-        # circular receptive field
-        if receptor_type == 'polar':
-            for angle in np.linspace(-np.pi, +np.pi, 8, endpoint=False):
-                for distance in np.linspace(range_min, range_max, 3):
-                    dx.append(distance * np.array([np.cos(angle), np.sin(angle)]))
-            # add origin
-            dx.append(np.array([0.0, 0.0]))
-        # grid receptive field
-        if receptor_type == 'grid':
-            for x in np.linspace(-range_max, +range_max, 5):
-                for y in np.linspace(-range_max, +range_max, 5):
-                    dx.append(np.array([x,y]))
-        return dx
+        results.append(self.viewer.render(return_rgb_array = mode=='rgb_array'))
 
+        return currentState
+
+# trajectory[0] = [allAgentsStates, allAgentsActions, allAgentsRewards, allAgentsNextState],
+# agentState = [agentPos1, agentPos2, agentVel1, agentVel2]

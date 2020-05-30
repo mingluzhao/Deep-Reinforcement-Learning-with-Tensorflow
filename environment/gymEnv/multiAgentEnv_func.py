@@ -1,7 +1,9 @@
 import tensorflow as tf
 import numpy as np
+import os
+import sys
 
-getPosFromState = lambda state: np.array([state[0], state[1]])
+getPosFromAgentState = lambda state: np.array([state[0], state[1]])
 
 class IsCollision:
     def __init__(self, getPosFromState):
@@ -72,7 +74,7 @@ class RewardSheep:
         self.collisionPunishment = collisionPunishment
         self.punishForOutOfBound = punishForOutOfBound
 
-    def __call__(self, state, action, nextState):
+    def __call__(self, state, action, nextState): #state, action not used
         reward = []
         for sheepID in self.sheepsID:
             sheepReward = 0
@@ -242,13 +244,19 @@ class IntegrateState:
         self.getEntityPos = lambda state, entityID: getPosFromAgentState(state[entityID])
 
     def __call__(self, pForce, state):
+        getNextState = lambda entityPos, entityVel: list(entityPos) + list(entityVel)
         nextState = []
         for entityID in range(self.numEntities):
             entityMovable = self.entitiesMovableList[entityID]
-            if not entityMovable: continue
             entityVel = self.getEntityVel(state, entityID)
-            entityNextVel = entityVel * (1 - self.damping)
+            entityPos = self.getEntityPos(state, entityID)
 
+
+            if not entityMovable:
+                nextState.append(getNextState(entityPos, entityVel))
+                continue
+
+            entityNextVel = entityVel * (1 - self.damping)
             entityForce = pForce[entityID]
             entityMass = self.massList[entityID]
             if entityForce is not None:
@@ -260,9 +268,8 @@ class IntegrateState:
                 if speed > entityMaxSpeed:
                     entityNextVel = entityNextVel / speed * entityMaxSpeed
 
-            entityPos = self.getEntityPos(state, entityID)
             entityNextPos = entityPos + entityNextVel * self.dt
-            nextState.append([entityNextPos, entityNextVel])
+            nextState.append(getNextState(entityNextPos, entityNextVel))
 
         return nextState
 
@@ -271,13 +278,15 @@ class IntegrateState:
 
 
 class TransitMultiAgentChasing:
-    def __init__(self, numEntities, applyActionForce, applyEnvironForce, integrateState):
+    def __init__(self, numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState):
         self.numEntities = numEntities
+        self.reshapeAction = reshapeAction
         self.applyActionForce = applyActionForce
         self.applyEnvironForce = applyEnvironForce
         self.integrateState = integrateState
 
     def __call__(self, state, actions):
+        actions = [self.reshapeAction(action) for action in actions]
         p_force = [None] * self.numEntities
         p_force = self.applyActionForce(p_force, actions)
         p_force = self.applyEnvironForce(p_force, state)
@@ -285,3 +294,14 @@ class TransitMultiAgentChasing:
 
         return nextState
 
+
+class ReshapeAction:
+    def __init__(self):
+        self.actionDim = 2
+        self.sensitivity = 5
+
+    def __call__(self, action): # action: tuple of dim (5,1)
+        actionX = action[1] - action[2]
+        actionY = action[3] - action[4]
+        action = np.array([actionX, actionY]) * self.sensitivity
+        return action

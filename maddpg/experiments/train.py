@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import time
 import pickle
+from functionTools.loadSaveModel import saveToPickle
 
 import maddpg.maddpg.common.tf_util as U
 from maddpg.maddpg.trainer.maddpg import MADDPGAgentTrainer
@@ -17,7 +18,7 @@ def parse_args():
     # Environment
     parser.add_argument("--scenario", type=str, default="simple", help="name of the scenario script")
     parser.add_argument("--max-episode-len", type=int, default=25, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=60000, help="number of episodes")
+    parser.add_argument("--num-episodes", type=int, default=10000, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
     parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
     parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
@@ -33,7 +34,7 @@ def parse_args():
     parser.add_argument("--load-dir", type=str, default="", help="directory in which training state and model are loaded")
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--display", action="store_true", default=False)
+    parser.add_argument("--display", action="store_true", default=True)
     parser.add_argument("--benchmark", action="store_true", default=False)
     parser.add_argument("--benchmark-iters", type=int, default=100000, help="number of iterations run for benchmarking")
     parser.add_argument("--benchmark-dir", type=str, default=os.path.join(dirName, '..', 'benchmark_files'), help="directory where benchmark data is saved")
@@ -86,6 +87,9 @@ def get_trainers(env, num_adversaries, obs_shape_n, arglist): # get_trainers(env
 
 
 def train(arglist):
+    trajectory = []
+    obsList = []
+
     with U.single_threaded_session():
         # Create environment
         env = make_env(arglist.scenario, arglist, arglist.benchmark)
@@ -116,12 +120,28 @@ def train(arglist):
         train_step = 0
         t_start = time.time()
 
+
+
         print('Starting iterations...')
         while True:
+            obsList.append(obs_n)
             # get action
-            action_n = [agent.action(obs) for agent, obs in zip(trainers,obs_n)]
+            action_n = [agent.action(obs) for agent, obs in zip(trainers,obs_n)] # shape = 3* 5
+            # actionList.append(np.array([action_n]))
+
+            getStateFromEnv = lambda entityID: list(env.world.entities[entityID].state.p_pos) + list(env.world.entities[entityID].state.p_vel)
+            numEntities = len(env.world.entities)
+            currentState = [getStateFromEnv(entityID) for entityID in range(numEntities)]
+
             # environment step
             new_obs_n, rew_n, done_n, info_n = env.step(action_n)
+
+            nextState = [getStateFromEnv(entityID) for entityID in range(numEntities)]
+            currentTimeStepInfo = [currentState, action_n, rew_n, nextState]
+            trajectory.append(np.array(currentTimeStepInfo))
+
+            # rewardList.append(np.array([rew_n]))
+
             episode_step += 1
             done = all(done_n)
             terminal = (episode_step >= arglist.max_episode_len)
@@ -141,26 +161,43 @@ def train(arglist):
                 for a in agent_rewards:
                     a.append(0)
                 agent_info.append([[]])
+                ####
+                trajectoryPath = os.path.join(dirName, '..', 'trajectoryFull.pickle')
+                saveToPickle(trajectory, trajectoryPath)
+                #
+                obsPath = os.path.join(dirName, '..', 'obs.pickle')
+                saveToPickle(obsList, obsPath)
+                #
+                # rewardPath = os.path.join(dirName, '..', 'reward.pickle')
+                # saveToPickle(rewardList, rewardPath)
+
+
+                break
+
+                ####
+
 
             # increment global step counter
             train_step += 1
 
-            # for benchmarking learned policies
-            if arglist.benchmark:
-                for i, info in enumerate(info_n):
-                    agent_info[-1][i].append(info_n['n'])
-                if train_step > arglist.benchmark_iters and (done or terminal):
-                    file_name = arglist.benchmark_dir + arglist.exp_name + '.pkl'
-                    print('Finished benchmarking, now saving...')
-                    with open(file_name, 'wb') as fp:
-                        pickle.dump(agent_info[:-1], fp)
-                    break
-                continue
+            # # for benchmarking learned policies
+            # if arglist.benchmark:
+            #     for i, info in enumerate(info_n):
+            #         agent_info[-1][i].append(info_n['n'])
+            #     if train_step > arglist.benchmark_iters and (done or terminal):
+            #         file_name = arglist.benchmark_dir + arglist.exp_name + '.pkl'
+            #         print('Finished benchmarking, now saving...')
+            #         with open(file_name, 'wb') as fp:
+            #             pickle.dump(agent_info[:-1], fp)
+            #         break
+            #     continue
 
             # for displaying learned policies
+
             if arglist.display:
                 time.sleep(0.1)
-                env.render()
+                currentStateRender = env.render()
+                # trajectory.append([np.array(currentState)] )
                 continue
 
             # update all trainers, if not in display or benchmark mode
