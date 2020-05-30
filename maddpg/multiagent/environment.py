@@ -121,14 +121,14 @@ class MultiAgentEnv(gym.Env):
     # render environment
     # render environment
     # def render(self, mode='human'):
-    #     from maddpg.multiagent import rendering
+    #     from maddpgAlgor.multiagent import rendering
     #     self.viewers = rendering.Viewer(700,700)
     #
     #     # create rendering geometry
     #     if self.render_geoms is None:
     #         # import rendering only if we need it (and don't import for headless machines)
     #         #from gym.envs.classic_control import rendering
-    #         from maddpg.multiagent import rendering
+    #         from maddpgAlgor.multiagent import rendering
     #         self.render_geoms = []
     #         self.render_geoms_xform = []
     #         for entity in self.world.entities:
@@ -164,7 +164,7 @@ class MultiAgentEnv(gym.Env):
     # create receptor field locations in local coordinate frame
 
     def render(self, mode='human'):
-        from maddpg.multiagent import rendering
+        from maddpgAlgor.multiagent import rendering
         if self.viewer is None:
             self.viewer = rendering.Viewer(700,700)
 

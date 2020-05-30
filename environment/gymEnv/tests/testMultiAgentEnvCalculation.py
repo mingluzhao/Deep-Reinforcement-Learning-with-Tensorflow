@@ -12,7 +12,7 @@ from environment.gymEnv.multiAgentEnv_func import *
 import random
 
 @ddt
-class TestPendulumEnv(unittest.TestCase):
+class TestMultiAgentEnv(unittest.TestCase):
     def setUp(self):
         self.sheepsID = [0]
         self.wolvesID = [1, 2]

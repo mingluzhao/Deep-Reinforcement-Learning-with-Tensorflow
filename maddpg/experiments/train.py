@@ -5,8 +5,8 @@ import time
 import pickle
 from functionTools.loadSaveModel import saveToPickle
 
-import maddpg.maddpg.common.tf_util as U
-from maddpg.maddpg.trainer.maddpg import MADDPGAgentTrainer
+import maddpg.maddpgAlgor.common.tf_util as U
+from maddpg.maddpgAlgor.trainer.maddpg import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 
 import os
@@ -20,8 +20,8 @@ def parse_args():
     parser.add_argument("--max-episode-len", type=int, default=25, help="maximum episode length")
     parser.add_argument("--num-episodes", type=int, default=10000, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
-    parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
-    parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
+    parser.add_argument("--good-policy", type=str, default="maddpgAlgor", help="policy for good agents")
+    parser.add_argument("--adv-policy", type=str, default="maddpgAlgor", help="policy of adversaries")
     # Core training parameters
     parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
     parser.add_argument("--gamma", type=float, default=0.95, help="discount factor")
@@ -68,8 +68,6 @@ def make_env(scenario_name, arglist, benchmark=False):  #### why is arglist not 
         print(env.action_space)
     return env
 
-#  env.observation_space <class 'list'>: [Box(16,), Box(16,), Box(16,), Box(14,)]
-# env.action_space <class 'list'>: [Discrete(5), Discrete(5), Discrete(5), Discrete(5)]
 
 def get_trainers(env, num_adversaries, obs_shape_n, arglist): # get_trainers(env, num_adversaries, obs_shape_n, arglist)
     trainers = []
@@ -161,20 +159,15 @@ def train(arglist):
                 for a in agent_rewards:
                     a.append(0)
                 agent_info.append([[]])
-                ####
+
                 trajectoryPath = os.path.join(dirName, '..', 'trajectoryFull.pickle')
                 saveToPickle(trajectory, trajectoryPath)
-                #
+
                 obsPath = os.path.join(dirName, '..', 'obs.pickle')
                 saveToPickle(obsList, obsPath)
-                #
-                # rewardPath = os.path.join(dirName, '..', 'reward.pickle')
-                # saveToPickle(rewardList, rewardPath)
-
-
                 break
 
-                ####
+
 
 
             # increment global step counter

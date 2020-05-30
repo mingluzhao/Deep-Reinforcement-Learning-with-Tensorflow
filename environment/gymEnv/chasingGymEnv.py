@@ -1,6 +1,6 @@
 import numpy as np
-from maddpg.maddpg_openai.multiagent.core import World, Agent, Landmark
-from maddpg.maddpg_openai.multiagent.scenario import BaseScenario
+from maddpgAlgor.maddpg_openai.multiagent.core import World, Agent, Landmark
+from maddpgAlgor.maddpg_openai.multiagent.scenario import BaseScenario
 # predator-prey environment
 # good agents are prey, adversaries are predators, now set good = 0, bad = 1
 

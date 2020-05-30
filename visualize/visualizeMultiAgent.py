@@ -347,7 +347,7 @@ class Render:
         self.render_geoms_xform = None
         self.viewer = None
 
-        # import maddpg.multiagent.rendering as rendering
+        # import maddpgAlgor.multiagent.rendering as rendering
         for timeStep in range(len(trajectory)):
             time.sleep(0.1)
             if self.viewer is None:

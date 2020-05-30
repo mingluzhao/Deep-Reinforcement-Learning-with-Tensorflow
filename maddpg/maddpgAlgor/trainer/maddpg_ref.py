@@ -1,10 +1,10 @@
 import numpy as np
 import random
 import tensorflow as tf
-import maddpg.maddpg.common.tf_util as U
-from maddpg.maddpg.common.distributions import make_pdtype
-from maddpg.maddpg import AgentTrainer
-from maddpg.maddpg.trainer.replay_buffer import ReplayBuffer
+import maddpg.maddpgAlgor.common.tf_util as U
+from maddpg.maddpgAlgor.common.distributions import make_pdtype
+from maddpg.maddpgAlgor import AgentTrainer
+from maddpg.maddpgAlgor.trainer.replay_buffer import ReplayBuffer
 
 def make_update_exp(vals, target_vals):
     polyak = 1.0 - 1e-2
@@ -65,7 +65,7 @@ def p_train(observPlaceHolderList, actionSpaceList, agentIndex, getMLPModel, q_f
 def q_train(observPlaceHolderList, actionSpaceList, q_index, q_func, optimizer, grad_norm_clipping=None, ddpg=False, scope="trainer", reuse=None, num_units=64):
     with tf.variable_scope(scope, reuse=reuse):  #    parser.add_argument("--num-units", type=int, default=64, help="number of units in the mlp")
 
-    # ddpg = False if maddpg, = true if ddpg
+    # ddpg = False if maddpgAlgor, = true if ddpg
         # create distribtuions
         actionPlaceHolderTypeList = [make_pdtype(actionSpace) for actionSpace in actionSpaceList]
 

@@ -5,6 +5,10 @@
       <sourceFolder url="file://$MODULE_DIR$/ddpg" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gymEnv/env" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/dqn" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/environment" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/functionTools" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/maddpg" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

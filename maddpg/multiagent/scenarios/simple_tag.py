@@ -1,6 +1,6 @@
 import numpy as np
-from maddpg.multiagent.core import World, Agent, Landmark
-from maddpg.multiagent.scenario import BaseScenario
+from maddpgAlgor.multiagent.core import World, Agent, Landmark
+from maddpgAlgor.multiagent.scenario import BaseScenario
 # predator-prey environment
 
 class Scenario(BaseScenario):
