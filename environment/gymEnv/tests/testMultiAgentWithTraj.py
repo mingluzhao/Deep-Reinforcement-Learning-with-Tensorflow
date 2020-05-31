@@ -8,7 +8,7 @@ sys.path.append(os.path.join(dirName, '..', '..', '..'))
 
 import unittest
 from ddt import ddt, data, unpack
-from environment.gymEnv.multiAgentEnv_func import *
+from environment.gymEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import loadFromPickle
 
 wolfSize = 0.075

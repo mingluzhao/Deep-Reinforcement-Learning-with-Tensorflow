@@ -15,6 +15,7 @@ class IsCollision:
         minDist = agent1Size + agent2Size
         return True if dist < minDist else False
 
+
 class RewardWolf:
     def __init__(self, wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward=10):
         self.wolvesID = wolvesID
@@ -37,12 +38,7 @@ class RewardWolf:
                     wolfReward += self.collisionReward
         reward = [wolfReward] * len(self.wolvesID)
         return reward
-# wolvesID = [0, 1]
-# sheepsID = [2]
-# rewardWolf = RewardWolf(wolvesID, sheepsID, getAgentState, isCollision)
-# action = [1]
-# nextState = [1]
-# rewardWolf(state, action, nextState)
+
 
 class PunishForOutOfBound:
     def __init__(self):
@@ -112,7 +108,6 @@ class ResetMultiAgentChasing:
         return state
 
 
-# reset = ResetMultiAgentChasing(numTotalAgents, numBlocks)
 class Observe:
     def __init__(self, agentID, wolvesID, sheepsID, blocksID, getPosFromState, getVelFromAgentState):
         self.agentID = agentID
@@ -186,14 +181,6 @@ class ApplyActionForce:
                 pForce[agentID] = np.array(actions[agentID]) + agentNoise
         return pForce
 
-#
-# applyActionForce = ApplyActionForce(wolvesID, sheepsID, entitiesMovableList, actionDim=2)
-# pForce = [None] * 5
-# actions = [[-1, 2], [1, 2], [2, 3], [2, 2], [1, 0]]
-# pForce = applyActionForce(pForce, actions)
-#
-# entitiesSizeList = [0.05] * len(wolvesID + sheepsID) + [0.2] * len(blocksID)
-
 
 class ApplyEnvironForce:
     def __init__(self, numEntities, entitiesMovableList, entitiesSizeList, getCollisionForce, getPosFromState):
@@ -225,11 +212,6 @@ class ApplyEnvironForce:
                     pForce[entity2ID] = force2 + pForce[entity2ID]
 
         return pForce
-
-
-# applyEnvironForce = ApplyEnvironForce(wolvesID, sheepsID, blocksID, entitiesMovableList, entitiesSizeList,
-#                                       getCollisionForce, getPosFromState)
-# applyEnvironForce(pForce, state)
 
 
 class IntegrateState:

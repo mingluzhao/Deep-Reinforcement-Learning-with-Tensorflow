@@ -18,7 +18,7 @@ class Observe:
     def __call__(self, timeStep):
         if timeStep >= len(self.trajectory):
             return None
-        state = self.trajectory[timeStep][0]
+        state = self.trajectory[timeStep]
         currentState = np.asarray(state).reshape(self.numAgents, 2)
         return currentState
 
