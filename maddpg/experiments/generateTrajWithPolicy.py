@@ -13,11 +13,11 @@ from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *
 
 import maddpg.maddpgAlgor.common.tf_util as U
-from maddpg.maddpgAlgor.trainer.maddpg import MADDPGAgentTrainer
+from maddpg.maddpgAlgor.trainer.maddpg_try import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 from gym import spaces
 
-policyPath = os.path.join(dirName, '..', 'policy')
+policyPath = os.path.join(dirName, '..', 'policy1WolfDDPG1SheepDDPGWithTryTrain30k')
 
 wolfSize = 0.075
 sheepSize = 0.05
@@ -43,10 +43,10 @@ class GetTrainers:
         trainers = []
         for i in range(self.numWolves):
             trainers.append(
-                trainer("agent_%d" % i, model, self.obsShape, self.actionSpace, i, arglist, local_q_func=useDDPG))
+                trainer("agent_%d" % i, model, self.obsShape, self.actionSpace, i, arglist, useDDPG))
         for i in range(self.numWolves, self.numAgents):
             trainers.append(
-                trainer("agent_%d" % i, model, self.obsShape, self.actionSpace, i, arglist, local_q_func=useDDPG))
+                trainer("agent_%d" % i, model, self.obsShape, self.actionSpace, i, arglist, useDDPG))
 
         return trainers
 
@@ -90,10 +90,14 @@ def parse_args():
 
 
 def main():
-    wolvesID = [0, 1]
-    sheepsID = [2]
-    blocksID = [3]
-    
+    # wolvesID = [0, 1]
+    # sheepsID = [2]
+    # blocksID = [3]
+    #
+    wolvesID = [0]
+    sheepsID = [1]
+    blocksID = []
+
     numWolves = len(wolvesID)
     numSheeps = len(sheepsID)
     numBlocks = len(blocksID)
@@ -141,26 +145,30 @@ def main():
     trainer = MADDPGAgentTrainer
     model = mlp_model
     arglist = parse_args()
-    trainers = getTrainers(trainer, model, arglist, useDDPG=False)
+    trainers = getTrainers(trainer, model, arglist, useDDPG=True )
 
-    with U.single_threaded_session():
-        U.initialize()
-        U.load_state(policyPath)
-        policy = lambda state: [agent.action(obs) for agent, obs in zip(trainers, observe(state))]
-        traj = sampleTrajectory(policy)
 
-# saveTraj
-    saveTraj = True
-    if saveTraj:
-        trajSavePath = os.path.join(dirName, '..', 'trajectory', 'trajectory1.pickle')
-        saveToPickle(traj, trajSavePath)
+    trajList = []
+    for i in range(20):
+        with U.single_threaded_session():
+            U.initialize()
+            U.load_state(policyPath)
+            policy = lambda state: [agent.action(obs) for agent, obs in zip(trainers, observe(state))]
+            traj = sampleTrajectory(policy)
+            trajList = trajList + list(traj)
 
-# visualize
+    # saveTraj
+        saveTraj = False
+        if saveTraj:
+            trajSavePath = os.path.join(dirName, '..', 'trajectory', 'trajectory1.pickle')
+            saveToPickle(traj, trajSavePath)
+
+    # visualize
     visualize = True
     if visualize:
-        entitiesColorList = [wolfColor, wolfColor, sheepColor, blockColor]
+        entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
         render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
-        render(traj)
+        render(trajList)
 
 
 if __name__ == '__main__':
