@@ -72,6 +72,7 @@ class LearnFromBuffer:
 
     def __call__(self, replayBuffer, runTime):
         if runTime >= self.learningStartBufferSize:
+            # print('learn-------------------------------------')
             miniBatch = self.sampleFromMemory(replayBuffer)
             self.trainModels(miniBatch)
 
@@ -88,6 +89,8 @@ class RunTimeStep:
         observation = self.observe(state) if self.observe is not None else state
         action = self.actOneStep(observation, runTime)
         reward, nextState = self.sampleOneStep(state, action)
+        print('state: ', state, ', action: ', action, ', reward: ', reward)
+
         nextObservation = self.observe(nextState) if self.observe is not None else nextState
         replayBuffer.append((observation, action, reward, nextObservation))
         trajectory.append((state, action, reward, nextState))
@@ -102,6 +105,7 @@ class RunEpisode:
         self.runTimeStep = runTimeStep
         self.maxTimeStep = maxTimeStep
         self.isTerminal = isTerminal
+        self.notTerminalCount = 0
 
     def __call__(self, replayBuffer, trajectory):
         state = self.reset()
@@ -111,9 +115,16 @@ class RunEpisode:
             episodeReward += reward
             terminal = self.isTerminal(state)
             if terminal:
-                print('------------terminal----------------- timeStep: ', timeStep)
+                print('------------terminal------------------------------------ timeStep: ', timeStep)
+                print('------------terminal------------------------------------ timeStep: ', timeStep)
+                print('------------terminal------------------------------------ timeStep: ', timeStep)
                 break
         print('episodeReward: ', episodeReward, 'runSteps: ', len(trajectory))
+        if timeStep >= (self.maxTimeStep-1):
+            self.notTerminalCount+=1
+
+        print('notTerminalCount: ', self.notTerminalCount)
+
         return replayBuffer, episodeReward, trajectory
 
 

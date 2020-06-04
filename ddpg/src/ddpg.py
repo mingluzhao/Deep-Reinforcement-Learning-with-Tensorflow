@@ -65,8 +65,8 @@ class BuildActorModel:
                 tf.add_to_collection("learningRate_", learningRate_)
                 tf.add_to_collection("tau_", tau_)
 
-            initWeight = tf.random_uniform_initializer(0, 0.3)
-            initBias = tf.constant_initializer(0.1)
+            initWeight = tf.random_uniform_initializer(-0.003, 0.003)
+            initBias = tf.constant_initializer(0.001)
             with tf.variable_scope("trainHidden"):
                 activation_ = states_
                 for i in range(len(layersWidths)):
@@ -182,8 +182,8 @@ class BuildCriticModel:
                 tf.add_to_collection("tau_", tau_)
                 tf.add_to_collection("gamma_", gamma_)
 
-            initWeight = tf.random_uniform_initializer(0, 0.1)
-            initBias = tf.constant_initializer(0.1)
+            initWeight = tf.random_uniform_initializer(-0.003, 0.003)
+            initBias = tf.constant_initializer(0.001)
             with tf.variable_scope("trainHidden"):
                 activation_ = states_
                 for i in range(len(layersWidths)-1):

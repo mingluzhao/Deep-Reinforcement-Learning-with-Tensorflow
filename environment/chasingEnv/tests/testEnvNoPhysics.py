@@ -1,9 +1,16 @@
+import os
 import sys
-sys.path.append("..")
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+dirName = os.path.dirname(__file__)
+sys.path.append(os.path.join(dirName, '..', '..', '..'))
+sys.path.append(os.path.join(dirName, '..', '..'))
+sys.path.append(os.path.join(dirName, '..'))
+
 import numpy as np
 import unittest
 from ddt import ddt, data, unpack
-from environment.chasingEnv.envNoPhysics import Reset, StayWithinBoundary, TransitForNoPhysics, GetAgentPosFromState
+from environment.chasingEnv.envNoPhysics import Reset, getIntendedNextState, StayWithinBoundary, \
+    TransitForNoPhysics, GetAgentPosFromState, IsBoundaryTerminal, IsTerminal
 
 @ddt
 class TestEnv(unittest.TestCase):
@@ -36,7 +43,7 @@ class TestEnv(unittest.TestCase):
           )
     @unpack
     def testTransition(self, state, action, trueNextState):
-        transitForNoPhysics = TransitForNoPhysics(self.stayWithinBoundary)
+        transitForNoPhysics = TransitForNoPhysics(getIntendedNextState, self.stayWithinBoundary)
         nextState = tuple(transitForNoPhysics(state, action))
         trueNextState = tuple(trueNextState)
         self.assertEqual(nextState, trueNextState)
@@ -49,6 +56,38 @@ class TestEnv(unittest.TestCase):
         getAgentPosFromState = GetAgentPosFromState(agentID)
         pos = getAgentPosFromState(state)
         self.assertEqual(pos, truePos)
+
+    @data(((1, 2, 3, 4), False),
+          ((0, 2, 3, 4), True),
+          ((1, 20, 0, 0), True),
+          )
+    @unpack
+    def testBoundaryTerminal(self, state, trueTerminal):
+        sheepID = 0
+        getSheepPos = GetAgentPosFromState(sheepID)
+        isBoundaryTerminal = IsBoundaryTerminal(self.xBoundary, self.yBoundary, getSheepPos)
+        terminal = isBoundaryTerminal(state)
+        self.assertEqual(terminal, trueTerminal)
+
+    @data(((1, 2, 3, 4), False),
+          ((1, 2, 1, 2), True),
+          ((0, 2, 3, 4), True),
+          ((1, 20, 0, 0), True),
+          )
+    @unpack
+    def testTerminal(self, state, trueTerminal):
+        sheepId = 0
+        wolfId = 1
+        getSheepPos = GetAgentPosFromState(sheepId)
+        getWolfPos = GetAgentPosFromState(wolfId)
+
+        isBoundaryTerminal = IsBoundaryTerminal(self.xBoundary, self.yBoundary, getSheepPos)
+        killzoneRadius = 1
+        isTerminal = IsTerminal(getWolfPos, getSheepPos, killzoneRadius, isBoundaryTerminal)
+
+        terminal = isTerminal(state)
+        self.assertEqual(terminal, trueTerminal)
+
 
 
 if __name__ == '__main__':

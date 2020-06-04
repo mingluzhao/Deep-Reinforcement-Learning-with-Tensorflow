@@ -207,7 +207,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
     <option name="x" value="525" />
     <option name="width" value="915" />
     <option name="height" value="900" />
@@ -264,10 +264,14 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ddpg/exec" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+<<<<<<< HEAD
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+=======
     <property name="settings.editor.selected.configurable" value="vcs.Subversion.Network" />
+>>>>>>> master
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -907,6 +911,7 @@
     <SUITE FILE_PATH="coverage/maddpg$testPendulumEnv.coverage" NAME="testMountainCarEnv Coverage Results" MODIFIED="1588477811404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/environment/gymEnv/tests" />
     <SUITE FILE_PATH="coverage/maddpg$testRLRun.coverage" NAME="testRLRun Coverage Results" MODIFIED="1589130391753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RLframework" />
     <SUITE FILE_PATH="coverage/maddpg$runGymPendulum.coverage" NAME="runGymPendulum Coverage Results" MODIFIED="1589212631834" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
+    <SUITE FILE_PATH="coverage/Deep_Reinforcement_Learning_with_Tensorflow$testContinMountainCarEnv.coverage" NAME="testContinMountainCarEnv Coverage Results" MODIFIED="1589218955781" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/environment/gymEnv/tests" />
     <SUITE FILE_PATH="coverage/maddpg$testOneStepDDPG.coverage" NAME="testCritic Coverage Results" MODIFIED="1587153717498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />
     <SUITE FILE_PATH="coverage/maddpg$buildSheepDDPGModels.coverage" NAME="runSheepDDPG Coverage Results" MODIFIED="1589213874502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/exec" />
     <SUITE FILE_PATH="coverage/maddpg$testReward.coverage" NAME="testReward Coverage Results" MODIFIED="1586971557728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ddpg/tests" />

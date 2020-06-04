@@ -153,6 +153,11 @@ def main():
             plt.ylim([-1600, 50])
             innerSubDf.T.plot(ax=subplot)
 
+            subplot.set_ylabel('MeanEpsReward', fontsize=5)
+            subplot.set_xlabel('Episode', fontsize=5)
+            subplot.tick_params(axis='both', which='major', labelsize=5)
+            subplot.tick_params(axis='both', which='minor', labelsize=5)
+
     dirName = os.path.dirname(__file__)
     plotPath = os.path.join(dirName, '..', 'plots')
     plt.savefig(os.path.join(plotPath, 'pendulumEvaluation'))
