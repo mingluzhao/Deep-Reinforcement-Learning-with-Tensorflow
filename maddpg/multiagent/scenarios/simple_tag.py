@@ -1,6 +1,6 @@
 import numpy as np
-from maddpgAlgor.multiagent.core import World, Agent, Landmark
-from maddpgAlgor.multiagent.scenario import BaseScenario
+from maddpg.multiagent.core import World, Agent, Landmark
+from maddpg.multiagent.scenario import BaseScenario
 # predator-prey environment
 
 class Scenario(BaseScenario):
@@ -9,9 +9,9 @@ class Scenario(BaseScenario):
         # set any world properties first
         world.dim_c = 2
         num_good_agents = 1
-        num_adversaries = 2
+        num_adversaries = 1 ###
         num_agents = num_adversaries + num_good_agents
-        num_landmarks = 1
+        num_landmarks = 0
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
         for i, agent in enumerate(world.agents):

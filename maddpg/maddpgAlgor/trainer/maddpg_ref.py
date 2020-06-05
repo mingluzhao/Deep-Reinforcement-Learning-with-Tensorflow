@@ -6,6 +6,8 @@ from maddpg.maddpgAlgor.common.distributions import make_pdtype
 from maddpg.maddpgAlgor import AgentTrainer
 from maddpg.maddpgAlgor.trainer.replay_buffer import ReplayBuffer
 
+tf.set_random_seed(1)
+
 def make_update_exp(vals, target_vals):
     polyak = 1.0 - 1e-2
     expression = []
@@ -177,7 +179,7 @@ class MADDPGAgentTrainer(AgentTrainer):
             target_q_next = self.q_debug['target_q_values'](*(obs_next_n + target_act_next_n))
             target_q += rew + self.args.gamma * (1.0 - done) * target_q_next
         target_q /= num_sample
-        q_loss = self.q_train(*(obs_n + act_n + [target_q]))
+        q_loss = self.q_train(*(obs_n + act_n + [target_q])) # number representing the q loss
 
         # train p network
         p_loss = self.p_train(*(obs_n + act_n))

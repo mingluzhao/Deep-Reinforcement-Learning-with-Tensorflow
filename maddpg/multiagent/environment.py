@@ -164,7 +164,7 @@ class MultiAgentEnv(gym.Env):
     # create receptor field locations in local coordinate frame
 
     def render(self, mode='human'):
-        from maddpgAlgor.multiagent import rendering
+        from maddpg.multiagent import rendering
         if self.viewer is None:
             self.viewer = rendering.Viewer(700,700)
 
