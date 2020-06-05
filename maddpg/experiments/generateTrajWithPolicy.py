@@ -17,7 +17,8 @@ from maddpg.maddpgAlgor.trainer.maddpg_try import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 from gym import spaces
 
-policyPath = os.path.join(dirName, '..', 'policy1WolfDDPG1SheepDDPGWithTryTrain30k')
+# policyPath = os.path.join(dirName, '..', 'policy1WolfMADDPG1SheepMADDPGWithTryTrain')
+policyPath = os.path.join(dirName, '..', 'policy2WolfMADDPG1SheepMADDPG1BoundaryWithTryTrain')
 
 wolfSize = 0.075
 sheepSize = 0.05
@@ -90,13 +91,13 @@ def parse_args():
 
 
 def main():
-    # wolvesID = [0, 1]
-    # sheepsID = [2]
-    # blocksID = [3]
-    #
-    wolvesID = [0]
-    sheepsID = [1]
-    blocksID = []
+    wolvesID = [0, 1]
+    sheepsID = [2]
+    blocksID = [3]
+
+    # wolvesID = [0]
+    # sheepsID = [1]
+    # blocksID = []
 
     numWolves = len(wolvesID)
     numSheeps = len(sheepsID)
@@ -145,7 +146,7 @@ def main():
     trainer = MADDPGAgentTrainer
     model = mlp_model
     arglist = parse_args()
-    trainers = getTrainers(trainer, model, arglist, useDDPG=True )
+    trainers = getTrainers(trainer, model, arglist, useDDPG= False )
 
 
     trajList = []

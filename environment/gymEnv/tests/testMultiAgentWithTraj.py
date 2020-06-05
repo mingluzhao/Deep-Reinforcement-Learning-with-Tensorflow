@@ -49,10 +49,10 @@ class TestMultiAgentEnv(unittest.TestCase):
         observeOneAgent = lambda agentID: Observe(agentID, self.wolvesID, self.sheepsID, self.blocksID, getPosFromAgentState, getVelFromAgentState)
         self.observe = lambda state: [observeOneAgent(agentID)(state) for agentID in range(self.numTotalAgents)]
 
-        trajectoryPath = os.path.join(dirName, '..', '..','..', 'maddpg', 'trajectoryFull.pickle')
+        trajectoryPath = os.path.join(dirName, 'trajectoryFull.pickle')
         self.traj = loadFromPickle(trajectoryPath)
 
-        observationPath = os.path.join(dirName, '..', '..','..', 'maddpg', 'obs.pickle')
+        observationPath = os.path.join(dirName, 'obs.pickle')
         self.obs = loadFromPickle(observationPath) # 25* 3* 12
 
 
