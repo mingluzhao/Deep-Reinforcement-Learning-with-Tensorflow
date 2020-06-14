@@ -1,14 +1,17 @@
 import os
 import sys
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 dirName = os.path.dirname(__file__)
-sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
+sys.path.append(os.path.join(dirName, '..', '..'))
+import logging
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import numpy as np
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg import BuildCriticModel, TrainCriticBySASRQ
+from src.ddpg_followPaper import BuildCriticModel, TrainCriticBySASRQ
 from RLframework.RLrun import UpdateParameters
 
 @ddt
@@ -76,10 +79,13 @@ class TestCritic(unittest.TestCase):
     def testCriticImprovement(self, stateBatch, actionBatch, rewardBatch, targetQValue):
         criticWriter, criticModel = self.buildCriticModel(self.criticLayerWidths)
         trainCriticBySASRQ = TrainCriticBySASRQ(self.learningRateCritic, self.gamma, criticWriter)
-        lossWithTrain1, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
-        lossWithTrain2, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
 
-        self.assertTrue(lossWithTrain1 > lossWithTrain2)
+        for i in range(10):
+            lossWithTrain1, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
+            lossWithTrain2, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch, targetQValue)
+            print(lossWithTrain1)
+            print(lossWithTrain2)
+            self.assertTrue(lossWithTrain1 > lossWithTrain2)
 
 
     def testDDPGUpdateCriticParams(self):

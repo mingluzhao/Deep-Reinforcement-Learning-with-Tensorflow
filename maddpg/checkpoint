@@ -1,2 +1,2 @@
-model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../policy2WolfMADDPG1SheepMADDPG1BoundaryWithTryTrain"
-all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../policy2WolfMADDPG1SheepMADDPG1BoundaryWithTryTrain"
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../my2Wolf1Sheep3Block_allddpg_agent2"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../my2Wolf1Sheep3Block_allddpg_agent2"

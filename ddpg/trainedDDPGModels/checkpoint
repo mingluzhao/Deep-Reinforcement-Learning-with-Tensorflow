@@ -1,2 +1,2 @@
-model_checkpoint_path: "criticModel=0_dimension=2_gamma=0.95_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=5000_maxTimeStep=20_minibatchSize=32_wolfSpeed=1.ckpt"
-all_model_checkpoint_paths: "criticModel=0_dimension=2_gamma=0.95_learningRateActor=0.001_learningRateCritic=0.001_maxEpisode=5000_maxTimeStep=20_minibatchSize=32_wolfSpeed=1.ckpt"
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedDDPGModels/pendulum_newddpg"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedDDPGModels/pendulum_newddpg"
