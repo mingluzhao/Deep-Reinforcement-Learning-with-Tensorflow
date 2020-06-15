@@ -165,7 +165,7 @@ class RunEpisode:
 
 
 class SaveModel:
-    def __init__(self, modelSaveRate, saveVariables, getCurrentModel, modelSavePath, saveAllmodels):
+    def __init__(self, modelSaveRate, saveVariables, getCurrentModel, modelSavePath, saveAllmodels = False):
         self.modelSaveRate = modelSaveRate
         self.saveVariables = saveVariables
         self.getCurrentModel = getCurrentModel

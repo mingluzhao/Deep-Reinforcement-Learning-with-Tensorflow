@@ -7,20 +7,20 @@ sys.path.append(os.path.join(dirName, '..'))
 sys.path.append(os.path.join(dirName, '..', '..'))
 import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
+import numpy as np
 
-import matplotlib.pyplot as plt
 
-from ddpg.src.newddpg_withCombinedTrain import *
-from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
+from ddpg.src.newddpg_withCombinedTrain import BuildDDPGModels, TrainActorFromState, TrainCriticBySASR, TrainActor, \
+    TrainCritic, reshapeBatchToGetSASR, TrainDDPGModelsWithBuffer, ActOneStepWithSoftMaxNoise, actByPolicyTrainNoisy
+from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
-from environment.gymEnv.multiAgentEnv import *
-from visualize.visualizeMultiAgent import *
-
+from environment.gymEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
+    ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
+    IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
 
 maxEpisode = 60000
 maxTimeStep = 25
-
 learningRateActor = 0.01#
 learningRateCritic = 0.01#
 gamma = 0.95 #
@@ -28,8 +28,8 @@ tau=0.01 #
 bufferSize = 1e6#
 minibatchSize = 1024#
 learningStartBufferSize = minibatchSize * maxTimeStep#
-########
 
+########
 
 wolfSize = 0.075
 sheepSize = 0.05
@@ -44,16 +44,18 @@ sheepColor = np.array([0.35, 0.85, 0.35])
 blockColor = np.array([0.25, 0.25, 0.25])
 
 def main():
-    wolvesID = [0, 1]
-    sheepsID = [2]
-    blocksID = [3, 4, 5]
+    numWolves = int(sys.argv[1])
+    numSheeps = int(sys.argv[2])
+    numBlocks = int(sys.argv[3])
+    saveAllmodels = True
+    print("ddpg: {} wolves, {} sheep, {} blocks, {} total episodes, save all models: {}".format(numWolves, numSheeps, numBlocks, maxEpisode, str(saveAllmodels)))
 
-    numWolves = len(wolvesID)
-    numSheeps = len(sheepsID)
-    numBlocks = len(blocksID)
 
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
+    wolvesID = list(range(numWolves))
+    sheepsID = list(range(numWolves, numAgents))
+    blocksID = list(range(numAgents, numEntities))
 
     entitiesSizeList = [wolfSize] * numWolves + [sheepSize] * numSheeps + [blockSize] * numBlocks
     entityMaxSpeedList = [wolfMaxSpeed] * numWolves + [sheepMaxSpeed] * numSheeps + [blockMaxSpeed] * numBlocks
@@ -122,10 +124,11 @@ def main():
 
     getAgentModel = lambda agentId: lambda: learnFromBuffer.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 5000
-    modelPath = os.path.join(dirName, '..', 'my2Wolf1Sheep3Block_allddpg_agent')
+    modelSaveRate = 10000
+    fileName = "ddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
+    modelPath = os.path.join(dirName, '..', fileName)
 
-    saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i)) for i, getTrainedModel in enumerate(getModelList)]
+    saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     ddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
     replayBuffer = getBuffer(bufferSize)

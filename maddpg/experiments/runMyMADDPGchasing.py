@@ -7,13 +7,16 @@ sys.path.append(os.path.join(dirName, '..'))
 sys.path.append(os.path.join(dirName, '..', '..'))
 import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
+import numpy as np
 
-from maddpg.maddpgAlgor.trainer.myMADDPG import *
+from maddpg.maddpgAlgor.trainer.myMADDPG import BuildMADDPGModels, TrainCritic, TrainActor, TrainCriticBySASR, \
+    TrainActorFromSA, TrainMADDPGModelsWithBuffer, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
 from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
-    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
-from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
-from environment.gymEnv.multiAgentEnv import *
-from visualize.visualizeMultiAgent import *
+    RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
+from functionTools.loadSaveModel import saveVariables
+from environment.gymEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
+    ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
+    IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
 
 # fixed training parameters
 maxEpisode = 60000
