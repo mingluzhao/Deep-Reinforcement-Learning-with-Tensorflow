@@ -8,7 +8,7 @@ sys.path.append(os.path.join(dirName, '..', '..'))
 import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import numpy as np
-
+import json
 
 from ddpg.src.newddpg_withCombinedTrain import BuildDDPGModels, TrainActorFromState, TrainCriticBySASR, TrainActor, \
     TrainCritic, reshapeBatchToGetSASR, TrainDDPGModelsWithBuffer, ActOneStepWithSoftMaxNoise, actByPolicyTrainNoisy
@@ -44,10 +44,21 @@ sheepColor = np.array([0.35, 0.85, 0.35])
 blockColor = np.array([0.25, 0.25, 0.25])
 
 def main():
-    numWolves = int(sys.argv[1])
-    numSheeps = int(sys.argv[2])
-    numBlocks = int(sys.argv[3])
-    saveAllmodels = True
+
+    debug = 0
+    if debug:
+        numWolves = 1
+        numSheeps = 1
+        numBlocks = 0
+        saveAllmodels = True
+
+    else:
+        print(sys.argv)
+        condition = json.loads(sys.argv[1])
+        numWolves = int(condition['numWolves'])
+        numSheeps = int(condition['numSheeps'])
+        numBlocks = int(condition['numBlocks'])
+        saveAllmodels = True
     print("ddpg: {} wolves, {} sheep, {} blocks, {} total episodes, save all models: {}".format(numWolves, numSheeps, numBlocks, maxEpisode, str(saveAllmodels)))
 
 
