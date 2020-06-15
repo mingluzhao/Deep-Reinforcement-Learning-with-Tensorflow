@@ -20,8 +20,7 @@ from environment.gymEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActi
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
 
 # fixed training parameters
-maxEpisode = 2000
-# maxEpisode = 60000
+maxEpisode = 60000
 maxTimeStep = 25
 
 learningRateActor = 0.01#
@@ -138,7 +137,7 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 1000
+    modelSaveRate = 10000
     fileName = "maddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
 
     modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
