@@ -11,15 +11,14 @@ sys.path.append(os.path.join(dirName, '..'))
 from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
-from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
-    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm
+from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
+    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm, SaveModel
 from src.policy import ActDDPGOneStep
-from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
+from functionTools.loadSaveModel import saveVariables, saveToPickle
 
 from environment.noise.noise import GetExponentialDecayGaussNoise
 from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, isTerminalGymPendulum, \
     observe, angle_normalize, VisualizeGymPendulum, ResetGymPendulum
-
 
 maxEpisode = 200
 maxTimeStep = 200
@@ -83,32 +82,16 @@ def main():
     reset = ResetGymPendulum(seed)
     runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep, isTerminalGymPendulum)
 
-    ddpg = RunAlgorithm(runEpisode, maxEpisode)
+    dirName = os.path.dirname(__file__)
+    modelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'pendulum')
+    getTrainedModel = lambda: trainModels.actorModel
+    modelSaveRate = 50
+    saveModel = SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath)
+
+    ddpg = RunAlgorithm(runEpisode, maxEpisode, [saveModel])
 
     replayBuffer = deque(maxlen=int(bufferSize))
     meanRewardList, trajectory = ddpg(replayBuffer)
-
-    trainedActorModel, trainedCriticModel = trainModels.getTrainedModels()
-
-# save Model
-    modelIndex = 0
-    actorFixedParam = {'actorModel': modelIndex}
-    criticFixedParam = {'criticModel': modelIndex}
-    parameters = {'env': ENV_NAME, 'Eps': maxEpisode, 'timeStep': maxTimeStep, 'batch': minibatchSize,
-                  'gam': gamma, 'lrActor': learningRateActor, 'lrCritic': learningRateCritic,
-                  'noiseVar': noiseInitVariance, 'varDiscout': varianceDiscount}
-
-    modelSaveDirectory = "../trainedDDPGModels"
-    modelSaveExtension = '.ckpt'
-    getActorSavePath = GetSavePath(modelSaveDirectory, modelSaveExtension, actorFixedParam)
-    getCriticSavePath = GetSavePath(modelSaveDirectory, modelSaveExtension, criticFixedParam)
-    savePathActor = getActorSavePath(parameters)
-    savePathCritic = getCriticSavePath(parameters)
-
-    with actorModel.as_default():
-        saveVariables(trainedActorModel, savePathActor)
-    with criticModel.as_default():
-        saveVariables(trainedCriticModel, savePathCritic)
 
     dirName = os.path.dirname(__file__)
     trajectoryPath = os.path.join(dirName, '..', 'trajectory', 'pendulumTrajectory1.pickle')

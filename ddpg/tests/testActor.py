@@ -5,12 +5,13 @@ dirName = os.path.dirname(__file__)
 sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
 
-
 import numpy as np
 import unittest
 from ddt import ddt, data, unpack
 
-from src.ddpg import BuildActorModel, BuildCriticModel,TrainActorFromGradients
+from src.ddpg import BuildActorModel, BuildCriticModel,TrainActorFromGradients, \
+    TrainCriticBySASRQ, actByPolicyTrain, evaluateCriticTrain, getActionGradients, TrainActorOneStep
+
 from RLframework.RLrun import UpdateParameters
 
 @ddt
@@ -64,6 +65,44 @@ class TestActor(unittest.TestCase):
         difference = np.array(updatedTargetParams) - calUpdatedTargetParam
 
         [self.assertEqual(np.mean(paramDiff), 0) for paramDiff in difference]
+
+
+    def testActorTrainImprovement(self):
+        stateBatch = [[2, 5, 10, 5, 2, 5, 10, 5], [1,1,1,1,1,1,1,1]]
+        actionBatch = [[0.1,0.2, 0.3, 0.4, 0.5], [0.2,0.2,0.2,0.2,0.2]]
+        rewardBatch = [[2], [0]]
+        targetQValue = [[3], [1]]
+
+        numStateSpace = len(stateBatch[0])
+        actionDim = 5
+        actionRange = 1
+
+        buildActorModel = BuildActorModel(numStateSpace, actionDim, actionRange)
+        actorLayerWidths = [64, 64]
+        criticLayerWidths = [64, 64]
+        buildCriticModel = BuildCriticModel(numStateSpace, actionDim)
+
+        actorWriter, actorModel = buildActorModel(actorLayerWidths)
+        criticWriter, criticModel = buildCriticModel(criticLayerWidths)
+
+        trainCriticBySASRQ = TrainCriticBySASRQ(self.learningRateCritic, self.gamma, criticWriter)
+
+        for i in range(100):
+            lossWithTrain, criticModel = trainCriticBySASRQ(criticModel, stateBatch, actionBatch, rewardBatch,
+                                                             targetQValue)
+            print(lossWithTrain)
+
+        actionUntrained = actByPolicyTrain(actorModel, stateBatch)
+        actionUntrainedQVal = evaluateCriticTrain(criticModel, stateBatch, actionUntrained)
+
+        trainActorFromGradients = TrainActorFromGradients(self.learningRateActor, actorWriter)
+        trainOneStep = TrainActorOneStep(actByPolicyTrain, trainActorFromGradients, getActionGradients)
+
+        actorModel = trainOneStep(actorModel, criticModel, stateBatch)
+        actionTrained = actByPolicyTrain(actorModel, stateBatch)
+        actionTrainedValue = evaluateCriticTrain(criticModel, stateBatch, actionTrained)
+
+        [self.assertTrue(trained > untrained) for trained, untrained in zip(actionTrainedValue, actionUntrainedQVal)]
 
 
 if __name__ == '__main__':

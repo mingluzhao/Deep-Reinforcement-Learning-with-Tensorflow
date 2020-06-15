@@ -1,12 +1,9 @@
 import numpy as np
-import random
 import tensorflow as tf
 import maddpg.maddpgAlgor.common.tf_util as U
-from maddpg.maddpgAlgor.common.distributions import SoftCategoricalPdType
 from maddpg.maddpgAlgor import AgentTrainer
 from maddpg.maddpgAlgor.trainer.replay_buffer import ReplayBuffer
 
-# tf.set_random_seed(1)
 def p_train(observPlaceHolderList, actionSpaceList, agentIndex, p_func, q_func, optimizer,grad_norm_clipping,
             ddpg, num_units=64, scope="trainer", reuse=None):
 
@@ -19,7 +16,7 @@ def p_train(observPlaceHolderList, actionSpaceList, agentIndex, p_func, q_func, 
         policyTrainOutput = p_func(policyNetInput, policyOutputShape, scope="p_func", num_units=num_units)
         policyNetVariables = U.scope_vars(U.absolute_scope_name("p_func"))
 
-        sampleNoise = tf.random_uniform(tf.shape(policyTrainOutput), seed = 1)
+        sampleNoise = tf.random_uniform(tf.shape(policyTrainOutput), seed = 0)
         actionSample = U.softmax(policyTrainOutput - tf.log(-tf.log(sampleNoise)), axis=-1) # output of function act
         p_reg = tf.reduce_mean(tf.square(policyTrainOutput))
         
@@ -28,7 +25,7 @@ def p_train(observPlaceHolderList, actionSpaceList, agentIndex, p_func, q_func, 
 
         qNetInput = tf.concat(observPlaceHolderList + actionInputPlaceHolderList, 1)
         if ddpg:
-            qNetInput = tf.concat([observPlaceHolderList[agentIndex], actionInputPlaceHolderList[agentIndex]], 1)
+            qNetInput = tf.concat([observPlaceHolderList[agentIndex], actionSample], 1)
 
         q = q_func(qNetInput, 1, scope="q_func", reuse=True, num_units=num_units)[:,0]
         pg_loss = -tf.reduce_mean(q)
@@ -44,8 +41,8 @@ def p_train(observPlaceHolderList, actionSpaceList, agentIndex, p_func, q_func, 
 
         # target network
         target_p = p_func(policyNetInput, int(actionSpaceList[agentIndex].n), scope="target_p_func", num_units=num_units)
-        target_p_func_vars = U.scope_vars(U.absolute_scope_name("target_p_func"))
-        update_target_p = make_update_exp(policyNetVariables, target_p_func_vars)
+        targetNetVariables = U.scope_vars(U.absolute_scope_name("target_p_func"))
+        update_target_p = make_update_exp(policyNetVariables, targetNetVariables)
 
         uTarget = tf.random_uniform(tf.shape(target_p))
         target_act_sample = U.softmax(target_p - tf.log(-tf.log(uTarget)), axis=-1)
@@ -74,7 +71,7 @@ def q_train(observPlaceHolderList, actionSpaceList, agentIndex, q_func, optimize
         if ddpg:
             q_input = tf.concat([observPlaceHolderList[agentIndex], actionPlaceHolderList[agentIndex]], 1) # shape (?, 13)
 
-        q = q_func(q_input, 1, scope="q_func", num_units=num_units)[:,0] # drop a level: shape (?, 1) to shape (?,)
+        q = q_func(q_input, 1, scope="q_func", num_units=num_units)[:, 0] # drop a level: shape (?, 1) to shape (?,)
         q_func_vars = U.scope_vars(U.absolute_scope_name("q_func"))
 
         loss = tf.reduce_mean(tf.square(q - yi_))
@@ -135,15 +132,17 @@ class MADDPGAgentTrainer(AgentTrainer):
         self.max_replay_buffer_len = args.batch_size * args.max_episode_len
         self.replay_sample_index = None
 
-    def action(self, obs):
-        # obs = np.array([ 0. ,         0. ,        -0.72976433, -0.46009255,  0.61463679,  0.06004687, 0. ,         0.        ])
-        a = 2
-        actionOutput = self.act(obs[None])[0]
-        return actionOutput
-# self.p_debug['p_values'](obs[None]) [[-0.02130714  0.24859267  0.14140013 -0.11110234  0.09297387]]
+        sess = tf.Session()  # get session
+        writer = tf.summary.FileWriter("logs/", sess.graph)
 
-# actionoutput [0.29184955 0.03116821 0.62127304 0.03114849 0.02456076]
-# [[-0.02130714  0.24859267  0.14140013 -0.11110234  0.09297387]]
+        self.learnStart = 0
+
+    def action(self, obs):
+        # obs = np.array([ 0., 0., -0.91739134,  0.96584283,  0.30922375, -0.95104116, 0. , 0.])
+        actionOutput = self.act(obs[None])[0]
+        actionWithoutNoise = self.p_debug['p_values'](obs[None])[0]
+        # print(actionWithoutNoise, 'noisy', actionOutput)
+        return actionOutput
 
     def experience(self, obs, act, rew, new_obs, done, terminal):
         # Store transition in the replay buffer.
@@ -153,10 +152,23 @@ class MADDPGAgentTrainer(AgentTrainer):
         self.replay_sample_index = None
 
     def update(self, agents, t):
+
+        # everyone has a replay buffer, the buffer contains information for personal experience
+        # and each time it samples an index, everyone act once, store information to the buffer
+        # then use what i did in this step to update myself
+
+        # when updating, has an index, take the experience from all agents at that specific index
+
+
         if len(self.replay_buffer) < self.max_replay_buffer_len: # replay buffer is not large enough
             return
         if not t % 100 == 0:  # only update every 100 steps
             return
+
+        self.learnStart += 1
+        if self.learnStart is 1:
+            print('---------------------------------learning starts--------------------------------------------')
+
 
         self.replay_sample_index = self.replay_buffer.make_index(self.args.batch_size)
         # collect replay sample from all agents
@@ -169,7 +181,9 @@ class MADDPGAgentTrainer(AgentTrainer):
             obs_n.append(obs)
             obs_next_n.append(obs_next)
             act_n.append(act)
-        obs, act, rew, obs_next, done = self.replay_buffer.sample_index(index)
+            # buffer information
+
+        obs, act, rew, obs_next, done = self.replay_buffer.sample_index(index)# personal buffer
 
         # train q network
         target_q = 0.0

@@ -37,6 +37,7 @@ class RewardWolf:
                 if self.isCollision(wolfNextState, sheepNextState, wolfSize, sheepSize):
                     wolfReward += self.collisionReward
         reward = [wolfReward] * len(self.wolvesID)
+        # print('wolfreward ', wolfReward)
         return reward
 
 
@@ -268,7 +269,12 @@ class TransitMultiAgentChasing:
         self.integrateState = integrateState
 
     def __call__(self, state, actions):
+        # print(actions[0])
+
         actions = [self.reshapeAction(action) for action in actions]
+        # print('action', actions[0], actions[1])
+        # print('wolfaction', actions[0])
+
         p_force = [None] * self.numEntities
         p_force = self.applyActionForce(p_force, actions)
         p_force = self.applyEnvironForce(p_force, state)
@@ -283,7 +289,8 @@ class ReshapeAction:
         self.sensitivity = 5
 
     def __call__(self, action): # action: tuple of dim (5,1)
+        # print(action)
         actionX = action[1] - action[2]
         actionY = action[3] - action[4]
-        action = np.array([actionX, actionY]) * self.sensitivity
-        return action
+        actionReshaped = np.array([actionX, actionY]) * self.sensitivity
+        return actionReshaped

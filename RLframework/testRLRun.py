@@ -1,15 +1,23 @@
+import os
 import sys
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+dirName = os.path.dirname(__file__)
+sys.path.append(os.path.join(dirName, '..'))
+sys.path.append(os.path.join(dirName, '..', '..'))
+import logging
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
+
 import numpy as np
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+from collections import deque
 
 from dqn.src.dqn import BuildModel, TrainModelBySASRQ, getTargetQValue
 from ddpg.src.ddpg import BuildActorModel, BuildCriticModel, TrainActorFromGradients, TrainCriticBySASRQ
-from RLframework.RLrun import UpdateParameters, resetTargetParamToTrainParam
-
+from RLframework.RLrun import UpdateParameters, resetTargetParamToTrainParam, SampleFromMemory, getBuffer
+import random
 
 @ddt
 class TestDQNParameterUpdate(unittest.TestCase):
@@ -163,6 +171,48 @@ class TestDDPGParameterUpdate(unittest.TestCase):
 
         [self.assertEqual(np.mean(paramDiff), 0) for paramDiff in difference]
 
+
+@ddt
+class TestReplayBuffer(unittest.TestCase):
+    def setUp(self):
+        minibatchSize  = 32
+        self.sampleFromBuffer = SampleFromMemory(minibatchSize)
+
+    def testBufferSize(self):
+        bufferSize = 5
+        buffer = getBuffer(bufferSize)
+        for i in range(5):
+            buffer.append((1, 1))
+            self.assertEqual(len(buffer), i+1)
+
+        buffer.append((1, 2))
+        self.assertEqual(len(buffer), 5)
+
+    def testBufferSampleSize(self):
+        bufferSize = 5
+        buffer = getBuffer(bufferSize)
+        for i in range(5):
+            buffer.append((1, i))
+
+        minibatchSize = 2
+        sampleBuffer = SampleFromMemory(minibatchSize)
+
+        sample = sampleBuffer(buffer)
+        self.assertEqual(len(sample), minibatchSize)
+
+    def testMultiAgentBufferRetrieval(self):
+        getAgentBuffer = lambda buffer, id: [[bufferElement[id] for bufferElement in timeStepBuffer] for timeStepBuffer
+                                             in buffer]
+
+        buffer = getBuffer(5)
+        buffer.append((((1, 1), (2, 2)), (2, 3), (4, 5)))
+        buffer.append((((1, 1), (2, 2)), (2, 3), (4, 5)))
+        buffer.append((((1, 1), (2, 2)), (2, 3), (4, 5)))
+
+        agentBuffer = getAgentBuffer(buffer, 1)
+        trueAgentBuffer = ([(2, 2), (3), (5)], [(2, 2), (3), (5)], [(2, 2), (3), (5)])
+
+        self.assertEqual(tuple(agentBuffer), trueAgentBuffer)
 
 if __name__ == '__main__':
     unittest.main()
