@@ -83,7 +83,7 @@ def main():
     buildModels = [BuildDDPGModels(agentObsShape, actionDim) for agentObsShape in obsShapeList]
     allModels = [buildAgentModel(layerWidth, agentID) for agentID, buildAgentModel in enumerate(buildModels)]
     dirName = os.path.dirname(__file__)
-    modelPaths = [os.path.join(dirName, '..', 'my2Wolf1Sheep3Block_allddpg_agent' + str(i)) for i in range(numAgents)]
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', 'my2Wolf1Sheep3Block_allddpg_agent' + str(i)) for i in range(numAgents)]
     [restoreVariables(model, path) for model, path in zip(allModels, modelPaths)]
 
     agentsActOneStep = [ActOneStepWithSoftMaxNoise(model, actByPolicyTrainNoisy) for model in allModels]

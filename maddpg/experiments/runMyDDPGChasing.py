@@ -19,7 +19,9 @@ from environment.gymEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActi
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
 
-maxEpisode = 60000
+# maxEpisode = 60000
+maxEpisode = 2000
+
 maxTimeStep = 25
 learningRateActor = 0.01#
 learningRateCritic = 0.01#
@@ -135,9 +137,9 @@ def main():
 
     getAgentModel = lambda agentId: lambda: learnFromBuffer.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 10000
+    modelSaveRate = 1000
     fileName = "ddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
-    modelPath = os.path.join(dirName, '..', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
 
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 

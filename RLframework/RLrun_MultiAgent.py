@@ -176,11 +176,10 @@ class SaveModel:
     def __call__(self):
         self.epsNum += 1
         if self.epsNum % self.modelSaveRate == 0:
-            if self.saveAllmodels:
-                self.modelSavePath = self.modelSavePath + str(self.epsNum) + "eps"
+            modelSavePathToUse = self.modelSavePath + str(self.epsNum) + "eps" if self.saveAllmodels else self.modelSavePath
             model = self.getCurrentModel()
             with model.as_default():
-                self.saveVariables(model, self.modelSavePath)
+                self.saveVariables(model, modelSavePathToUse)
 
 
 

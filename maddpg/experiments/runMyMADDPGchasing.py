@@ -8,6 +8,7 @@ sys.path.append(os.path.join(dirName, '..', '..'))
 import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import numpy as np
+import json
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import BuildMADDPGModels, TrainCritic, TrainActor, TrainCriticBySASR, \
     TrainActorFromSA, TrainMADDPGModelsWithBuffer, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
@@ -19,7 +20,8 @@ from environment.gymEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActi
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
 
 # fixed training parameters
-maxEpisode = 60000
+maxEpisode = 2000
+# maxEpisode = 60000
 maxTimeStep = 25
 
 learningRateActor = 0.01#
@@ -29,7 +31,6 @@ tau=0.01 #
 bufferSize = 1e6#
 minibatchSize = 1024#
 learningStartBufferSize = minibatchSize * maxTimeStep#
-
 
 wolfSize = 0.075
 sheepSize = 0.05
@@ -47,9 +48,24 @@ blockColor = np.array([0.25, 0.25, 0.25])
 # arguments: numWolves numSheeps numBlocks saveAllmodels = True or False
 
 def main():
-    numWolves = 2
-    numSheeps = 1
-    numBlocks = 3
+    debug = 0
+    if debug:
+        numWolves = 1
+        numSheeps = 1
+        numBlocks = 0
+        saveAllmodels = True
+
+    else:
+        print(sys.argv)
+        condition = json.loads(sys.argv[1])
+        numWolves = int(condition['numWolves'])
+        numSheeps = int(condition['numSheeps'])
+        numBlocks = int(condition['numBlocks'])
+        saveAllmodels = True
+
+    print("maddpg: {} wolves, {} sheep, {} blocks, {} total episodes, save all models: {}".format(numWolves, numSheeps, numBlocks, maxEpisode, str(saveAllmodels)))
+
+
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
     wolvesID = list(range(numWolves))
@@ -122,10 +138,10 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 10000
+    modelSaveRate = 1000
     fileName = "maddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
 
-    modelPath = os.path.join(dirName, '..', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
     saveAllmodels = True
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
