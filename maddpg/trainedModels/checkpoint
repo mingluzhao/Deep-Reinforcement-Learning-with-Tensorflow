@@ -1,2 +1,0 @@
-model_checkpoint_path: "ddpg2wolves1sheep3blocks60000eps_agent260000eps"
-all_model_checkpoint_paths: "ddpg2wolves1sheep3blocks60000eps_agent260000eps"

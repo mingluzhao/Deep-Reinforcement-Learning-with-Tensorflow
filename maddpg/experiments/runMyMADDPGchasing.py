@@ -106,7 +106,7 @@ def main():
     worldDim = 2
     actionDim = worldDim * 2 + 1
 
-    layerWidth = [64, 64]
+    layerWidth = [128, 128]
 
 #------------ models ------------------------
 

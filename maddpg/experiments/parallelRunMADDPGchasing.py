@@ -45,7 +45,7 @@ def main():
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)
     print("start")
     
-    numEntitiessList = [(1, 1, 0), (2, 1, 3)]
+    numEntitiessList = [(3, 1, 2), (3, 2, 2), (3, 3, 2), (3, 4, 2)]
     conditions = []
     for numEntities in numEntitiessList:
         numWolves, numSheeps, numBlocks = numEntities
