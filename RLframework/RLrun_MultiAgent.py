@@ -40,6 +40,7 @@ class SampleOneStep:
         self.getReward = getReward
 
     def __call__(self, state, action):
+        # print(action)
         nextState = self.transit(state, action)
         reward = self.getReward(state, action, nextState)
         # print('state', state, 'action', action, 'reward', reward)

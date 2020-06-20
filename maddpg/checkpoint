@@ -1,2 +1,2 @@
-model_checkpoint_path: "maddpg2wolves1sheep3blocks2000eps_agent21000eps2000eps"
-all_model_checkpoint_paths: "maddpg2wolves1sheep3blocks2000eps_agent21000eps2000eps"
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../my2Wolf1Sheep0BlockStaticSheep_allddpg_agent2"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../my2Wolf1Sheep0BlockStaticSheep_allddpg_agent2"
