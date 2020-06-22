@@ -8,8 +8,10 @@ sys.path.append(os.path.join(dirName, '..'))
 
 import unittest
 from ddt import ddt, data, unpack
-from chasingEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 import random
+
 
 @ddt
 class TestMultiAgentEnv(unittest.TestCase):
@@ -28,6 +30,8 @@ class TestMultiAgentEnv(unittest.TestCase):
         self.numTotalAgents = len(self.sheepsID) + len(self.wolvesID)
         self.numBlocks = len(self.blocksID)
         self.reset = ResetMultiAgentChasing(self.numTotalAgents, self.numBlocks)
+
+        self.rewardWolfIndividual = RewardWolfIndividual(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, collisionReward=10)
 
 
     @data(([0, 1, 1., 0.], [1,  0,  1.,  0.], 0.1, 0.2, False),
@@ -107,6 +111,29 @@ class TestMultiAgentEnv(unittest.TestCase):
         observe = Observe(agentID, self.wolvesID, self.sheepsID, self.blocksID, getPosFromAgentState, getVelFromAgentState)
         obsShape = observe(state).shape
         self.assertEqual(obsShape, trueObsShape)
+
+
+    @data((np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
+           [1, 1, 1, 1],
+           np.array([[0, 1, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
+           [0, 0]  # wolfwolf collide but no reward
+           ),
+          (np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
+           [1, 1, 1, 1],
+           np.array([[0, 0, 1., 0.], [0, 0.2, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
+           [10, 0]  # one wolf one sheep collide
+           ),
+          (np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
+           [1, 1, 1, 1],
+           np.array([[0, 1, 1., 0.], [0.1, 1, 1., 0.], [-0.25, 1, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
+           [10, 10]
+           )  # two wolves catch
+          )
+    @unpack
+    def testRewardWolfIndividual(self, state, action, nextState, trueWolfReward):
+        wolfReward = self.rewardWolfIndividual(state, action, nextState)
+        self.assertEqual(tuple(wolfReward), tuple(trueWolfReward))
+
 
 if __name__ == '__main__':
     unittest.main()

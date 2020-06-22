@@ -28,7 +28,7 @@ class ExcuteCodeOnConditionsParallel:
             conditionStartEndIndexesPair = list(it.product(conditions, startEndIndexesPair))
             cmdList = [['python3', self.codeFileName, json.dumps(condition), str(startEndSampleIndex[0]), str(startEndSampleIndex[1])]
                        for condition, startEndSampleIndex in conditionStartEndIndexesPair]
-        else: 
+        else:
             cmdList = [['python3', self.codeFileName, json.dumps(condition)]
                        for condition in conditions]
         processList = [Popen(cmd, stdout=PIPE, stderr=PIPE) for cmd in cmdList]
@@ -39,7 +39,7 @@ class ExcuteCodeOnConditionsParallel:
 
 def main():
     startTime = time.time()
-    fileName = 'runMyMADDPGchasing.py'
+    fileName = 'runMyMADDPGchasing_individualRewardWolf.py'
     numSample = None
     numCpuToUse = int(0.8 * os.cpu_count())
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)
