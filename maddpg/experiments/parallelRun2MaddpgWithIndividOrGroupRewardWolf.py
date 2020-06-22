@@ -49,8 +49,7 @@ def main():
     excuteCodeParallel = ExcuteMultipleCodeOnConditionsParallel(fileNameList, numSample, numCpuToUse)
     print("start")
 
-    # numEntitiessList = [(3, 1, 2), (3, 2, 2), (3, 4, 2), (3, 8, 2)]
-    numEntitiessList = [(2, 1, 3)]
+    numEntitiessList = [(3, 1, 2), (3, 2, 2), (3, 4, 2), (3, 8, 2)]
 
     conditions = []
     for numEntities in numEntitiessList:
