@@ -7,7 +7,7 @@ dirName = os.path.dirname(__file__)
 sys.path.append(os.path.join(dirName, '..'))
 sys.path.append(os.path.join(dirName, '..', '..'))
 
-from environment.gymEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import saveToPickle
 from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *

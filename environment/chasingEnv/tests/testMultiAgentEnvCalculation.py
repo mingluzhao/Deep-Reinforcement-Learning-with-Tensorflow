@@ -8,7 +8,7 @@ sys.path.append(os.path.join(dirName, '..'))
 
 import unittest
 from ddt import ddt, data, unpack
-from environment.gymEnv.multiAgentEnv import *
+from chasingEnv.multiAgentEnv import *
 import random
 
 @ddt

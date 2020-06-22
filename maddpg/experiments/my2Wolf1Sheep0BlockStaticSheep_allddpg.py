@@ -14,7 +14,7 @@ from ddpg.src.newddpg_withCombinedTrain import *
 from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
-from environment.gymEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnv import *
 from visualize.visualizeMultiAgent import *
 
 

@@ -15,7 +15,7 @@ from src.ddpg_followPaper import *
 from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
     LearnFromBuffer, RunMultiAgentTimeStep, RunEpisode, RunAlgorithm, getBuffer
 from functionTools.loadSaveModel import GetSavePath, saveVariables, saveToPickle
-from environment.gymEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnv import *
 from visualize.visualizeMultiAgent import *
 
 

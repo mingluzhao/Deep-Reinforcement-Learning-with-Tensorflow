@@ -9,7 +9,7 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 from gym import spaces
 
-from environment.gymEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import saveToPickle, restoreVariables
 from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *

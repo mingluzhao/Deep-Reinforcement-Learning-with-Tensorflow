@@ -347,7 +347,7 @@ class BuildDDPGModelsForCentralController:
                 actorLoss_ = pg_loss + p_reg * 1e-3
 
                 actorOptimizer = tf.train.AdamOptimizer(learningRate_, name='actorOptimizer')
-                grad_norm_clipping = 0.25
+                grad_norm_clipping = 0.5
                 actorTrainOpt_ = U.minimize_and_clip(actorOptimizer, actorLoss_, actorTrainParams_, grad_norm_clipping)
 
                 tf.add_to_collection("actorLoss_", actorLoss_)
@@ -362,7 +362,7 @@ class BuildDDPGModelsForCentralController:
                 tf.add_to_collection("valueLoss_", criticLoss_)
 
                 criticOptimizer = tf.train.AdamOptimizer(learningRate_, name='criticOptimizer')
-                grad_norm_clipping = 0.25
+                grad_norm_clipping = 0.5
                 crticTrainOpt_ = U.minimize_and_clip(criticOptimizer, criticLoss_, criticTrainParams_,
                                                      grad_norm_clipping)
 

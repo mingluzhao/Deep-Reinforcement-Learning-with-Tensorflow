@@ -12,7 +12,7 @@ import tensorflow.contrib.layers as layers
 from gym import spaces
 import pickle
 
-from environment.gymEnv.multiAgentEnv import *
+from environment.chasingEnv.multiAgentEnv import *
 from visualize.visualizeMultiAgent import *
 import maddpg.maddpgAlgor.common.tf_util as U
 from maddpg.maddpgAlgor.trainer.maddpg_try import MADDPGAgentTrainer

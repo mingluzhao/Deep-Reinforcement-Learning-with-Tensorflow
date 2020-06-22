@@ -15,15 +15,15 @@ from ddpg.src.newddpg_centralController import BuildDDPGModels, BuildDDPGModelsF
 from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
-from environment.gymEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
+from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
 from visualize.visualizeMultiAgent import *
 
 maxEpisode = 60000
 maxTimeStep = 25
-learningRateActor = 0.01#
-learningRateCritic = 0.01#
+learningRateActor = 0.001#
+learningRateCritic = 0.001#
 gamma = 0.95 #
 tau=0.01 #
 bufferSize = 1e6#
@@ -132,7 +132,7 @@ def main():
 
     worldDim = 2
     actionDim = worldDim * 2 + 1
-    layerWidth = [128, 128]
+    layerWidth = [128, 128, 128]
 
     actionDimListCentralController = [numWolves* actionDim, actionDim]
     numModels = 1 + numSheeps
