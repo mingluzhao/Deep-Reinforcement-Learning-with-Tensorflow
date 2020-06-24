@@ -20,7 +20,7 @@ from maddpg.maddpgAlgor.trainer.maddpg_ref import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 
 
-trajectoryPath = os.path.join(dirName, '..', 'policy1WolfMADDPG1SheepMADDPG')
+trajectoryPath = os.path.join(dirName, '..', 'policy3WolfMADDPG1SheepMADDPG')
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")

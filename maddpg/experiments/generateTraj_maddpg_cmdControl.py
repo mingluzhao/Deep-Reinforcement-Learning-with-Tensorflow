@@ -12,6 +12,7 @@ from environment.chasingEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import saveToPickle, restoreVariables
 from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *
+from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import *
 import json
@@ -34,9 +35,9 @@ maxEpisode = 60000
 def main():
     debug = 1
     if debug:
-        numWolves = 2
+        numWolves = 3
         numSheeps = 1
-        numBlocks = 3
+        numBlocks = 2
         saveTraj = False
         visualizeTraj = True
 
@@ -65,6 +66,8 @@ def main():
     
     isCollision = IsCollision(getPosFromAgentState)
     rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
+
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision, punishForOutOfBound)
 
@@ -94,15 +97,16 @@ def main():
     worldDim = 2
     actionDim = worldDim * 2 + 1
 
-    layerWidth = [64, 64]
+    # layerWidth = [64, 64]
+    layerWidth = [128, 128]
 
     # ------------ model ------------------------
     buildMADDPGModels = BuildMADDPGModels(actionDim, numAgents, obsShape)
     modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
 
     dirName = os.path.dirname(__file__)
-    fileName = "maddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', fileName + str(i) + '60000eps') for i in range(numAgents)]
+    fileName = "maddpgIndividWolf{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
@@ -111,7 +115,7 @@ def main():
 
 
     trajList = []
-    numTrajToSample = 50
+    numTrajToSample = 10
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
         trajList.append(list(traj))
