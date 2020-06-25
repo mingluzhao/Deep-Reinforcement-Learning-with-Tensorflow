@@ -18,41 +18,30 @@ from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
+from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 # fixed training parameters
 maxEpisode = 60000
-maxTimeStep = 25
-
 learningRateActor = 0.01#
 learningRateCritic = 0.01#
 gamma = 0.95 #
 tau=0.01 #
 bufferSize = 1e6#
 minibatchSize = 1024#
-learningStartBufferSize = minibatchSize * maxTimeStep#
-
-wolfSize = 0.075
-sheepSize = 0.05
-blockSize = 0.2
-
-sheepMaxSpeed = 1.3
-wolfMaxSpeed = 1.0
-blockMaxSpeed = None
-
-wolfColor = np.array([0.85, 0.35, 0.35])
-sheepColor = np.array([0.35, 0.85, 0.35])
-blockColor = np.array([0.25, 0.25, 0.25])
 
 
 # arguments: numWolves numSheeps numBlocks saveAllmodels = True or False
 
 def main():
-    debug = 0
+    debug = 1
     if debug:
         numWolves = 1
         numSheeps = 1
         numBlocks = 0
-        saveAllmodels = True
+        saveAllmodels = False
+        maxTimeStep = 25
+        sheepSpeedMultiplier = 1
+        individualRewardWolf = int(False)
 
     else:
         print(sys.argv)
@@ -60,9 +49,15 @@ def main():
         numWolves = int(condition['numWolves'])
         numSheeps = int(condition['numSheeps'])
         numBlocks = int(condition['numBlocks'])
-        saveAllmodels = True
 
-    print("maddpg: {} wolves, {} sheep, {} blocks, {} total episodes, save all models: {}".format(numWolves, numSheeps, numBlocks, maxEpisode, str(saveAllmodels)))
+        maxTimeStep = int(condition['maxTimeStep'])
+        sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
+        individualRewardWolf = int(condition['individualRewardWolf'])
+
+        saveAllmodels = False
+
+    print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, save all models: {}".
+          format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, str(saveAllmodels)))
 
 
     numAgents = numWolves + numSheeps
@@ -71,16 +66,29 @@ def main():
     sheepsID = list(range(numWolves, numAgents))
     blocksID = list(range(numAgents, numEntities))
 
+    wolfSize = 0.075
+    sheepSize = 0.05
+    blockSize = 0.2
     entitiesSizeList = [wolfSize] * numWolves + [sheepSize] * numSheeps + [blockSize] * numBlocks
+
+    wolfMaxSpeed = 1.0
+    blockMaxSpeed = None
+    sheepMaxSpeedOriginal = 1.3
+    sheepMaxSpeed = sheepMaxSpeedOriginal * sheepSpeedMultiplier
+
     entityMaxSpeedList = [wolfMaxSpeed] * numWolves + [sheepMaxSpeed] * numSheeps + [blockMaxSpeed] * numBlocks
     entitiesMovableList = [True] * numAgents + [False] * numBlocks
     massList = [1.0] * numEntities
 
     isCollision = IsCollision(getPosFromAgentState)
-    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
                               punishForOutOfBound)
+
+    if individualRewardWolf:
+        rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    else:
+        rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
 
     rewardFunc = lambda state, action, nextState: \
         list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
@@ -123,6 +131,7 @@ def main():
     sampleBatchFromMemory = SampleFromMemory(minibatchSize)
 
     learnInterval = 100
+    learningStartBufferSize = minibatchSize * maxTimeStep
     startLearn = StartLearn(learningStartBufferSize, learnInterval)
 
     trainMADDPGModels = TrainMADDPGModelsWithBuffer(updateParameters, trainActor, trainCritic, sampleBatchFromMemory, startLearn, modelsList)
@@ -140,7 +149,7 @@ def main():
     modelSaveRate = 10000
     fileName = "maddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName)
     saveAllmodels = True
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 

@@ -18,7 +18,7 @@ import tensorflow.contrib.layers as layers
 from gym import spaces
 
 # policyPath = os.path.join(dirName, '..', 'policy1WolfMADDPG1SheepMADDPGWithTryTrain')
-policyPath = os.path.join(dirName, '..', 'policy2WolfMADDPG1SheepMADDPG1BoundaryWithTryTrain')
+policyPath = os.path.join(dirName, '..', 'policy3WolfMADDPG1SheepMADDPG')
 
 wolfSize = 0.075
 sheepSize = 0.05

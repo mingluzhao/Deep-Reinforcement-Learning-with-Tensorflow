@@ -105,7 +105,8 @@ def main():
     modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
 
     dirName = os.path.dirname(__file__)
-    fileName = "maddpgIndividWolf{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
+    # fileName = "maddpgIndividWolf{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}eps_agent".format(numWolves, numSheeps, numBlocks, maxEpisode)
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
