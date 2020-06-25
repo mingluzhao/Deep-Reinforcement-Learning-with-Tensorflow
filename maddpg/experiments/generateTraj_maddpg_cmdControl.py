@@ -36,7 +36,7 @@ def main():
     debug = 1
     if debug:
         numWolves = 3
-        numSheeps = 1
+        numSheeps = 4
         numBlocks = 2
         saveTraj = False
         visualizeTraj = True
@@ -88,7 +88,7 @@ def main():
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: False
-    maxRunningSteps = 25
+    maxRunningSteps = 80
     sampleTrajectory = SampleTrajectory(maxRunningSteps, transit, isTerminal, rewardFunc, reset)
 
     initObsForParams = observe(reset())
