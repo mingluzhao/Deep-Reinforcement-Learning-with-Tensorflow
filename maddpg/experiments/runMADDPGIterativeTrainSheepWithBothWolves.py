@@ -33,7 +33,7 @@ minibatchSize = 1024#
 # arguments: numWolves numSheeps numBlocks saveAllmodels = True or False
 
 class RunAlgorithmWithIterSheep:
-    def __init__(self, runEpisodeIndivid, runEpisodeShared, maxEpisode, saveModelsIndivid, saveModelsShared, numAgents = 1, printEpsFrequency = 100):
+    def __init__(self, runEpisodeIndivid, runEpisodeShared, maxEpisode, saveModelsIndivid, saveModelsShared, numAgents = 1, printEpsFrequency = 1000):
         self.runEpisodeIndivid = runEpisodeIndivid
         self.runEpisodeShared = runEpisodeShared
         self.maxEpisode = maxEpisode
