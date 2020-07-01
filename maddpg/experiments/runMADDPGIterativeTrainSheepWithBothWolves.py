@@ -200,7 +200,7 @@ def main():
 
     getAgentModelIndivid = lambda agentId: lambda: trainMADDPGModelsIndivid.getTrainedModels()[agentId]
     getModelListIndivid = [getAgentModelIndivid(i) for i in range(numAgents)]
-    modelSaveRate = 100
+    modelSaveRate = 10000
     individStr = 'individ'
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
