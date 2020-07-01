@@ -1,6 +1,6 @@
 import numpy as np
-from multiagent.core import World, Agent, Landmark
-from multiagent.scenario import BaseScenario
+from maddpg.multiagent.core import World, Agent, Landmark
+from maddpg.multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
@@ -47,7 +47,7 @@ class Scenario(BaseScenario):
             landmark.name = 'forest %d' % i
             landmark.collide = False
             landmark.movable = False
-            landmark.size = 0.3
+            landmark.size = 0.0001 # 0.3
             landmark.boundary = False
         world.landmarks += world.food
         world.landmarks += world.forests

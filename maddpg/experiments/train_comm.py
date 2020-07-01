@@ -20,14 +20,14 @@ from maddpg.maddpgAlgor.trainer.maddpg_ref import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 
 
-trajectoryPath = os.path.join(dirName, '..', 'policy3WolfMADDPG1SheepMADDPG')
+trajectoryPath = os.path.join(dirName, '..', 'policy3WolfMADDPG1SheepMADDPG_comm')
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
     # Environment
     parser.add_argument("--scenario", type=str, default="simple", help="name of the scenario script")
     parser.add_argument("--max-episode-len", type=int, default=25, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=5000, help="number of episodes") #60000
+    parser.add_argument("--num-episodes", type=int, default=60000, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
     parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
     parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument("--load-dir", type=str, default="", help="directory in which training state and model are loaded")
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--display", action="store_true", default=True)
+    parser.add_argument("--display", action="store_true", default=False)
     parser.add_argument("--benchmark", action="store_true", default=False)
     parser.add_argument("--benchmark-iters", type=int, default=100000, help="number of iterations run for benchmarking")
     parser.add_argument("--benchmark-dir", type=str, default=os.path.join(dirName, '..', 'benchmark_files'), help="directory where benchmark data is saved")
@@ -66,7 +66,7 @@ def make_env(scenario_name, arglist, benchmark=False):  #### why is arglist not 
 
     # load scenario from script
     # scenario = scenarios.load(scenario_name + ".py").Scenario()
-    scenario = scenarios.load("simple_tag.py").Scenario()
+    scenario = scenarios.load("simple_world_comm.py").Scenario()
     # create world
     world = scenario.make_world()
     # create multiagent environment
@@ -168,10 +168,7 @@ def train(arglist):
             # for displaying learned policies
             if arglist.display:
                 time.sleep(0.1)
-                # env.render()
-                if len(episode_rewards) > arglist.num_episodes:
-                    print('mean eps reward: ', np.mean(episode_rewards))
-                    break
+                env.render()
                 continue
 
             # update all trainers, if not in display or benchmark mode
@@ -210,8 +207,6 @@ def train(arglist):
                 with open(agrew_file_name, 'wb') as fp:
                     pickle.dump(final_ep_ag_rewards, fp)
                 print('...Finished total of {} episodes.'.format(len(episode_rewards)))
-
-                print('mean eps reward: ', np.mean(episode_rewards))
                 break
 
         # writer = tf.summary.FileWriter('./log', U.get_session().graph)  # write to file

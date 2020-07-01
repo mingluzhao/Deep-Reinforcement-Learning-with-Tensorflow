@@ -50,9 +50,9 @@ class RunAlgorithmWithIterSheep:
         trajectory = []
         agentsEpsRewardList = [list() for agentID in range(self.numAgents)]
 
-        shared = 1
+        shared = 0
         for episode in range(self.maxEpisode):
-            if shared % 2 == 1:
+            if shared % 10 < 5:
                 replayBufferShared, episodeReward, trajectory = self.runEpisodeShared(replayBufferShared, trajectory)
                 episodeRewardList.append(np.sum(episodeReward))
                 [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in zip(agentsEpsRewardList, episodeReward)]
@@ -82,7 +82,7 @@ def main():
     if debug:
         numWolves = 3
         numSheeps = 1
-        numBlocks = 0
+        numBlocks = 2
         saveAllmodels = False
         maxTimeStep = 25
         sheepSpeedMultiplier = 1
