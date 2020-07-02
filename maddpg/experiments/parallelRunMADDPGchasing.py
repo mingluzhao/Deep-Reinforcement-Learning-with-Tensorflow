@@ -44,21 +44,30 @@ def main():
     numCpuToUse = int(0.8 * os.cpu_count())
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)
     print("start")
-    
-    numEntitiessList = [(3, 1, 2), (3, 2, 2), (3, 4, 2), (3, 8, 2)]
-    conditions = []
-    for numEntities in numEntitiessList:
-        numWolves, numSheeps, numBlocks = numEntities
-        parameters = {'numWolves': numWolves, 'numSheeps': numSheeps, 'numBlocks': numBlocks}
-        conditions.append(parameters)
-    
-    # example when all variables are independent
-    #manipulatedVariables = OrderedDict()
-    #manipulatedVariables['numTrainStepEachIteration'] = [4,8]
-    #manipulatedVariables['numTrajectoriesPerIteration'] = [16, 1]
 
-    #productedValues = it.product(*[[(key, value) for value in values] for key, values in manipulatedVariables.items()])
-    #condtions = [dict(list(specificValueParameter)) for specificValueParameter in productedValues]
+    numWolvesLevels = [2]
+    numSheepsLevels = [1, 2, 4]
+    numBlocksLevels = [2]
+    maxTimeStepLevels = [25]
+    sheepSpeedMultiplierLevels = [1]
+    individualRewardWolfLevels = [0]
+
+    conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward)
+                       for wolfNum in numWolvesLevels
+                       for sheepNum in numSheepsLevels
+                       for blockNum in numBlocksLevels
+                       for timeStep in maxTimeStepLevels
+                       for sheepSpeed in sheepSpeedMultiplierLevels
+                       for individReward in individualRewardWolfLevels]
+
+    conditions = []
+    for condition in conditionLevels:
+        numWolves, numSheeps, numBlocks, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf = condition
+        parameters = {'numWolves': numWolves, 'numSheeps': numSheeps, 'numBlocks': numBlocks,
+                      'maxTimeStep': maxTimeStep, 'sheepSpeedMultiplier': sheepSpeedMultiplier, 'individualRewardWolf': individualRewardWolf}
+        conditions.append(parameters)
+
+
     cmdList = excuteCodeParallel(conditions)
     print(cmdList)
 

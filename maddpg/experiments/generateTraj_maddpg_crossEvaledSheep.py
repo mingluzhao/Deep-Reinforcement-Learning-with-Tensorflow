@@ -42,12 +42,11 @@ def main():
     if debug:
         numWolves = 3
         numSheeps = 1
-        numBlocks = 0
+        numBlocks = 2
         saveTraj = False
         visualizeTraj = True
         maxTimeStep = 25
         sheepSpeedMultiplier = 1
-        individualRewardWolf = 1
 
     else:
         print(sys.argv)
@@ -123,52 +122,53 @@ def main():
 
     layerWidth = [128, 128]
 
-    # ------------ model ------------------------
-    buildMADDPGModels = BuildMADDPGModels(actionDim, numAgents, obsShape)
-    modelsListShared = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
-    sheepModel = [modelsListShared[sheepID] for sheepID in sheepsID]
-    individStr = 'shared'
-
-    dirName = os.path.dirname(__file__)
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    modelPathsShared = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName + str(i)) for i in range(numAgents)]
-    [restoreVariables(model, path) for model, path in zip(modelsListShared, modelPathsShared)]
-
-    actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
-    policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsListShared]
-
-    trajList = []
-    rewardList = []
-    numTrajToSample = 5000
-    for i in range(numTrajToSample):
-        traj = sampleTrajectoryShared(policy)
-        rew = calcTrajRewardWithSharedWolfReward(traj)
-        rewardList.append(rew)
-        # trajList.append(list(traj))
-    meanTrajReward = np.mean(rewardList)
-    print('meanTrajRewardSharedWolf', meanTrajReward)
-
-
-    # ------------ model ------------------------
-    modelsListIndivid = [buildMADDPGModels(layerWidth, agentID) for agentID in wolvesID] + sheepModel
-
-    individStr = 'individ'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    modelPathsIndivid = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName + str(i)) for i in range(numAgents)]
-    [restoreVariables(model, path) for model, path in zip(modelsListIndivid, modelPathsIndivid)]
-
-    policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsListIndivid]
-
-    rewardList = []
-    numTrajToSample = 5000
-    for i in range(numTrajToSample):
-        traj = sampleTrajectoryIndivid(policy)
-        rew = calcTrajRewardWithIndividualWolfReward(traj, wolvesID)
-        rewardList.append(rew)
-    meanTrajReward = np.mean(rewardList)
-    print('meanTrajRewardIndividWolf', meanTrajReward)
+    # # ------------ model ------------------------
+    # buildMADDPGModels = BuildMADDPGModels(actionDim, numAgents, obsShape)
+    # modelsListShared = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
+    # sheepModel = [modelsListShared[sheepID] for sheepID in sheepsID]
+    # individStr = 'shared'
+    #
+    # dirName = os.path.dirname(__file__)
+    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    # modelPathsShared = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName + str(i)) for i in range(numAgents)]
+    # [restoreVariables(model, path) for model, path in zip(modelsListShared, modelPathsShared)]
+    #
+    # actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
+    # policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsListShared]
+    #
+    # trajList = []
+    # rewardList = []
+    # numTrajToSample = 50
+    # for i in range(numTrajToSample):
+    #     traj = sampleTrajectoryShared(policy)
+    #     rew = calcTrajRewardWithSharedWolfReward(traj)
+    #     rewardList.append(rew)
+    #     trajList.append(list(traj))
+    # meanTrajReward = np.mean(rewardList)
+    # print('meanTrajRewardSharedWolf', meanTrajReward)
+    #
+    #
+    # # ------------ model ------------------------
+    # modelsListIndivid = [buildMADDPGModels(layerWidth, agentID) for agentID in wolvesID] + sheepModel
+    #
+    # individStr = 'individ'
+    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    # modelPathsIndivid = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName + str(i)) for i in range(numAgents)]
+    # [restoreVariables(model, path) for model, path in zip(modelsListIndivid, modelPathsIndivid)]
+    #
+    # policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsListIndivid]
+    #
+    # trajList = []
+    # rewardList = []
+    # for i in range(numTrajToSample):
+    #     traj = sampleTrajectoryIndivid(policy)
+    #     rew = calcTrajRewardWithIndividualWolfReward(traj, wolvesID)
+    #     rewardList.append(rew)
+    #     trajList.append(list(traj))
+    # meanTrajReward = np.mean(rewardList)
+    # print('meanTrajRewardIndividWolf', meanTrajReward)
 
 
 
@@ -180,11 +180,56 @@ def main():
     #
     #
     # # visualize
-    # if visualizeTraj:
-    #     entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
-    #     render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
-    #     trajToRender = np.concatenate(trajList)
-    #     render(trajToRender)
+
+    # ------------ model ------------------------
+    buildMADDPGModels = BuildMADDPGModels(actionDim, numAgents, obsShape)
+    modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
+    sheepModel = modelsList[sheepsID[0]]
+    individStr = 'shared'
+    dirName = os.path.dirname(__file__)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    sheepModelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName + str(sheepsID[0]))
+    restoreVariables(sheepModel, sheepModelPath)
+
+    # wolvesModel = modelsList[:-1]
+    # fileName = "maddpg{}wolves{}sheep{}blocks60000eps_agent".format(numWolves, numSheeps, numBlocks)
+    # wolvesModelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in wolvesID]
+    # [restoreVariables(model, path) for model, path in zip(wolvesModel, wolvesModelPaths)]
+    #
+    # actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
+    # policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
+
+    wolvesModel = modelsList[:-1]
+    individStr = 'individ'
+    fileName = "maddpg{}wolves{}sheep{}blocks60000episodes25stepSheepSpeed1.0{}_agent".format(
+        numWolves, numSheeps, numBlocks, individStr)
+    wolvesModelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName + str(i)) for i in wolvesID]
+    [restoreVariables(model, path) for model, path in zip(wolvesModel, wolvesModelPaths)]
+
+    actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
+    policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
+
+
+    trajList = []
+    rewardList = []
+    numTrajToSample = 500
+    for i in range(numTrajToSample):
+        traj = sampleTrajectoryShared(policy)
+        rew = calcTrajRewardWithSharedWolfReward(traj)
+        rewardList.append(rew)
+        trajList.append(list(traj))
+    meanTrajReward = np.mean(rewardList)
+    print('meanTrajRewardSharedWolf', meanTrajReward)
+
+
+
+    visualizeTraj = False
+    if visualizeTraj:
+        entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
+        render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
+        trajToRender = np.concatenate(trajList)
+        render(trajToRender)
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, Apply
 from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 # fixed training parameters
-maxEpisode = 60000
+maxEpisode = 200
 learningRateActor = 0.01#
 learningRateCritic = 0.01#
 gamma = 0.95 #
@@ -146,12 +146,12 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 10000
+    modelSaveRate = 100
     individStr = 'individ' if individualRewardWolf else 'shared'
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '2wolvesMaddpg', fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
