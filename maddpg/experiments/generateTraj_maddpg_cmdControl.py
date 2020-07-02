@@ -32,9 +32,9 @@ def main():
         numBlocks = 2
         saveTraj = False
         visualizeTraj = True
-        maxTimeStep = 75
-        sheepSpeedMultiplier = 1.5
-        individualRewardWolf = 1
+        maxTimeStep = 25
+        sheepSpeedMultiplier = 1.0
+        individualRewardWolf = 0
 
     else:
         print(sys.argv)
@@ -97,7 +97,7 @@ def main():
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: False
-    maxRunningStepsToSample = 50
+    maxRunningStepsToSample = 25
     sampleTrajectory = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFunc, reset)
 
     initObsForParams = observe(reset())
