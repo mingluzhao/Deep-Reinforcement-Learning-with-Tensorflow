@@ -45,10 +45,10 @@ def main():
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)
     print("start")
 
-    numWolvesLevels = [2]
+    numWolvesLevels = [2, 3]
     numSheepsLevels = [1, 2, 4]
     numBlocksLevels = [2]
-    maxTimeStepLevels = [25]
+    maxTimeStepLevels = [75]
     sheepSpeedMultiplierLevels = [1]
     individualRewardWolfLevels = [0]
 

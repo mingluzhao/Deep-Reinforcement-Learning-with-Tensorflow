@@ -28,13 +28,13 @@ def main():
     debug = 1
     if debug:
         numWolves = 3
-        numSheeps = 1
+        numSheeps = 2
         numBlocks = 2
         saveTraj = False
         visualizeTraj = True
-        maxTimeStep = 75
-        sheepSpeedMultiplier = 1.5
-        individualRewardWolf = 1
+        maxTimeStep = 25
+        sheepSpeedMultiplier = 1
+        individualRewardWolf = 0
 
     else:
         print(sys.argv)
@@ -97,7 +97,7 @@ def main():
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: False
-    maxRunningStepsToSample = 75
+    maxRunningStepsToSample = 25
     sampleTrajectory = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFunc, reset)
 
     initObsForParams = observe(reset())
@@ -113,12 +113,19 @@ def main():
     modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
 
     dirName = os.path.dirname(__file__)
-    individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    # individStr = 'individ' if individualRewardWolf else 'shared'
+    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    fileName = "maddpg{}wolves{}sheep{}blocks60000eps_agent".format(numWolves, numSheeps, numBlocks)
+    # wolvesModelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in wolvesID]
+    # [restoreVariables(model, path) for model, path in zip(wolvesModel, wolvesModelPaths)]
+    #
+    # actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
+    # policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName + str(i)) for i in
-                  range(numAgents)]
+    # modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName + str(i)) for i in
+    #               range(numAgents)]
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
