@@ -151,7 +151,7 @@ def main():
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '2wolvesMaddpg', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpg75steps', fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
