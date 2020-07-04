@@ -9,11 +9,12 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import numpy as np
 import json
+import random
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import BuildMADDPGModels, TrainCritic, TrainActor, TrainCriticBySASR, \
-    TrainActorFromSA, TrainMADDPGModelsWithBuffer, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
+    TrainActorFromSA, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
 from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
-    RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
+    RunTimeStep, RunEpisode, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
@@ -22,18 +23,41 @@ from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndi
 
 # fixed training parameters
 maxEpisode = 120000
-learningRateActor = 0.01#
-learningRateCritic = 0.01#
+learningRateWolfActor = 0.01#
+learningRateWolfCritic = 0.01#
 gamma = 0.95 #
 tau=0.01 #
 bufferSize = 1e6#
 minibatchSize = 1024#
 
 
-# arguments: numWolves numSheeps numBlocks saveAllmodels = True or False
+class TrainMADDPGModelsWithIterSheep:
+    def __init__(self, updateParameters, trainActorList, trainCriticList, sampleFromBuffer, startLearn, allModels):
+        self.updateParameters = updateParameters
+        self.trainActorList = trainActorList
+        self.trainCriticList = trainCriticList
+        self.sampleFromBuffer = sampleFromBuffer
+        self.startLearn = startLearn
+        self.allModels = allModels
+
+    def __call__(self, buffer, runTime):
+        if not self.startLearn(runTime):
+            return
+
+        numAgents = len(self.allModels)
+        for agentID in range(numAgents):
+            miniBatch = self.sampleFromBuffer(buffer)
+            agentModel = self.trainCriticList[agentID](agentID, self.allModels, miniBatch)
+            agentModel = self.trainActorList[agentID](agentID, agentModel, miniBatch)
+            agentModel = self.updateParameters(agentModel)
+            self.allModels[agentID] = agentModel
+
+    def getTrainedModels(self):
+        return self.allModels
+    
 
 class RunAlgorithmWithIterSheep:
-    def __init__(self, runEpisodeIndivid, runEpisodeShared, maxEpisode, saveModelsIndivid, saveModelsShared, numAgents = 1, printEpsFrequency = 1000):
+    def __init__(self, runEpisodeIndivid, runEpisodeShared, maxEpisode, saveModelsIndivid, saveModelsShared, sampleMethod, numAgents = 1, printEpsFrequency = 1000):
         self.runEpisodeIndivid = runEpisodeIndivid
         self.runEpisodeShared = runEpisodeShared
         self.maxEpisode = maxEpisode
@@ -41,6 +65,7 @@ class RunAlgorithmWithIterSheep:
         self.saveModelsShared = saveModelsShared
         self.numAgents = numAgents
         self.printEpsFrequency = printEpsFrequency
+        self.sampleMethod = sampleMethod
 
     def __call__(self, replayBufferShared, replayBufferIndivid):
         episodeRewardList = []
@@ -50,18 +75,25 @@ class RunAlgorithmWithIterSheep:
         trajectory = []
         agentsEpsRewardList = [list() for agentID in range(self.numAgents)]
 
-        shared = 0
         for episode in range(self.maxEpisode):
-            if shared % 10 < 5:
+            if self.sampleMethod == 'random':
+                updateShared = random.randrange(2)
+            else:
+                switchInterval = int(self.sampleMethod)
+                updateShared = episode % (2 * switchInterval) < switchInterval
+
+            if updateShared:
                 replayBufferShared, episodeReward, trajectory = self.runEpisodeShared(replayBufferShared, trajectory)
                 episodeRewardList.append(np.sum(episodeReward))
-                [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in zip(agentsEpsRewardList, episodeReward)]
+                [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in
+                 zip(agentsEpsRewardList, episodeReward)]
                 meanRewardList.append(np.mean(episodeRewardList))
                 [saveModel() for saveModel in self.saveModelsShared]
             else:
                 replayBufferIndivid, episodeReward, trajectory = self.runEpisodeIndivid(replayBufferIndivid, trajectory)
                 episodeRewardList.append(np.sum(episodeReward))
-                [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in zip(agentsEpsRewardList, episodeReward)]
+                [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in
+                 zip(agentsEpsRewardList, episodeReward)]
                 meanRewardList.append(np.mean(episodeRewardList))
                 [saveModel() for saveModel in self.saveModelsIndivid]
 
@@ -73,12 +105,11 @@ class RunAlgorithmWithIterSheep:
                     len(replayBufferShared), len(replayBufferIndivid), len(episodeRewardList), self.printEpsFrequency, lastTimeSpanMeanReward,
                     [np.mean(rew[-self.printEpsFrequency:]) for rew in agentsEpsRewardList]))
 
-            shared += 1
-
         return meanRewardList, trajectory
 
+
 def main():
-    debug = 1
+    debug = 0
     if debug:
         numWolves = 3
         numSheeps = 1
@@ -86,23 +117,25 @@ def main():
         saveAllmodels = False
         maxTimeStep = 25
         sheepSpeedMultiplier = 1
-        individualRewardWolf = int(False)
+        sampleMethod = '5'
+        learningRateSheepCritic = 0.005
+        learningRateSheepActor = 0.005
 
     else:
         print(sys.argv)
         condition = json.loads(sys.argv[1])
-        numWolves = int(condition['numWolves'])
-        numSheeps = int(condition['numSheeps'])
-        numBlocks = int(condition['numBlocks'])
-
-        maxTimeStep = int(condition['maxTimeStep'])
-        sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
-        individualRewardWolf = int(condition['individualRewardWolf'])
-
+        numWolves = 3
+        numSheeps = 1
+        numBlocks = 2
         saveAllmodels = False
+        maxTimeStep = 25
+        sheepSpeedMultiplier = 1
+        sampleMethod = condition['sampleMethod']
+        learningRateSheepCritic = condition['sheepLr']
+        learningRateSheepActor = condition['sheepLr']
 
-    print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, save all models: {}".
-          format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, str(saveAllmodels)))
+    print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x,  sampleMethod: {}".
+          format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, str(sampleMethod)))
 
 
     numAgents = numWolves + numSheeps
@@ -168,11 +201,19 @@ def main():
     sheepModel = [modelsListShared[sheepID] for sheepID in sheepsID]
     modelsListIndivid = [buildMADDPGModels(layerWidth, agentID) for agentID in wolvesID] + sheepModel
 
+    trainCriticBySASRWolf = TrainCriticBySASR(actByPolicyTargetNoisyForNextState, learningRateWolfCritic, gamma)
+    trainCriticWolf = TrainCritic(trainCriticBySASRWolf)
+    trainCriticBySASRSheep = TrainCriticBySASR(actByPolicyTargetNoisyForNextState, learningRateSheepCritic, gamma)
+    trainCriticSheep = TrainCritic(trainCriticBySASRSheep)
+    
+    trainActorFromSAWolf = TrainActorFromSA(learningRateWolfActor)
+    trainActorWolf = TrainActor(trainActorFromSAWolf)
 
-    trainCriticBySASR = TrainCriticBySASR(actByPolicyTargetNoisyForNextState, learningRateCritic, gamma)
-    trainCritic = TrainCritic(trainCriticBySASR)
-    trainActorFromSA = TrainActorFromSA(learningRateActor)
-    trainActor = TrainActor(trainActorFromSA)
+    trainActorFromSASheep = TrainActorFromSA(learningRateSheepActor)
+    trainActorSheep = TrainActor(trainActorFromSASheep)
+
+    trainActorList = [trainActorWolf]* numWolves + [trainActorSheep]* numSheeps
+    trainCriticList = [trainCriticWolf]* numWolves + [trainCriticSheep]* numSheeps
 
     paramUpdateInterval = 1 #
     updateParameters = UpdateParameters(paramUpdateInterval, tau)
@@ -182,8 +223,8 @@ def main():
     learningStartBufferSize = minibatchSize * maxTimeStep
     startLearn = StartLearn(learningStartBufferSize, learnInterval)
 
-    trainMADDPGModelsIndivid = TrainMADDPGModelsWithBuffer(updateParameters, trainActor, trainCritic, sampleBatchFromMemory, startLearn, modelsListIndivid)
-    trainMADDPGModelsShared = TrainMADDPGModelsWithBuffer(updateParameters, trainActor, trainCritic, sampleBatchFromMemory, startLearn, modelsListShared)
+    trainMADDPGModelsIndivid = TrainMADDPGModelsWithIterSheep(updateParameters, trainActorList, trainCriticList, sampleBatchFromMemory, startLearn, modelsListIndivid)
+    trainMADDPGModelsShared = TrainMADDPGModelsWithIterSheep(updateParameters, trainActorList, trainCriticList, sampleBatchFromMemory, startLearn, modelsListShared)
 
     actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
     actOneStepIndivid = lambda allAgentsStates, runTime: [actOneStepOneModel(model, allAgentsStates) for model in modelsListIndivid]
@@ -200,30 +241,27 @@ def main():
 
     getAgentModelIndivid = lambda agentId: lambda: trainMADDPGModelsIndivid.getTrainedModels()[agentId]
     getModelListIndivid = [getAgentModelIndivid(i) for i in range(numAgents)]
-    modelSaveRate = 10000
+    modelSaveRate = 1000
     individStr = 'individ'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}Lr{}SampleMethod{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, learningRateSheepActor, sampleMethod, individStr)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', 'IterTrainSheep_evalSheeplrAndSampleMethod', fileName)
     saveModelsIndivid = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelListIndivid)]
 
     getAgentModelShared = lambda agentId: lambda: trainMADDPGModelsShared.getTrainedModels()[agentId]
     getModelListShared = [getAgentModelShared(i) for i in range(numAgents)]
     individStr = 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_iterTrainSheep', fileName)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}Lr{}SampleMethod{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, learningRateSheepActor, sampleMethod, individStr)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', 'IterTrainSheep_evalSheeplrAndSampleMethod', fileName)
     saveModelsShared = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelListShared)]
 
-    maddpgIterSheep = RunAlgorithmWithIterSheep(runEpisodeIndivid, runEpisodeShared, maxEpisode, saveModelsIndivid, saveModelsShared, numAgents)
+    maddpgIterSheep = RunAlgorithmWithIterSheep(runEpisodeIndivid, runEpisodeShared, maxEpisode, saveModelsIndivid, saveModelsShared, sampleMethod, numAgents)
 
     replayBufferIndivid = getBuffer(bufferSize)
     replayBufferShared = getBuffer(bufferSize)
 
     meanRewardList, trajectory = maddpgIterSheep(replayBufferShared, replayBufferIndivid)
-
-
-
 
 
 if __name__ == '__main__':
