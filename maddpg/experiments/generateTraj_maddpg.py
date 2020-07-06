@@ -22,7 +22,7 @@ sheepColor = np.array([0.35, 0.85, 0.35])
 blockColor = np.array([0.25, 0.25, 0.25])
 
 maxEpisode = 60000
-
+maxRunningStepsToSample = 50 # num of timesteps in one eps
 
 def main():
     debug = 1
@@ -32,8 +32,8 @@ def main():
         numBlocks = 2
         saveTraj = False
         visualizeTraj = True
-        maxTimeStep = 25
-        sheepSpeedMultiplier = 1
+        maxTimeStep = 75
+        sheepSpeedMultiplier = 1.0
         individualRewardWolf = 0
 
     else:
@@ -97,7 +97,6 @@ def main():
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: False
-    maxRunningStepsToSample = 25
     sampleTrajectory = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFunc, reset)
 
     initObsForParams = observe(reset())
@@ -113,25 +112,15 @@ def main():
     modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
 
     dirName = os.path.dirname(__file__)
-    # individStr = 'individ' if individualRewardWolf else 'shared'
-    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    fileName = "maddpg{}wolves{}sheep{}blocks60000eps_agent".format(numWolves, numSheeps, numBlocks)
-    # wolvesModelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in wolvesID]
-    # [restoreVariables(model, path) for model, path in zip(wolvesModel, wolvesModelPaths)]
-    #
-    # actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
-    # policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
-
-    # modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName + str(i)) for i in
-    #               range(numAgents)]
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg', fileName + str(i) + '60000eps') for i in range(numAgents)]
+    individStr = 'individ' if individualRewardWolf else 'shared'
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpg75steps', fileName + str(i)) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
     actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
-
 
     trajList = []
     numTrajToSample = 50

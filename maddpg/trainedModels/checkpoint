@@ -1,2 +1,0 @@
-model_checkpoint_path: "ddpgCentralControllerStaticSheep2wolves1sheep0blocks60000eps_agent120000eps"
-all_model_checkpoint_paths: "ddpgCentralControllerStaticSheep2wolves1sheep0blocks60000eps_agent120000eps"
