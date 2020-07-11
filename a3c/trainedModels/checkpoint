@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/a3c/exec/../trainedModels/a3cMountainCarContinuous"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/a3c/exec/../trainedModels/a3cMountainCarContinuous"
