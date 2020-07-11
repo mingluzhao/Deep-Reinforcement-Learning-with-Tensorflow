@@ -155,7 +155,7 @@ def evaluateWolfSheepTrain(df):
     numTrajToSample = 500
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
-        rew = calcTrajRewardWithSharedWolfReward(traj)
+        rew = calcTrajRewardWithSharedWolfReward(traj) if wolfIndividStr == 'shared' else calcTrajRewardWithIndividualWolfReward(traj, wolvesID)
         rewardList.append(rew)
         trajList.append(list(traj))
 

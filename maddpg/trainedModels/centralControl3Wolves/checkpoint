@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../trainedModels/centralControl3Wolves/maddpgCentralControl3wolves1sheep2blocks60000episodes25stepSheepSpeed1shared_agent1"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../trainedModels/centralControl3Wolves/maddpgCentralControl3wolves1sheep2blocks60000episodes25stepSheepSpeed1shared_agent1"
