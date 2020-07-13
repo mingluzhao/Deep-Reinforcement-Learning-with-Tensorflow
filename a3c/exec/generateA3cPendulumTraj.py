@@ -13,7 +13,7 @@ import multiprocessing
 import gym
 
 
-from algorithm.a3cAlgorithm import *
+from algorithm.a3cContinuous import *
 from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, isTerminalGymPendulum, \
     observe, angle_normalize, VisualizeGymPendulum, ResetGymPendulum
 from functionTools.loadSaveModel import restoreVariables

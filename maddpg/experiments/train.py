@@ -20,14 +20,14 @@ from maddpg.maddpgAlgor.trainer.maddpg_ref import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 
 
-trajectoryPath = os.path.join(dirName, '..', 'policy5WolfMADDPG2SheepMADDPG')
+trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'newtry3v1', 'policy3WoolfMADDPG1SheepMADDPG')
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
     # Environment
     parser.add_argument("--scenario", type=str, default="simple", help="name of the scenario script")
-    parser.add_argument("--max-episode-len", type=int, default=25, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=60000, help="number of episodes") #60000
+    parser.add_argument("--max-episode-len", type=int, default=50, help="maximum episode length")
+    parser.add_argument("--num-episodes", type=int, default=300, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
     parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
     parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
@@ -51,7 +51,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def mlp_model(input, num_outputs, scope, reuse=False, num_units=64, rnn_cell=None):
+def mlp_model(input, num_outputs, scope, reuse=False, num_units=128, rnn_cell=None):
     # This model takes as input an observation and returns values of all actions
     with tf.variable_scope(scope, reuse=reuse):
         out = input
@@ -168,9 +168,14 @@ def train(arglist):
             # for displaying learned policies
             if arglist.display:
                 time.sleep(0.1)
-                env.render()
+                # env.render()
+                # print(len(episode_rewards))
+                print(len(agent_rewards[0]))
                 if len(episode_rewards) > arglist.num_episodes:
-                    print('mean eps reward: ', np.mean(episode_rewards))
+                    wolfRewardList = agent_rewards[0]
+                    seAgentReweard = np.std(wolfRewardList) / np.sqrt(len(wolfRewardList) - 1)
+                    print('mean agent eps reward: ', np.mean(wolfRewardList), 'se: ', seAgentReweard )
+
                     break
                 continue
 

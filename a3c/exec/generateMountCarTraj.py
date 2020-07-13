@@ -13,7 +13,7 @@ import threading
 import gym
 import time
 
-from algorithm.a3cAlgorithm import *
+from algorithm.a3cContinuous import *
 from functionTools.loadSaveModel import saveVariables, restoreVariables
 
 def main():

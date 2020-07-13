@@ -12,7 +12,7 @@ import multiprocessing
 import threading
 import gym
 
-from algorithm.a3cAlgorithm import *
+from algorithm.a3cContinuous import *
 from functionTools.loadSaveModel import saveVariables
 from environment.gymEnv.continousMountainCarEnv import IsTerminalMountCarContin, TransitGymMountCarContinuous, \
     RewardMountCarContin, ResetMountCarContin, VisualizeMountCarContin

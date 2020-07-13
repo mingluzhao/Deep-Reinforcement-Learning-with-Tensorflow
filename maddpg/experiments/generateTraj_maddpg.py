@@ -27,8 +27,8 @@ maxRunningStepsToSample = 50 # num of timesteps in one eps
 def main():
     debug = 1
     if debug:
-        numWolves = 3
-        numSheeps = 2
+        numWolves = 5
+        numSheeps = 1
         numBlocks = 2
         saveTraj = False
         visualizeTraj = True
@@ -115,7 +115,7 @@ def main():
     individStr = 'individ' if individualRewardWolf else 'shared'
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpg75steps', fileName + str(i)) for i in range(numAgents)]
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', 'evalOneSheep_2575steps_1to6wolves_11.25speed', fileName + str(i)) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 

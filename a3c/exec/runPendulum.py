@@ -13,7 +13,7 @@ import threading
 import gym
 
 
-from a3c.algorithm.a3cAlgorithm import *
+from a3c.algorithm.a3cContinuous import *
 from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, observe, angle_normalize, \
     ResetGymPendulum
 from functionTools.loadSaveModel import saveVariables

@@ -22,12 +22,14 @@ class GlobalNet(object):
                 self.states_ = tf.placeholder(tf.float32, [None, self.stateDim], name='states_')
 
             with tf.variable_scope('actorNet'):
+                actorTrainActivation_ = self.states_
                 for numUnits in self.actorLayersWidths:
-                    actorTrainActivation_ = tf.layers.dense(self.states_, numUnits, self.actorActivFunction, kernel_initializer=self.weightInit)
+                    actorTrainActivation_ = tf.layers.dense(actorTrainActivation_, numUnits, self.actorActivFunction, kernel_initializer=self.weightInit)
                 mu_ = tf.layers.dense(actorTrainActivation_, self.actionDim, self.actorMuOutputActiv, kernel_initializer=self.weightInit, name='mu_')
                 sigma_ = tf.layers.dense(actorTrainActivation_, self.actionDim, self.actorSigmaOutputActiv, kernel_initializer=self.weightInit, name='sigma_')
 
             with tf.variable_scope('criticNet'):
+                criticTrainActivation_ = self.states_
                 for numUnits in self.criticLayersWidths:
                     criticTrainActivation_ = tf.layers.dense(self.states_, numUnits, self.criticActivFunction, kernel_initializer=self.weightInit)
                 value_ = tf.layers.dense(criticTrainActivation_, 1, kernel_initializer=self.weightInit)  # state value

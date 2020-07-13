@@ -11,22 +11,34 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import multiprocessing
 import threading
 import gym
+import matplotlib.pyplot as plt
 
-from algorithm.a3cAlgorithm import *
+from algorithm.a3cRNN import *
 from functionTools.loadSaveModel import saveVariables
 
 def main():
+    hyperparamDict = dict()
+    hyperparamDict['actorLR'] = 1e-5
+    hyperparamDict['criticLR'] = 1e-4
+    hyperparamDict['weightInit'] = tf.truncated_normal_initializer(mean=0.0, stddev=0.002)
+    hyperparamDict['actorActivFunction'] = tf.nn.relu6
+    hyperparamDict['actorMuOutputActiv'] = tf.nn.tanh
+    hyperparamDict['actorSigmaOutputActiv'] = tf.nn.softplus
+    hyperparamDict['criticActivFunction'] = tf.nn.relu6
+    hyperparamDict['actorLayersWidths'] = [512, 512]
+    hyperparamDict['criticLayersWidths'] = [512, 512]
+    hyperparamDict['entropyBeta'] = 0.001
+    hyperparamDict['cellSize'] = 128
+
     game = 'InvertedDoublePendulum-v2'
     env = gym.make(game)
 
-    numWorkers = multiprocessing.cpu_count()
-    maxTimeStepPerEps = 10000
-    maxGlobalEpisode = 2000
-    updateInterval = 10
+    # numWorkers = multiprocessing.cpu_count()
+    numWorkers = 20
+    maxTimeStepPerEps = 200
+    maxGlobalEpisode = 100000
+    updateInterval = 20
     gamma = 0.99
-
-    actorLayersWidths = [256, 256]
-    criticLayersWidths = [256]
 
     stateDim = env.observation_space.shape[0] #11
     actionDim = env.action_space.shape[0] #1
@@ -41,17 +53,17 @@ def main():
 
     fileName = 'a3cInvDoublePendulum'
     modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
-    modelSaveRate = 200
+    modelSaveRate = 500
     saveModel = SaveModel(modelSaveRate, saveVariables, modelPath, session, saveAllmodels=False)
 
     with tf.device("/cpu:0"):
         workers = []
-        globalModel = GlobalNet(stateDim, actionDim, actorLayersWidths, criticLayersWidths)
+        globalModel = GlobalNet(stateDim, actionDim, hyperparamDict)
 
         for workerID in range(numWorkers):
             workerEnv = gym.make(game)
             workerName = 'worker_%i' % workerID
-            workerNet = WorkerNet(stateDim, actionDim, actionRange, workerName, actorLayersWidths, criticLayersWidths, globalModel, session)
+            workerNet = WorkerNet(stateDim, actionDim, hyperparamDict, actionRange, workerName, globalModel, session)
             worker = A3CWorkerUsingGym(maxGlobalEpisode, coord, getValueTargetList, workerEnv, maxTimeStepPerEps, globalCount, globalReward, updateInterval, workerNet, saveModel)
 
             workers.append(worker)
@@ -72,6 +84,8 @@ def main():
         worker_threads.append(t)
 
     coord.join(worker_threads)
+
+    plt.plot(range(len(globalReward.reward)), globalReward.reward)
 
 
 if __name__ == '__main__':
