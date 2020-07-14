@@ -5,6 +5,22 @@ import sys
 
 getPosFromAgentState = lambda state: np.array([state[0], state[1]])
 
+class GetActionCost:
+    def __init__(self, costActionRatio, reshapeAction, individualWolf):
+        self.costActionRatio = costActionRatio
+        self.individualWolf = individualWolf
+        self.reshapeAction =reshapeAction
+
+    def __call__(self, agentsActions):
+        agentsActions = [self.reshapeAction(action) for action in agentsActions]
+        actionMagnitude = [np.linalg.norm(np.array(action), ord=2) for action in agentsActions]
+        cost = self.costActionRatio* np.array(actionMagnitude)
+        numAgents = len(agentsActions)
+        groupCost = cost if self.individualWolf else [np.sum(cost)] * numAgents
+
+        return groupCost
+
+
 class IsCollision:
     def __init__(self, getPosFromState):
         self.getPosFromState = getPosFromState

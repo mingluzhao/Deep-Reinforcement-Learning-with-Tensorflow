@@ -17,7 +17,7 @@ from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, Sample
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
-    IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
+    IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState, GetActionCost
 from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 # fixed training parameters
@@ -30,18 +30,19 @@ bufferSize = 1e6#
 minibatchSize = 1024#
 
 
-# arguments: numWolves numSheeps numBlocks saveAllmodels = True or False
+# 7.13 add action cost
 
 def main():
     debug = 0
     if debug:
-        numWolves = 1
+        numWolves = 2
         numSheeps = 1
         numBlocks = 0
         saveAllmodels = False
         maxTimeStep = 25
         sheepSpeedMultiplier = 1
         individualRewardWolf = int(False)
+        costActionRatio = 0.01
 
     else:
         print(sys.argv)
@@ -53,6 +54,7 @@ def main():
         maxTimeStep = int(condition['maxTimeStep'])
         sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
         individualRewardWolf = int(condition['individualRewardWolf'])
+        costActionRatio = float(condition['costActionRatio'])
 
         saveAllmodels = False
 
@@ -85,20 +87,25 @@ def main():
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
                               punishForOutOfBound)
 
+    reshapeAction = ReshapeAction()
     if individualRewardWolf:
         rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
+        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualWolf= True)
     else:
         rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualWolf= False)
+
+    getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
+    rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
 
     rewardFunc = lambda state, action, nextState: \
-        list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
+        list(rewardWolfWithActionCost(state, action, nextState)) + list(rewardSheep(state, action, nextState))
 
     reset = ResetMultiAgentChasing(numAgents, numBlocks)
     observeOneAgent = lambda agentID: Observe(agentID, wolvesID, sheepsID, blocksID, getPosFromAgentState,
                                               getVelFromAgentState)
     observe = lambda state: [observeOneAgent(agentID)(state) for agentID in range(numAgents)]
 
-    reshapeAction = ReshapeAction()
     getCollisionForce = GetCollisionForce()
     applyActionForce = ApplyActionForce(wolvesID, sheepsID, entitiesMovableList)
     applyEnvironForce = ApplyEnvironForce(numEntities, entitiesMovableList, entitiesSizeList,
@@ -130,7 +137,7 @@ def main():
     updateParameters = UpdateParameters(paramUpdateInterval, tau)
     sampleBatchFromMemory = SampleFromMemory(minibatchSize)
 
-    learnInterval = 100
+    learnInterval = 1000
     learningStartBufferSize = minibatchSize * maxTimeStep
     startLearn = StartLearn(learningStartBufferSize, learnInterval)
 
@@ -148,10 +155,10 @@ def main():
     getModelList = [getAgentModel(i) for i in range(numAgents)]
     modelSaveRate = 1000
     individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpg75steps', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpgWithActionCost', fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
