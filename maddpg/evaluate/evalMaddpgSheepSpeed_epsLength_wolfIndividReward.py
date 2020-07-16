@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from environment.chasingEnv.multiAgentEnv import *
 from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
-from functionTools.loadSaveModel import saveToPickle, restoreVariables
+from functionTools.loadSaveModel import saveToPickle, restoreVariables, loadFromPickle
 from functionTools.trajectory import SampleTrajectory
 import pandas as pd
 from maddpg.maddpgAlgor.trainer.myMADDPG import *
@@ -35,6 +35,7 @@ def calcTrajRewardWithIndividualWolfReward(traj, wolvesID):
 
 
 def evaluateWolfSheepIterativeTrain(df):
+    maxRunningStepsToSample = df.index.get_level_values('maxRunningStepsToSample')[0]
     maxTimeStep = df.index.get_level_values('maxTimeStep')[0]
     sheepSpeedMultiplier = df.index.get_level_values('sheepSpeedMultiplier')[0]
     individualRewardWolf = df.index.get_level_values('individualRewardWolf')[0]
@@ -43,7 +44,6 @@ def evaluateWolfSheepIterativeTrain(df):
     numSheeps = 1
     numBlocks = 2
     maxEpisode = 60000
-    maxRunningStepsToSample = 50
 
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
@@ -112,7 +112,7 @@ def evaluateWolfSheepIterativeTrain(df):
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
 
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_ExpEpsLengthAndSheepSpeed', fileName + str(i)) for i in
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpg_255075steps_11.251.5speed_share_sheepNum1', fileName + str(i)) for i in
                   range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
@@ -139,42 +139,49 @@ def main():
     independentVariables['maxTimeStep'] = [25, 50, 75]
     independentVariables['sheepSpeedMultiplier'] = [1, 1.25, 1.5]
     independentVariables['individualRewardWolf'] = [0, 1]
+    independentVariables['maxRunningStepsToSample'] = [25, 50, 75]
 
     levelNames = list(independentVariables.keys())
     levelValues = list(independentVariables.values())
     levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
     toSplitFrame = pd.DataFrame(index=levelIndex)
-    resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepIterativeTrain)
-    print(resultDF)
-    resultLoc = os.path.join(dirName, 'evalMaddpgSheepSpeed_epsLength_individTrainWolfresult.pkl')
-    saveToPickle(resultDF, resultLoc)
+    # resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepIterativeTrain)
+    # print(resultDF)
+    resultPath = os.path.join(dirName, '..', 'evalResults')
+    resultLoc = os.path.join(resultPath, 'evalMaddpgSheepSpeed_epsLength_individTrainWolfresult.pkl')
+    # saveToPickle(resultDF, resultLoc)
+    resultDF = loadFromPickle(resultLoc)
 
-    figure = plt.figure(figsize=(16, 5))
+    figure = plt.figure(figsize=(10, 10))
     plotCounter = 1
-    numRows = 1
+    numRows = len(independentVariables['maxRunningStepsToSample'])
     numColumns = len(independentVariables['sheepSpeedMultiplier'])
-    for keyCol, outterSubDf in resultDF.groupby('sheepSpeedMultiplier'):
-        outterSubDf.index = outterSubDf.index.droplevel('sheepSpeedMultiplier')
-        axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
-        for keyRow, innerSubDf in outterSubDf.groupby('maxTimeStep'):
-            innerSubDf.index = innerSubDf.index.droplevel('maxTimeStep')
-            plt.ylim([0, 150])
 
-            innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
-            axForDraw.title.set_text('sheepSpeed' + str(keyCol))
-            if plotCounter == 1:
-                axForDraw.set_ylabel('Reward')
-            axForDraw.set_xlabel('Shared     Individ')
-            axForDraw.tick_params(axis='both', which='major')
-            axForDraw.tick_params(axis='both', which='minor')
-        plotCounter += 1
-        axForDraw.set_aspect(0.01, adjustable='box')
+    for key, outmostSubDf in resultDF.groupby('maxRunningStepsToSample'):
+        outmostSubDf.index = outmostSubDf.index.droplevel('maxRunningStepsToSample')
+        for keyCol, outterSubDf in outmostSubDf.groupby('sheepSpeedMultiplier'):
+            outterSubDf.index = outterSubDf.index.droplevel('sheepSpeedMultiplier')
+            axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+            for keyRow, innerSubDf in outterSubDf.groupby('maxTimeStep'):
+                innerSubDf.index = innerSubDf.index.droplevel('maxTimeStep')
+                plt.ylim([0, 150])
 
-        plt.legend(title='train steps')
+                innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
+                if plotCounter <= numColumns:
+                    axForDraw.title.set_text('sheepSpeed' + str(keyCol))
+                if plotCounter% numRows == 1:
+                    axForDraw.set_ylabel('Reward with ' + str(key) + ' steps/eps sample')
+                axForDraw.set_xlabel('Shared = 0         Individ = 1')
 
-    plt.suptitle('3v1 maddpg sampling 50 steps/eps')
+            plotCounter += 1
+            axForDraw.set_aspect(0.007, adjustable='box')
+            plt.xticks(independentVariables['individualRewardWolf'])
+
+            plt.legend(title='train steps')
+
+    plt.suptitle('3v1 maddpg evaluate eps length and sheep speed')
+    plt.savefig(os.path.join(resultPath, 'evalMaddpgSheepSpeed_epsLength_individTrainWolfresult'))
     plt.show()
-
 
 if __name__ == '__main__':
     main()

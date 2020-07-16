@@ -6,9 +6,9 @@ import sys
 getPosFromAgentState = lambda state: np.array([state[0], state[1]])
 
 class GetActionCost:
-    def __init__(self, costActionRatio, reshapeAction, individualWolf):
+    def __init__(self, costActionRatio, reshapeAction, individualCost):
         self.costActionRatio = costActionRatio
-        self.individualWolf = individualWolf
+        self.individualCost = individualCost
         self.reshapeAction =reshapeAction
 
     def __call__(self, agentsActions):
@@ -16,7 +16,7 @@ class GetActionCost:
         actionMagnitude = [np.linalg.norm(np.array(action), ord=2) for action in agentsActions]
         cost = self.costActionRatio* np.array(actionMagnitude)
         numAgents = len(agentsActions)
-        groupCost = cost if self.individualWolf else [np.sum(cost)] * numAgents
+        groupCost = cost if self.individualCost else [np.sum(cost)] * numAgents
 
         return groupCost
 
@@ -290,6 +290,7 @@ class TransitMultiAgentChasing:
         actions = [self.reshapeAction(action) for action in actions]
         # print('action', actions[0], actions[1])
         # print('wolfaction', actions[0])
+        # print('actions', actions)
 
         p_force = [None] * self.numEntities
         p_force = self.applyActionForce(p_force, actions)

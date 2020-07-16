@@ -18,7 +18,7 @@ import tensorflow.contrib.layers as layers
 from gym import spaces
 
 # policyPath = os.path.join(dirName, '..', 'policy1WolfMADDPG1SheepMADDPGWithTryTrain')
-policyPath = os.path.join(dirName, '..', 'policy3WolfMADDPG1SheepMADDPG')
+policyPath =  os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'newtry3v1', 'policy3WoolfMADDPG1SheepMADDPG')
 
 wolfSize = 0.075
 sheepSize = 0.05
@@ -68,13 +68,13 @@ def parse_args():
     parser.add_argument("--max-episode-len", type=int, default=25, help="maximum episode length")
     parser.add_argument("--num-episodes", type=int, default=10000, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
-    parser.add_argument("--good-policy", type=str, default="maddpgAlgor", help="policy for good agents")
-    parser.add_argument("--adv-policy", type=str, default="maddpgAlgor", help="policy of adversaries")
+    parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
+    parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
     # Core training parameters
     parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
     parser.add_argument("--gamma", type=float, default=0.95, help="discount factor")
     parser.add_argument("--batch-size", type=int, default=1024, help="number of episodes to optimize at the same time")
-    parser.add_argument("--num-units", type=int, default=64, help="number of units in the mlp")
+    parser.add_argument("--num-units", type=int, default=128, help="number of units in the mlp")
     # Checkpointing
     parser.add_argument("--exp-name", type=str, default='exp', help="name of the experiment")
     parser.add_argument("--save-dir", type=str, default= policyPath, help="directory in which training state and model should be saved")
@@ -91,13 +91,15 @@ def parse_args():
 
 
 def main():
-    wolvesID = [0, 1]
-    sheepsID = [2]
-    blocksID = [3]
+    numWolves = 3
+    numSheeps = 1
+    numBlocks = 2
 
-    # wolvesID = [0]
-    # sheepsID = [1]
-    # blocksID = []
+    numAgents = numWolves + numSheeps
+    numEntities = numAgents + numBlocks
+    wolvesID = list(range(numWolves))
+    sheepsID = list(range(numWolves, numAgents))
+    blocksID = list(range(numAgents, numEntities))
 
     numWolves = len(wolvesID)
     numSheeps = len(sheepsID)

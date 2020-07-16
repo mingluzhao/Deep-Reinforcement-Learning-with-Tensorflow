@@ -45,13 +45,13 @@ def main():
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)
     print("start")
 
-    numWolvesLevels = [2, 3]
+    numWolvesLevels = [3]
     numSheepsLevels = [1]
     numBlocksLevels = [2]
     maxTimeStepLevels = [75]
     sheepSpeedMultiplierLevels = [1]
-    individualRewardWolfLevels = [0, 1]
-    costActionRatioList = [0.01, 0.05, 0.1, 0.5]
+    individualRewardWolfLevels = [0]
+    costActionRatioList = [0.01, 0.05, 0.1]
 
     conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward, costRatio)
                        for wolfNum in numWolvesLevels

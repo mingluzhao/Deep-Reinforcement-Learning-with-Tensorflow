@@ -22,17 +22,22 @@ sheepColor = np.array([0.35, 0.85, 0.35])
 blockColor = np.array([0.25, 0.25, 0.25])
 
 maxEpisode = 60000
-maxRunningStepsToSample = 50 # num of timesteps in one eps
+maxRunningStepsToSample = 75 # num of timesteps in one eps
+def calcTrajRewardWithSharedWolfReward(traj):
+    rewardIDinTraj = 2
+    rewardList = [timeStepInfo[rewardIDinTraj][0] for timeStepInfo in traj]
+    trajReward = np.sum(rewardList)
+    return trajReward
 
 def main():
     debug = 1
     if debug:
-        numWolves = 5
+        numWolves = 3
         numSheeps = 1
         numBlocks = 2
         saveTraj = False
         visualizeTraj = True
-        maxTimeStep = 75
+        maxTimeStep = 25
         sheepSpeedMultiplier = 1.0
         individualRewardWolf = 0
 
@@ -122,25 +127,30 @@ def main():
     actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
-    trajList = []
-    numTrajToSample = 50
+    rewardList = []
+    numTrajToSample = 500
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
-        trajList.append(list(traj))
+        rew = calcTrajRewardWithSharedWolfReward(traj)
+        rewardList.append(rew)
 
-    # saveTraj
-    if saveTraj:
-        trajFileName = "maddpg{}wolves{}sheep{}blocks{}eps{}stepSheepSpeed{}{}Traj".format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-        trajSavePath = os.path.join(dirName, '..', 'trajectory', trajFileName)
-        saveToPickle(trajList, trajSavePath)
+    meanTrajReward = np.mean(rewardList)
+    seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
+    print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
 
-
-    # visualize
-    if visualizeTraj:
-        entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
-        render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
-        trajToRender = np.concatenate(trajList)
-        render(trajToRender)
+    # # saveTraj
+    # if saveTraj:
+    #     trajFileName = "maddpg{}wolves{}sheep{}blocks{}eps{}stepSheepSpeed{}{}Traj".format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    #     trajSavePath = os.path.join(dirName, '..', 'trajectory', trajFileName)
+    #     saveToPickle(trajList, trajSavePath)
+    #
+    #
+    # # visualize
+    # if visualizeTraj:
+    #     entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
+    #     render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
+    #     trajToRender = np.concatenate(trajList)
+    #     # render(trajToRender)
 
 
 if __name__ == '__main__':

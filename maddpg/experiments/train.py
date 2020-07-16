@@ -19,15 +19,16 @@ import maddpg.maddpgAlgor.common.tf_util as U
 from maddpg.maddpgAlgor.trainer.maddpg_ref import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 
-
-trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'newtry3v1', 'policy3WoolfMADDPG1SheepMADDPG')
+modelNameList = ['policy3WolfMADDPG1SheepMADDPG', 'policy3WoolfMADDPG1SheepMADDPG',
+                 'policy3WoolfMADDPG1SheepMADDPG11111', 'policy3WoolfMADDPG1SheepMADDPG111111', 'policy3WoolfMADDPG1SheepMADDPG11111111']
+trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'newtry3v1', 'policy3WoolfMADDPG1SheepMADDPG11111111')
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
     # Environment
     parser.add_argument("--scenario", type=str, default="simple", help="name of the scenario script")
-    parser.add_argument("--max-episode-len", type=int, default=50, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=300, help="number of episodes") #60000
+    parser.add_argument("--max-episode-len", type=int, default=75, help="maximum episode length")
+    parser.add_argument("--num-episodes", type=int, default=500, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
     parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
     parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
@@ -74,7 +75,7 @@ def make_env(scenario_name, arglist, benchmark=False):  #### why is arglist not 
         env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation, scenario.benchmark_data)
     else:
         env = MultiAgentEnv(world, scenario.reset_world, scenario.reward, scenario.observation)
-        print(env.action_space)
+        # print(env.action_space)
     return env
 
 
@@ -101,7 +102,7 @@ def train(arglist):
         obs_shape_n = [env.observation_space[i].shape for i in range(env.n)]
         num_adversaries = min(env.n, arglist.num_adversaries)
         trainers = get_trainers(env, num_adversaries, obs_shape_n, arglist)
-        print('Using good policy {} and adv policy {}'.format(arglist.good_policy, arglist.adv_policy))
+        # print('Using good policy {} and adv policy {}'.format(arglist.good_policy, arglist.adv_policy))
 
         # Initialize
         U.initialize()
@@ -110,8 +111,8 @@ def train(arglist):
         if arglist.load_dir == "":
             arglist.load_dir = arglist.save_dir
         if arglist.display or arglist.restore or arglist.benchmark:
-            print('Loading previous state...')
             U.load_state(arglist.load_dir)
+            print('Loading previous state...' , arglist.load_dir)
 
         episode_rewards = [0.0]  # sum of rewards for all agents
         agent_rewards = [[0.0] for _ in range(env.n)]  # individual agent reward
@@ -170,7 +171,8 @@ def train(arglist):
                 time.sleep(0.1)
                 # env.render()
                 # print(len(episode_rewards))
-                print(len(agent_rewards[0]))
+                # print(len(agent_rewards[0]))
+
                 if len(episode_rewards) > arglist.num_episodes:
                     wolfRewardList = agent_rewards[0]
                     seAgentReweard = np.std(wolfRewardList) / np.sqrt(len(wolfRewardList) - 1)

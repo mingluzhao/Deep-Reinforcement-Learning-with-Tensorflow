@@ -33,7 +33,7 @@ minibatchSize = 1024#
 # 7.13 add action cost
 
 def main():
-    debug = 0
+    debug = 1
     if debug:
         numWolves = 2
         numSheeps = 1
@@ -90,10 +90,10 @@ def main():
     reshapeAction = ReshapeAction()
     if individualRewardWolf:
         rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualWolf= True)
+        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
     else:
         rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualWolf= False)
+        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
 
     getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
     rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
@@ -158,7 +158,7 @@ def main():
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpgWithActionCost', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpgWithActionCost_sharedWolvesHasIndividCost', fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)

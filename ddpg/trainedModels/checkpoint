@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/src/../trainedModels/ddpg_mujoco_invDblPendulum"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/src/../trainedModels/ddpg_mujoco_invDblPendulum"
