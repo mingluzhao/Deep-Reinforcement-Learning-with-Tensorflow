@@ -33,16 +33,16 @@ minibatchSize = 1024#
 # 7.13 add action cost
 
 def main():
-    debug = 1
+    debug = 0
     if debug:
-        numWolves = 2
+        numWolves = 3
         numSheeps = 1
-        numBlocks = 0
+        numBlocks = 2
         saveAllmodels = False
         maxTimeStep = 25
         sheepSpeedMultiplier = 1
         individualRewardWolf = int(False)
-        costActionRatio = 0.01
+        costActionRatio = 0.0
 
     else:
         print(sys.argv)
@@ -94,6 +94,7 @@ def main():
     else:
         rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
         getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
+        # getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= False)
 
     getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
     rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
@@ -137,7 +138,7 @@ def main():
     updateParameters = UpdateParameters(paramUpdateInterval, tau)
     sampleBatchFromMemory = SampleFromMemory(minibatchSize)
 
-    learnInterval = 1000
+    learnInterval = 100
     learningStartBufferSize = minibatchSize * maxTimeStep
     startLearn = StartLearn(learningStartBufferSize, learnInterval)
 
@@ -158,7 +159,9 @@ def main():
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpgWithActionCost_sharedWolvesHasIndividCost', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpgWithActionCost_sharedWolvesHasIndividCost', fileName)
+    # modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpgWithActionCost_sharedWolvesHasSharedCost', fileName)
+
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)

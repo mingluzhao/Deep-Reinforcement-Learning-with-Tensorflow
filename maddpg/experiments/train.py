@@ -169,7 +169,7 @@ def train(arglist):
             # for displaying learned policies
             if arglist.display:
                 time.sleep(0.1)
-                # env.render()
+                env.render()
                 # print(len(episode_rewards))
                 # print(len(agent_rewards[0]))
 

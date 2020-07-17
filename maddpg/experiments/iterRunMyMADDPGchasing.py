@@ -92,10 +92,10 @@ def main():
     reshapeAction = ReshapeAction()
     if individualRewardWolf:
         rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualWolf= True)
+        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
     else:
         rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualWolf= False)
+        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= False)
 
     getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
     rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
@@ -139,7 +139,7 @@ def main():
     updateParameters = UpdateParameters(paramUpdateInterval, tau)
     sampleBatchFromMemory = SampleFromMemory(minibatchSize)
 
-    learnInterval = 1000
+    learnInterval = 100
     learningStartBufferSize = minibatchSize * maxTimeStep
     startLearn = StartLearn(learningStartBufferSize, learnInterval)
 
