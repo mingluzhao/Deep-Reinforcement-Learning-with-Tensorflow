@@ -18,9 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
-wolfColor = np.array([0.85, 0.35, 0.35])
-sheepColor = np.array([0.35, 0.85, 0.35])
-blockColor = np.array([0.25, 0.25, 0.25])
+dirName = os.path.dirname(__file__)
 
 def calcTrajRewardWithSharedWolfReward(traj):
     rewardIDinTraj = 2
@@ -36,21 +34,42 @@ def calcTrajRewardWithIndividualWolfReward(traj, wolvesID):
     return trajReward
 
 def evaluateWolfSheepTrain(df):
-    numWolves = df.index.get_level_values('numWolves')[0]
     costActionRatio = df.index.get_level_values('costActionRatio')[0]
-    wolfIndividual = df.index.get_level_values('wolfIndividual')[0] #[shared, individ]
+    wolfIndividual = df.index.get_level_values('wolfIndividual')[0] #[sharedWithSharedCost, sharedWithIndividCost, individWithIndividCost]
 
+    individualCost = False if 'SharedCost' in wolfIndividual else True
+    individStr = 'shared' if 'sharedWith' in wolfIndividual else 'individ'
+
+    numWolves = 3
     numSheeps = 1
     numBlocks = 2
     maxTimeStep = 75
+    maxRunningStepsToSample = 75
     maxEpisode = 60000
     sheepSpeedMultiplier = 1.0
+
+    print("maddpg: {} wolves, {} sheep, {} blocks, wolfIndividual: {}, individualCost: {}, costActionRatio: {}, train{} sample{}".format(
+        numWolves, numSheeps, numBlocks, str(individStr), str(individualCost), costActionRatio, maxTimeStep, maxRunningStepsToSample))
 
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
     wolvesID = list(range(numWolves))
     sheepsID = list(range(numWolves, numAgents))
     blocksID = list(range(numAgents, numEntities))
+
+    if wolfIndividual == 'sharedWithSharedCost':
+        folderName = '3wolvesMaddpgWithActionCost_sharedWolvesHasSharedCost'
+        trajFileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}".format(
+            numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+        trajSavePath = os.path.join(dirName, '..', 'trajectories', folderName, trajFileName)
+        trajList = loadFromPickle(trajSavePath)
+        rewardList = [calcTrajRewardWithSharedWolfReward(traj) for traj in trajList]
+        meanTrajReward = np.mean(rewardList)
+        seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
+        print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
+
+        return pd.Series({'mean': meanTrajReward, 'se': seTrajReward})
+
 
     wolfSize = 0.075
     sheepSize = 0.05
@@ -73,13 +92,12 @@ def evaluateWolfSheepTrain(df):
 
     reshapeAction = ReshapeAction()
     rewardWolfIndivid = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    getActionCostIndivid = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
     rewardWolfShared = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    getActionCostShared = GetActionCost(costActionRatio, reshapeAction, individualCost= False)
+    getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= individualCost)
 
     getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
-    rewardWolfIndividWithActionCost = lambda state, action, nextState: np.array(rewardWolfIndivid(state, action, nextState)) - np.array(getActionCostIndivid(getWolvesAction(action)))
-    rewardWolfSharedWithActionCost = lambda state, action, nextState: np.array(rewardWolfShared(state, action, nextState)) - np.array(getActionCostShared(getWolvesAction(action)))
+    rewardWolfIndividWithActionCost = lambda state, action, nextState: np.array(rewardWolfIndivid(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
+    rewardWolfSharedWithActionCost = lambda state, action, nextState: np.array(rewardWolfShared(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
 
     rewardFuncIndividWolf = lambda state, action, nextState: \
         list(rewardWolfIndividWithActionCost(state, action, nextState)) + list(rewardSheep(state, action, nextState))
@@ -99,10 +117,9 @@ def evaluateWolfSheepTrain(df):
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: False
-    maxRunningStepsToSample = 75
     sampleTrajectoryIndivid = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFuncIndividWolf, reset)
     sampleTrajectoryShared = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFuncSharedWolf, reset)
-    sampleTrajectory = sampleTrajectoryIndivid if wolfIndividual == 'individ' else sampleTrajectoryShared
+    sampleTrajectory = sampleTrajectoryIndivid if individStr == 'individ' else sampleTrajectoryShared
 
     initObsForParams = observe(reset())
     obsShape = [initObsForParams[obsID].shape[0] for obsID in range(len(initObsForParams))]
@@ -112,19 +129,11 @@ def evaluateWolfSheepTrain(df):
     layerWidth = [128, 128]
     modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
 
-    dirName = os.path.dirname(__file__)
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual)
-
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', '2and3wolvesMaddpgWithActionCost', fileName + str(i)) for i in
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+    folderName = '3wolvesMaddpgWithActionCost_sharedWolvesHasIndividCost'
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in
                   range(numAgents)]
-
-    if costActionRatio == 0:
-        fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-            numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, wolfIndividual)
-
-        modelPaths = [os.path.join(dirName, '..', 'trainedModels', 'evalOneSheep_2575steps_1to6wolves_11.25speed', fileName + str(i))
-                      for i in range(numAgents)]
 
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
@@ -133,11 +142,21 @@ def evaluateWolfSheepTrain(df):
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
     rewardList = []
+    trajList = []
     numTrajToSample = 500
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
-        rew = calcTrajRewardWithSharedWolfReward(traj) if wolfIndividual == 'shared' else calcTrajRewardWithIndividualWolfReward(traj, wolvesID)
+        rew = calcTrajRewardWithSharedWolfReward(traj) if individStr == 'shared' else calcTrajRewardWithIndividualWolfReward(traj, wolvesID)
         rewardList.append(rew)
+        trajList.append(list(traj))
+
+    trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
+    if not os.path.exists(trajectoryDirectory):
+        os.makedirs(trajectoryDirectory)
+    trajFileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+    trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
+    # saveToPickle(trajList, trajSavePath)
 
     meanTrajReward = np.mean(rewardList)
     seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
@@ -149,49 +168,65 @@ def evaluateWolfSheepTrain(df):
 
 def main():
     independentVariables = OrderedDict()
-    independentVariables['wolfIndividual'] = ['shared', 'individ']
-    independentVariables['numWolves'] = [2, 3]
-    independentVariables['costActionRatio'] = [0, 0.01, 0.05, 0.1]
+    # independentVariables['wolfIndividual'] = ['sharedWithSharedCost', 'sharedWithIndividCost', 'individWithIndividCost']
+    independentVariables['wolfIndividual'] = [ 'sharedWithIndividCost' ]
+    independentVariables['costActionRatio'] = [0.0, 0.01, 0.05, 0.1, 0.2]
 
     levelNames = list(independentVariables.keys())
     levelValues = list(independentVariables.values())
     levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
     toSplitFrame = pd.DataFrame(index=levelIndex)
-    # resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
+    resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
+    print(resultDF)
 
-    resultPath = os.path.join(dirName, '..', 'evalResults')
-    resultLoc = os.path.join(resultPath, 'evalWolfActionCost_75steps_sample75_4levels.pkl')
+    # resultPath = os.path.join(dirName, '..', 'evalResults')
+    # resultLoc = os.path.join(resultPath, 'evalWolfActionCost_75steps_sample75_5levels.pkl')
     # saveToPickle(resultDF, resultLoc)
-
-    resultDF = loadFromPickle(resultLoc)
-
-    figure = plt.figure(figsize=(10, 6))
-    plotCounter = 1
-    numRows = 1
-    numColumns = len(independentVariables['numWolves'])
-    for keyCol, outterSubDf in resultDF.groupby('numWolves'):
-        outterSubDf.index = outterSubDf.index.droplevel('numWolves')
-        axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
-        for keyRow, innerSubDf in outterSubDf.groupby('wolfIndividual'):
-            innerSubDf.index = innerSubDf.index.droplevel('wolfIndividual')
-            plt.ylim([-5, 150])
-            innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
-
-        axForDraw.title.set_text('Number of wolves = ' + str(keyCol))
-        if plotCounter == 1:
-            axForDraw.set_ylabel('Mean Eps Reward')
-        axForDraw.set_xlabel('action cost/magnitude ratio')
-        plotCounter += 1
-        axForDraw.set_aspect(0.0007, adjustable='box')
-        plt.xticks(independentVariables['costActionRatio'])
-        plt.legend(title='Wolf type')
-
-    plt.suptitle('Wolves with action cost, train 75 steps, sampling 75 steps/eps')
-
-
-    plt.savefig(os.path.join(resultPath, 'evalWolfActionCost_75steps_sample75_4levels'))
-    plt.show()
+    #
+    # figure = plt.figure(figsize=(6, 6))
+    # plotCounter = 1
+    # numRows = 1
+    # numColumns = 1
+    # axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+    #
+    # for keyRow, innerSubDf in resultDF.groupby('wolfIndividual'):
+    #     innerSubDf.index = innerSubDf.index.droplevel('wolfIndividual')
+    #     plt.ylim([-5, 150])
+    #     innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
+    #
+    # axForDraw.set_ylabel('Mean Eps Reward')
+    # axForDraw.set_xlabel('action cost/magnitude ratio')
+    # # axForDraw.set_aspect(0.0007, adjustable='box')
+    # plt.xticks(independentVariables['costActionRatio'])
+    # plt.legend(title='Wolf type')
+    # plt.suptitle('Wolves with action cost, train 75 steps, sampling 75 steps/eps')
+    #
+    #
+    # plt.savefig(os.path.join(resultPath, 'evalWolfActionCost_75steps_sample75_5levels'))
+    # plt.show()
 
 
 if __name__ == '__main__':
     main()
+    # resultDF = loadFromPickle(resultLoc)
+
+    # figure = plt.figure(figsize=(10, 6))
+    # plotCounter = 1
+    # numRows = 1
+    # numColumns = len(independentVariables['numWolves'])
+    # for keyCol, outterSubDf in resultDF.groupby('numWolves'):
+    #     outterSubDf.index = outterSubDf.index.droplevel('numWolves')
+    #     axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+    #     for keyRow, innerSubDf in outterSubDf.groupby('wolfIndividual'):
+    #         innerSubDf.index = innerSubDf.index.droplevel('wolfIndividual')
+    #         plt.ylim([-5, 150])
+    #         innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
+    #
+    #     axForDraw.title.set_text('Number of wolves = ' + str(keyCol))
+    #     if plotCounter == 1:
+    #         axForDraw.set_ylabel('Mean Eps Reward')
+    #     axForDraw.set_xlabel('action cost/magnitude ratio')
+    #     plotCounter += 1
+    #     axForDraw.set_aspect(0.0007, adjustable='box')
+    #     plt.xticks(independentVariables['costActionRatio'])
+    #     plt.legend(title='Wolf type')
