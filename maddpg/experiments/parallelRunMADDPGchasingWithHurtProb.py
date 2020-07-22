@@ -52,8 +52,7 @@ def main():
     sheepSpeedMultiplierLevels = [1]
     individualRewardWolfLevels = [1]
     costActionRatioList = [0]
-    # oneWolfSelfHurtProb = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    oneWolfSelfHurtProb = [0, 0.2]
+    oneWolfSelfHurtProb = [0, 0.2, 0.4, 0.6, 0.8, 1]
 
     conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward, costRatio, hurtProb)
                        for wolfNum in numWolvesLevels
