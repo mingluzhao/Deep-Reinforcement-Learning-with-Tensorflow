@@ -52,9 +52,10 @@ def main():
     sheepSpeedMultiplierLevels = [1]
     individualRewardWolfLevels = [1]
     costActionRatioList = [0]
-    oneWolfSelfHurtProb = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    oneWolfSelfHurtProb = [0]
+    sensitiveZoneRadiusList = [0.25]
 
-    conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward, costRatio, hurtProb)
+    conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward, costRatio, hurtProb, radius)
                        for wolfNum in numWolvesLevels
                        for sheepNum in numSheepsLevels
                        for blockNum in numBlocksLevels
@@ -62,15 +63,16 @@ def main():
                        for sheepSpeed in sheepSpeedMultiplierLevels
                        for individReward in individualRewardWolfLevels
                        for costRatio in costActionRatioList
-                       for hurtProb in oneWolfSelfHurtProb]
+                       for hurtProb in oneWolfSelfHurtProb
+                       for radius in sensitiveZoneRadiusList]
 
     conditions = []
     for condition in conditionLevels:
-        numWolves, numSheeps, numBlocks, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, costActionRatio, oneWolfSelfHurtProb = condition
+        numWolves, numSheeps, numBlocks, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, costActionRatio, oneWolfSelfHurtProb, sensitiveZoneRadius = condition
         parameters = {'numWolves': numWolves, 'numSheeps': numSheeps, 'numBlocks': numBlocks,
                       'maxTimeStep': maxTimeStep, 'sheepSpeedMultiplier': sheepSpeedMultiplier,
                       'individualRewardWolf': individualRewardWolf, 'costActionRatio': costActionRatio,
-                      'oneWolfSelfHurtProb': oneWolfSelfHurtProb}
+                      'oneWolfSelfHurtProb': oneWolfSelfHurtProb, 'sensitiveZoneRadius': sensitiveZoneRadius}
         conditions.append(parameters)
 
     cmdList = excuteCodeParallel(conditions)

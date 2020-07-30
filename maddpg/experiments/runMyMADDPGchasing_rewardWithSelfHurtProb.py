@@ -31,6 +31,7 @@ minibatchSize = 1024#
 
 
 # 7.21 add hurt prob when hunting
+# 7.22 add sensitive zone as another param
 
 def main():
     debug = 0
@@ -39,11 +40,12 @@ def main():
         numSheeps = 1
         numBlocks = 2
         saveAllmodels = False
-        maxTimeStep = 25
+        maxTimeStep = 75
         sheepSpeedMultiplier = 1
         individualRewardWolf = int(False)
         costActionRatio = 0.0
-        oneWolfSelfHurtProb = 0.8
+        oneWolfSelfHurtProb = 0
+        sensitiveZoneRadius = 0.25
 
     else:
         print(sys.argv)
@@ -57,6 +59,7 @@ def main():
         individualRewardWolf = int(condition['individualRewardWolf'])
         costActionRatio = float(condition['costActionRatio'])
         oneWolfSelfHurtProb = float(condition['oneWolfSelfHurtProb'])
+        sensitiveZoneRadius = float(condition['sensitiveZoneRadius'])
 
         saveAllmodels = False
 
@@ -89,9 +92,8 @@ def main():
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
                               punishForOutOfBound)
 
-    sensitiveZoneRadius = 0.25
-    getHurtProbOfCatching = GetHurtProbOfCatching(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius,
-                                                  oneWolfSelfHurtProb)
+    getHurtProbOfCatching = GetHurtProbOfCatchingByDeterministicZone(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius,
+                                                                     oneWolfSelfHurtProb)
     hurtReward = -5
     collisionReward = 10
     rewardWolf = RewardWolfWithHurtProb(wolvesID, sheepsID, entitiesSizeList, isCollision, getHurtProbOfCatching,
@@ -158,10 +160,10 @@ def main():
     getModelList = [getAgentModel(i) for i in range(numAgents)]
     modelSaveRate = 1000
     individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}HurtProb{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, oneWolfSelfHurtProb, individStr)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}HurtProb{}Radius{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, oneWolfSelfHurtProb, sensitiveZoneRadius, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpgWithProbOfHurtBySheep_individ', fileName)
+    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpgWithProbOfHurtBySheep1', fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)

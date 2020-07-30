@@ -9,9 +9,6 @@ sys.path.append(os.path.join(dirName, '..'))
 import unittest
 from ddt import ddt, data, unpack
 from environment.chasingEnv.multiAgentEnv import *
-from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
-import random
-
 
 @ddt
 class TestMultiAgentEnv(unittest.TestCase):
@@ -22,16 +19,18 @@ class TestMultiAgentEnv(unittest.TestCase):
         self.isCollision = IsCollision(getPosFromAgentState)
         self.entitiesSizeList = [0.1] * len(self.sheepsID) + [0.2] * len(self.wolvesID) + [0.5] * len(self.blocksID)
 
-        self.rewardWolf = RewardWolf(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, collisionReward=10)
+        self.collisionReward = len(self.wolvesID) * 10 # only for this test
+        self.collisionPunishment = self.collisionReward
+        self.rewardWolf = RewardWolf(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, self.collisionReward, individual = False)
         self.punishForOutOfBound = PunishForOutOfBound()
         self.rewardSheep = RewardSheep(self.wolvesID, self.sheepsID, self.entitiesSizeList, getPosFromAgentState, self.isCollision, self.punishForOutOfBound,
-                                       collisionPunishment=10)
+                                       self.collisionPunishment)
 
         self.numTotalAgents = len(self.sheepsID) + len(self.wolvesID)
         self.numBlocks = len(self.blocksID)
         self.reset = ResetMultiAgentChasing(self.numTotalAgents, self.numBlocks)
 
-        self.rewardWolfIndividual = RewardWolfIndividual(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, collisionReward=10)
+        self.rewardWolfIndividual =RewardWolf(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, self.collisionReward, individual = True)
 
 
     @data(([0, 1, 1., 0.], [1,  0,  1.,  0.], 0.1, 0.2, False),
@@ -85,12 +84,12 @@ class TestMultiAgentEnv(unittest.TestCase):
           (np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
            [1, 1, 1, 1],
            np.array([[0, 0, 1., 0.], [0, 0.2, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
-           [-10] # caught by one, not out of bound
+           [-20] # caught by one, not out of bound
            ),
           (np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
            [1, 1, 1, 1],
            np.array([[0, 1, 1., 0.], [0.1, 1, 1., 0.], [-0.25, 1, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
-           [-20 - np.exp(2 * 1 - 2)]
+           [-40 - np.exp(2 * 1 - 2)]
            ) # two wolves catch, out of bound
           )
     @unpack
@@ -107,7 +106,7 @@ class TestMultiAgentEnv(unittest.TestCase):
           )
     @unpack
     def testObserve(self, agentID, trueObsShape):
-        state = np.array([[0, 1, 1., 0.], [1,  0, 1.,0.], [1,  0, 1.,0.], [1,  0, 1.,0.], [1,  0, 1.,0.]])
+        state = np.array([[0, 1, 1., 0.], [1, 0, 1.,0.], [1,  0, 1.,0.], [1,  0, 1.,0.], [1,  0, 1.,0.]])
         observe = Observe(agentID, self.wolvesID, self.sheepsID, self.blocksID, getPosFromAgentState, getVelFromAgentState)
         obsShape = observe(state).shape
         self.assertEqual(obsShape, trueObsShape)
@@ -121,12 +120,12 @@ class TestMultiAgentEnv(unittest.TestCase):
           (np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
            [1, 1, 1, 1],
            np.array([[0, 0, 1., 0.], [0, 0.2, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
-           [10, 0]  # one wolf one sheep collide
+           [20, 0]  # one wolf one sheep collide
            ),
           (np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]),
            [1, 1, 1, 1],
            np.array([[0, 1, 1., 0.], [0.1, 1, 1., 0.], [-0.25, 1, 1., 0.], [1, 0, 1., 0.], [1, 0, 1., 0.]]),
-           [10, 10]
+           [20, 20]
            )  # two wolves catch
           )
     @unpack

@@ -7,6 +7,9 @@ sys.path.append(os.path.join(dirName, '..'))
 sys.path.append(os.path.join(dirName, '..', '..'))
 import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
+import numpy as np
+import json
+
 import argparse
 import tensorflow.contrib.layers as layers
 from gym import spaces
@@ -19,7 +22,6 @@ from maddpg.maddpgAlgor.trainer.maddpg_try import MADDPGAgentTrainer
 from environment.chasingEnv.multiAgentEnvWithIndividReward import *
 
 ddpg = False
-policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'newtry3v1', 'policy3v1_originalCodeWithRefEnv_individ')
 
 wolfSize = 0.075
 sheepSize = 0.05
@@ -57,52 +59,64 @@ def mlp_model(input, num_outputs, scope, reuse=False, num_units=128, rnn_cell=No
     # This model takes as input an observation and returns values of all actions
     with tf.variable_scope(scope, reuse=reuse):
         out = input
-        out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu,
-                                     weights_initializer=tf.initializers.glorot_uniform(seed=0))
-        out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu,
-                                     weights_initializer=tf.initializers.glorot_uniform(seed=0))
-        out = layers.fully_connected(out, num_outputs=num_outputs, activation_fn=None,
-                                     weights_initializer=tf.initializers.glorot_uniform(seed=0))
-
+        out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu)
+        out = layers.fully_connected(out, num_outputs=num_units, activation_fn=tf.nn.relu)
+        out = layers.fully_connected(out, num_outputs=num_outputs, activation_fn=None) #########
         return out
 
-
-def parse_args():
-    parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
-    # Environment
-    parser.add_argument("--max-episode-len", type=int, default=25, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=60000, help="number of episodes")  # 60000
-    parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
-    parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
-    # Core training parameters
-    parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
-    parser.add_argument("--gamma", type=float, default=0.95, help="discount factor")
-    parser.add_argument("--batch-size", type=int, default=1024, help="number of episodes to optimize at the same time")
-    parser.add_argument("--num-units", type=int, default=128, help="number of units in the mlp")
-    # Checkpointing
-    parser.add_argument("--exp-name", type=str, default='exp', help="name of the experiment")
-    parser.add_argument("--save-dir", type=str, default=policyPath,
-                        help="directory in which training state and model should be saved")
-    parser.add_argument("--save-rate", type=int, default=1000,
-                        help="save model once every time this many episodes are completed")
-    parser.add_argument("--load-dir", type=str, default="",
-                        help="directory in which training state and model are loaded")
-    # Evaluation
-    parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--display", action="store_true", default=False)
-    parser.add_argument("--benchmark", action="store_true", default=False)
-    parser.add_argument("--benchmark-iters", type=int, default=100000, help="number of iterations run for benchmarking")
-    parser.add_argument("--benchmark-dir", type=str, default=os.path.join(dirName, '..', 'benchmark_files'),
-                        help="directory where benchmark data is saved")
-    parser.add_argument("--plots-dir", type=str, default=os.path.join(dirName, '..', 'learning_curves'),
-                        help="directory where plot data is saved")
-    return parser.parse_args()
-
-
 def main():
-    numWolves = 3
-    numSheeps = 1
-    numBlocks = 2
+    debug = 0
+    if debug:
+        numWolves = 2
+        numSheeps = 1
+        numBlocks = 0
+        fileID = 0
+
+    else:
+        print(sys.argv)
+        condition = json.loads(sys.argv[1])
+        numWolves = int(condition["numWolves"])
+        numSheeps = int(condition["numSheeps"])
+        numBlocks = int(condition["numBlocks"])
+        fileID = int(condition["fileID"])
+        print('a')
+
+    fileName = "maddpg{}wolves{}sheep{}blocksfile{}_agent".format(numWolves, numSheeps, numBlocks,fileID)
+    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', fileName)
+
+    def parse_args():
+        parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
+        # Environment
+        parser.add_argument("--max-episode-len", type=int, default=75, help="maximum episode length")
+        parser.add_argument("--num-episodes", type=int, default=600, help="number of episodes")  # 60000
+        parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
+        parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
+        # Core training parameters
+        parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
+        parser.add_argument("--gamma", type=float, default=0.95, help="discount factor")
+        parser.add_argument("--batch-size", type=int, default=1024,
+                            help="number of episodes to optimize at the same time")
+        parser.add_argument("--num-units", type=int, default=128, help="number of units in the mlp")
+        # Checkpointing
+        parser.add_argument("--exp-name", type=str, default='exp', help="name of the experiment")
+        parser.add_argument("--save-dir", type=str, default=policyPath,
+                            help="directory in which training state and model should be saved")
+        parser.add_argument("--save-rate", type=int, default=1000,
+                            help="save model once every time this many episodes are completed")
+        parser.add_argument("--load-dir", type=str, default="",
+                            help="directory in which training state and model are loaded")
+        # Evaluation
+        parser.add_argument("--restore", action="store_true", default=False)
+        parser.add_argument("--display", action="store_true", default=False)
+        parser.add_argument("--benchmark", action="store_true", default=False)
+        parser.add_argument("--benchmark-iters", type=int, default=100000,
+                            help="number of iterations run for benchmarking")
+        parser.add_argument("--benchmark-dir", type=str, default=os.path.join(dirName, '..', 'benchmark_files'),
+                            help="directory where benchmark data is saved")
+        parser.add_argument("--plots-dir", type=str, default=os.path.join(dirName, '..', 'learning_curves'),
+                            help="directory where plot data is saved")
+        return parser.parse_args()
+
 
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
@@ -123,23 +137,23 @@ def main():
     massList = [1.0] * numEntities
 
     isCollision = IsCollision(getPosFromAgentState)
-    # rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
                               punishForOutOfBound)
 
-    # rewardFunc = lambda state, action, nextState: \
-    #     list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
-    #
-    individualRewardWolf = True
-    print('individualRewardWolf: ', str(individualRewardWolf))
-    if individualRewardWolf:
-        rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    else:
-        rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-
     rewardFunc = lambda state, action, nextState: \
         list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
+
+    # individualRewardWolf = True
+    # print('individualRewardWolf: ', str(individualRewardWolf))
+    # if individualRewardWolf:
+    #     rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    # else:
+    #     rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    #
+    # rewardFunc = lambda state, action, nextState: \
+    #     list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
 
 
     reset = ResetMultiAgentChasing(numAgents, numBlocks)
@@ -168,7 +182,7 @@ def main():
     trainer = MADDPGAgentTrainer
     model = mlp_model
     arglist = parse_args()
-    trainers = getTrainers(trainer, model, arglist, useDDPG=ddpg)
+    trainers = getTrainers(trainer, model, arglist, useDDPG=False)
 
     with U.single_threaded_session():
         U.initialize()

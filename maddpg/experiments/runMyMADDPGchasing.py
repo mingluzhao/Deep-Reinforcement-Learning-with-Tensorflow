@@ -18,7 +18,6 @@ from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState, GetActionCost
-from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 # fixed training parameters
 maxEpisode = 60000
@@ -31,17 +30,18 @@ minibatchSize = 1024#
 
 
 # 7.13 add action cost
+# 7.29 constant sheep bonus = 30
 
 def main():
-    debug = 0
+    debug = 1
     if debug:
-        numWolves = 3
+        numWolves = 4
         numSheeps = 1
         numBlocks = 2
         saveAllmodels = False
         maxTimeStep = 25
         sheepSpeedMultiplier = 1
-        individualRewardWolf = int(False)
+        individualRewardWolf = 0
         costActionRatio = 0.0
 
     else:
@@ -60,7 +60,6 @@ def main():
 
     print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, save all models: {}".
           format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, str(saveAllmodels)))
-
 
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
@@ -82,20 +81,15 @@ def main():
     entitiesMovableList = [True] * numAgents + [False] * numBlocks
     massList = [1.0] * numEntities
 
+    collisionReward = 30 # originalPaper = 10*3
     isCollision = IsCollision(getPosFromAgentState)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
-                              punishForOutOfBound)
+                              punishForOutOfBound, collisionPunishment = collisionReward)
 
+    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
     reshapeAction = ReshapeAction()
-    if individualRewardWolf:
-        rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
-    else:
-        rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= True)
-        # getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost= False)
-
+    getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost=True)
     getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
     rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
 
@@ -148,9 +142,9 @@ def main():
     actOneStep = lambda allAgentsStates, runTime: [actOneStepOneModel(model, allAgentsStates) for model in modelsList]
 
     sampleOneStep = SampleOneStep(transit, rewardFunc)
-    runDDPGTimeStep = RunTimeStep(actOneStep, sampleOneStep, trainMADDPGModels, observe = observe)
+    runTimeStep = RunTimeStep(actOneStep, sampleOneStep, trainMADDPGModels, observe = observe)
 
-    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep, isTerminal)
+    runEpisode = RunEpisode(reset, runTimeStep, maxTimeStep, isTerminal)
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
@@ -159,17 +153,13 @@ def main():
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpgWithActionCost_sharedWolvesHasIndividCost', fileName)
-    # modelPath = os.path.join(dirName, '..', 'trainedModels', '3wolvesMaddpgWithActionCost_sharedWolvesHasSharedCost', fileName)
-
+    folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed'
+    modelPath = os.path.join(dirName, '..', 'trainedModels', folderName, fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
     replayBuffer = getBuffer(bufferSize)
     meanRewardList, trajectory = maddpg(replayBuffer)
-
-
-
 
 
 if __name__ == '__main__':

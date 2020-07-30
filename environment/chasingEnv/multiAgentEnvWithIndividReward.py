@@ -1,6 +1,6 @@
 
 class RewardWolfIndividual:
-    def __init__(self, wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward=10):
+    def __init__(self, wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward):
         self.wolvesID = wolvesID
         self.sheepsID = sheepsID
         self.entitiesSizeList = entitiesSizeList

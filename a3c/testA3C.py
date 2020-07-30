@@ -9,7 +9,7 @@ import numpy as np
 import unittest
 from ddt import ddt, data, unpack
 
-from a3c.a3cWithGlobalSession import *
+from a3c.algorithm.a3cContinuous import *
 
 @ddt
 class TestActor(unittest.TestCase):

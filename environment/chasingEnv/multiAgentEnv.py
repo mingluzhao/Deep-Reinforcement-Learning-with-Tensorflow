@@ -1,9 +1,7 @@
-import tensorflow as tf
 import numpy as np
-import os
-import sys
 
 getPosFromAgentState = lambda state: np.array([state[0], state[1]])
+getVelFromAgentState = lambda agentState: np.array([agentState[2], agentState[3]])
 
 class GetActionCost:
     def __init__(self, costActionRatio, reshapeAction, individualCost):
@@ -33,27 +31,32 @@ class IsCollision:
 
 
 class RewardWolf:
-    def __init__(self, wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward=10):
+    def __init__(self, wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individual):
         self.wolvesID = wolvesID
         self.sheepsID = sheepsID
         self.entitiesSizeList = entitiesSizeList
         self.isCollision = isCollision
         self.collisionReward = collisionReward
+        self.individual = individual
 
     def __call__(self, state, action, nextState):
-        wolfReward = 0
+        numWolves = len(self.wolvesID)
+        collisionRewardForSharing = self.collisionReward/numWolves
+        reward = [0]* numWolves
 
-        for wolfID in self.wolvesID:
+        for rewardID, wolfID in enumerate(self.wolvesID):
             wolfSize = self.entitiesSizeList[wolfID]
             wolfNextState = nextState[wolfID]
+
             for sheepID in self.sheepsID:
                 sheepSize = self.entitiesSizeList[sheepID]
                 sheepNextState = nextState[sheepID]
 
                 if self.isCollision(wolfNextState, sheepNextState, wolfSize, sheepSize):
-                    wolfReward += self.collisionReward
-        reward = [wolfReward] * len(self.wolvesID)
-        # print('wolfreward ', wolfReward)
+                    if self.individual:
+                        reward[rewardID] += self.collisionReward
+                    else:
+                        reward = [oldReward+ collisionRewardForSharing for oldReward in reward]
         return reward
 
 
@@ -78,7 +81,7 @@ class PunishForOutOfBound:
 
 class RewardSheep:
     def __init__(self, wolvesID, sheepsID, entitiesSizeList, getPosFromState, isCollision, punishForOutOfBound,
-                 collisionPunishment=10):
+                 collisionPunishment):
         self.wolvesID = wolvesID
         self.getPosFromState = getPosFromState
         self.entitiesSizeList = entitiesSizeList
@@ -102,7 +105,6 @@ class RewardSheep:
                 if self.isCollision(wolfNextState, sheepNextState, wolfSize, sheepSize):
                     sheepReward -= self.collisionPunishment
             reward.append(sheepReward)
-
         return reward
 
 
@@ -155,11 +157,6 @@ class Observe:
 
         agentVel = self.getEntityVel(state, self.agentID)
         return np.concatenate([agentVel] + [agentPos] + blocksInfo + posInfo + velInfo)
-
-
-## notice the order of velocity and pos!!
-
-getVelFromAgentState = lambda agentState: np.array([agentState[2], agentState[3]])
 
 
 class GetCollisionForce:
@@ -250,7 +247,6 @@ class IntegrateState:
             entityVel = self.getEntityVel(state, entityID)
             entityPos = self.getEntityPos(state, entityID)
 
-
             if not entityMovable:
                 nextState.append(getNextState(entityPos, entityVel))
                 continue
@@ -273,9 +269,6 @@ class IntegrateState:
         return nextState
 
 
-
-
-
 class TransitMultiAgentChasing:
     def __init__(self, numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState):
         self.numEntities = numEntities
@@ -285,13 +278,7 @@ class TransitMultiAgentChasing:
         self.integrateState = integrateState
 
     def __call__(self, state, actions):
-        # print(actions[0])
-
         actions = [self.reshapeAction(action) for action in actions]
-        # print('action', actions[0], actions[1])
-        # print('wolfaction', actions[0])
-        # print('actions', actions)
-
         p_force = [None] * self.numEntities
         p_force = self.applyActionForce(p_force, actions)
         p_force = self.applyEnvironForce(p_force, state)
@@ -306,7 +293,6 @@ class ReshapeAction:
         self.sensitivity = 5
 
     def __call__(self, action): # action: tuple of dim (5,1)
-        # print(action)
         actionX = action[1] - action[2]
         actionY = action[3] - action[4]
         actionReshaped = np.array([actionX, actionY]) * self.sensitivity

@@ -33,10 +33,12 @@ class TestMultiAgentEnv(unittest.TestCase):
         self.entitiesMovableList = [True, True, True, False]
         self.massList = [1.0] * self.numEntities
 
-        self.rewardWolf = RewardWolf(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, collisionReward=10)
+        self.collisionReward = len(self.wolvesID) * 10 # only for this test
+        self.collisionPunishment = self.collisionReward
+        self.rewardWolf = RewardWolf(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision, self.collisionReward, individual = False)
         self.punishForOutOfBound = PunishForOutOfBound()
         self.rewardSheep = RewardSheep(self.wolvesID, self.sheepsID, self.entitiesSizeList, getPosFromAgentState, self.isCollision, self.punishForOutOfBound,
-                                       collisionPunishment=10)
+                                       self.collisionPunishment)
 
         self.rewardFunc = lambda state, action, nextState: \
             list(self.rewardWolf(state, action, nextState)) + list(self.rewardSheep(state, action, nextState))

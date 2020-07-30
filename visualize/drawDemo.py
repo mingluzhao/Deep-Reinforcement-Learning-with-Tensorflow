@@ -103,7 +103,7 @@ class DrawState:
         return self.screen
 
 class DrawStateEnvMADDPG:
-    def __init__(self, fps, screen, viewRatio, colorSpace, circleSizeSpace, agentIdsToDraw, positionIndex, saveImage, imagePath, 
+    def __init__(self, fps, screen, viewRatio, colorSpace, circleSizeSpace, agentIdsToDraw, positionIndex, saveImage, imagePath, sheepsID, sensitiveZoneSize,
             drawBackGround, updateColorByPosterior = None, drawCircleOutside = None):
         self.fps = fps
         self.screen = screen
@@ -118,6 +118,8 @@ class DrawStateEnvMADDPG:
         self.drawBackGround = drawBackGround
         self.updateColorByPosterior = updateColorByPosterior
         self.drawCircleOutside = drawCircleOutside
+        self.sheepsID = sheepsID
+        self.sensitiveZoneSize = sensitiveZoneSize
 
     def __call__(self, state, posterior = None):
         fpsClock = pg.time.Clock()
@@ -135,6 +137,10 @@ class DrawStateEnvMADDPG:
             agentColor = tuple(circleColors[agentIndex])
             circleSize = self.circleSizeSpace[agentIndex]
             pg.draw.circle(self.screen, agentColor, agentPos, circleSize)
+            ##
+            if agentIndex in self.sheepsID:
+                pg.draw.circle(self.screen, agentColor, agentPos, self.sensitiveZoneSize, 1)
+            ##
 
         pg.display.flip()
         

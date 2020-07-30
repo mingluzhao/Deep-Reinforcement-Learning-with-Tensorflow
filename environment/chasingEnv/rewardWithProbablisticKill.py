@@ -56,7 +56,7 @@ class RewardWolfWithHurtProb:
         return rewardList
 
 
-class GetHurtProbOfCatching:
+class GetHurtProbOfCatchingByDeterministicZone:
     def __init__(self, getPosFromState, computeVectorNorm, sensitiveZoneRadius, oneWolfSelfHurtProb):
         self.getPosFromState = getPosFromState
         self.sensitiveZoneRadius = sensitiveZoneRadius

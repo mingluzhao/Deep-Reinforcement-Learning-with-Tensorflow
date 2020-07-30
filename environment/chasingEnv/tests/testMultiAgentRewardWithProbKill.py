@@ -51,35 +51,60 @@ class TestMultiAgentEnv(unittest.TestCase):
     def testHurtProbCalc(self, wolvesState, currentSheepState, trueHurtProb):
         sensitiveZoneRadius = 0.25
         oneWolfSelfHurtProb = 0.8
-        getHurtProbOfCatching = GetHurtProbOfCatching(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius, oneWolfSelfHurtProb)
+        getHurtProbOfCatching = GetHurtProbOfCatchingByDeterministicZone(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius, oneWolfSelfHurtProb)
         hurtProb = getHurtProbOfCatching(wolvesState, currentSheepState)
         self.assertEqual(hurtProb, trueHurtProb)
 
-    @data((np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]), 0.8*(0.5**2)), # 3 closeby, 3 catch
-          (np.array([[0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]), 0.8*(0.5)), # 2closeby, 2 catch
-          (np.array([[0, 0.2, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]), 0.8), # 1closeby, 0catch
-          (np.array([[0, 0.2, 0, 0], [0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]), 0.8), # 2closeby, 1catch
-          (np.array([[0, 0.2, 0, 0], [0, 0, 0, 0], [0, 0.2, 0, 0], [0, 0, 0, 0]]), 0.8) # 3closeby, 1catch
+    @data((np.array([[0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]), {(20, 20, 20): 0.64, (5, 5, 5): 0.32, (-10, -10, -10): 0.04}), # 2closeby, 2 catch
+          (np.array([[0, 0.2, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]), {(0, 0, 0): 1}), # 1closeby, 0catch
+          (np.array([[0, 0.2, 0, 0], [0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]), {(10, 10, 10): 0.8, (-5, -5, -5): 0.2}), # 2closeby, 1catch - 0.2
+          (np.array([[0, 0.2, 0, 0], [0, 0, 0, 0], [0, 0.2, 0, 0], [0, 0, 0, 0]]), {(10, 10, 10): 0.9, (-5, -5, -5): 0.1}) # 3closeby, 1catch
           )
     @unpack
-    def testRewardWithHurtProb(self, nextState, trueHurtProb):
+    def testRewardWithHurtProbWithSharedWolf(self, nextState, trueHurtProb):
         state = np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
         action = [1, 1, 1, 1]
         sensitiveZoneRadius = 0.25
-        oneWolfSelfHurtProb = 0.8
-        getHurtProbOfCatching = GetHurtProbOfCatching(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius, oneWolfSelfHurtProb)
+        oneWolfSelfHurtProb = 0.4
+        getHurtProbOfCatching = GetHurtProbOfCatchingByDeterministicZone(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius, oneWolfSelfHurtProb)
         individualWolf = False
         rewardWolfWithProbOfHurt = RewardWolfWithHurtProb(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision,
                                                           getHurtProbOfCatching, sampleFromDistribution, individualWolf, hurtReward = -5, collisionReward=10)
-        reward = rewardWolfWithProbOfHurt(state, action, nextState)
-        print(reward)
+        iterationTime = 100000
+        trueDict = {rew: trueHurtProb[rew]* iterationTime for rew in trueHurtProb.keys()}
+
+        rewardList = [rewardWolfWithProbOfHurt(state, action, nextState) for _ in range(iterationTime)]
+        for reward in trueHurtProb.keys():
+            self.assertAlmostEqual(rewardList.count(list(reward)), trueDict[reward] , delta=500)
+
+    @data((np.array([[0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]), {(10, 0, 10): 0.64, (10, 0, -5): 0.16, (-5, 0, 10): 0.16, (-5, 0, -5): 0.04}), # 2closeby, 2 catch
+          (np.array([[0, 0.2, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]), {(0, 0, 0): 1}), # 1closeby, 0catch
+          (np.array([[0, 0.2, 0, 0], [0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]]), {(0, 10, 0): 0.8, (0, -5, 0): 0.2}), # 2closeby, 1catch - 0.2
+          (np.array([[0, 0.2, 0, 0], [0, 0, 0, 0], [0, 0.2, 0, 0], [0, 0, 0, 0]]), {(0, 10, 0): 0.9, (0, -5, 0): 0.1}) # 3closeby, 1catch
+          )
+    @unpack
+    def testRewardWithHurtProbWithIndividWolf(self, nextState, trueHurtProb):
+        state = np.array([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+        action = [1, 1, 1, 1]
+        sensitiveZoneRadius = 0.25
+        oneWolfSelfHurtProb = 0.4
+        getHurtProbOfCatching = GetHurtProbOfCatchingByDeterministicZone(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius, oneWolfSelfHurtProb)
+        individualWolf = True
+        rewardWolfWithProbOfHurt = RewardWolfWithHurtProb(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision,
+                                                          getHurtProbOfCatching, sampleFromDistribution, individualWolf, hurtReward = -5, collisionReward=10)
+        iterationTime = 100000
+        trueDict = {rew: trueHurtProb[rew]* iterationTime for rew in trueHurtProb.keys()}
+
+        rewardList = [rewardWolfWithProbOfHurt(state, action, nextState) for _ in range(iterationTime)]
+        for reward in trueHurtProb.keys():
+            self.assertAlmostEqual(rewardList.count(list(reward)), trueDict[reward] , delta=500)
 
 
     def testRewardWithNoProbOfHuntSharedComparedWithTraj(self):
         sensitiveZoneRadius = 0.25
         oneWolfSelfHurtProb = 0 # not hurt
-        getHurtProbOfCatching = GetHurtProbOfCatching(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius,
-                                                      oneWolfSelfHurtProb)
+        getHurtProbOfCatching = GetHurtProbOfCatchingByDeterministicZone(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius,
+                                                                         oneWolfSelfHurtProb)
         individualWolf = False
         rewardWolfWithProbOfHurt = RewardWolfWithHurtProb(self.wolvesID, self.sheepsID, self.entitiesSizeList, self.isCollision,
                                                           getHurtProbOfCatching, sampleFromDistribution, individualWolf, hurtReward = -5, collisionReward=10)
@@ -102,8 +127,8 @@ class TestMultiAgentEnv(unittest.TestCase):
     def testRewardWithNoProbOfHuntIndividComparedWithTraj(self):
         sensitiveZoneRadius = 0.25
         oneWolfSelfHurtProb = 0  # not hurt
-        getHurtProbOfCatching = GetHurtProbOfCatching(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius,
-                                                      oneWolfSelfHurtProb)
+        getHurtProbOfCatching = GetHurtProbOfCatchingByDeterministicZone(getPosFromAgentState, computeVectorNorm, sensitiveZoneRadius,
+                                                                         oneWolfSelfHurtProb)
         individualWolf = True
         rewardWolfWithProbOfHurt = RewardWolfWithHurtProb(self.wolvesID, self.sheepsID, self.entitiesSizeList,
                                                           self.isCollision,

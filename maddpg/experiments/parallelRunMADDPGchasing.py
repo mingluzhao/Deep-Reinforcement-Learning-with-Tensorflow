@@ -9,7 +9,6 @@ from subprocess import Popen, PIPE
 import json
 import math
 import numpy as np
-from collections import OrderedDict
 import itertools as it
 
 class ExcuteCodeOnConditionsParallel:
@@ -45,13 +44,13 @@ def main():
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)
     print("start")
 
-    numWolvesLevels = [3]
+    numWolvesLevels = [2, 3, 4, 5, 6]
     numSheepsLevels = [1]
     numBlocksLevels = [2]
     maxTimeStepLevels = [75]
-    sheepSpeedMultiplierLevels = [1]
+    sheepSpeedMultiplierLevels = [1, 1.25]
     individualRewardWolfLevels = [0, 1]
-    costActionRatioList = [0, 0.01, 0.05, 0.1, 0.2]
+    costActionRatioList = [0, 0.05, 0.1]
 
     conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward, costRatio)
                        for wolfNum in numWolvesLevels

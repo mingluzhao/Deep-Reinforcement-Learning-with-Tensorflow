@@ -35,28 +35,14 @@ def calcTrajRewardWithSharedWolfReward(traj):
 
 
 def main():
-    debug = 1
-    if debug:
-        numWolves = 3
-        numSheeps = 1
-        numBlocks = 2
-        saveTraj = False
-        visualizeTraj = True
-        maxTimeStep = 25
-        sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 0
-
-    else:
-        print(sys.argv)
-        condition = json.loads(sys.argv[1])
-        numWolves = int(condition['numWolves'])
-        numSheeps = int(condition['numSheeps'])
-        numBlocks = int(condition['numBlocks'])
-        saveTraj = True
-        visualizeTraj = False
-        maxTimeStep = 50
-        sheepSpeedMultiplier = 1.25
-        individualRewardWolf = 1
+    numWolves = 3
+    numSheeps = 1
+    numBlocks = 2
+    saveTraj = False
+    visualizeTraj = True
+    maxTimeStep = 25
+    sheepSpeedMultiplier = 1.0
+    individualRewardWolf = 0
 
     print("maddpg: {} wolves, {} sheep, {} blocks, saveTraj: {}, visualize: {}".format(numWolves, numSheeps, numBlocks,
                                                                                        str(saveTraj),
