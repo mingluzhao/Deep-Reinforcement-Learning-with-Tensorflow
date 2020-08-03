@@ -9,20 +9,22 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import multiprocessing
-import threading
+
 import gym
 
 
-from a3c.algorithm.a3cContinuous import *
-from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, observe, angle_normalize, \
-    ResetGymPendulum
-from functionTools.loadSaveModel import saveVariables
+from algorithm.a3cContinuous import *
+from environment.gymEnv.pendulumEnv import TransitGymPendulum, RewardGymPendulum, isTerminalGymPendulum, \
+    observe, angle_normalize, VisualizeGymPendulum, ResetGymPendulum
+from functionTools.loadSaveModel import restoreVariables, saveVariables
+from functionTools.trajectory import SampleTrajectory
 
 def main():
     hyperparamDict = dict()
+    weightSd = .1
     hyperparamDict['actorLR'] = 0.0001
     hyperparamDict['criticLR'] = 0.001
-    hyperparamDict['weightInit'] = tf.random_normal_initializer(0., .1)
+    hyperparamDict['weightInit'] = tf.random_normal_initializer(0., weightSd)
     hyperparamDict['actorActivFunction'] = tf.nn.relu6
     hyperparamDict['actorMuOutputActiv'] = tf.nn.tanh
     hyperparamDict['actorSigmaOutputActiv'] = tf.nn.softplus
@@ -30,6 +32,7 @@ def main():
     hyperparamDict['actorLayersWidths'] = [200]
     hyperparamDict['criticLayersWidths'] = [100]
     hyperparamDict['entropyBeta'] = 0.01
+    bootstrap = True
 
     game = 'Pendulum-v0'
     numWorkers = multiprocessing.cpu_count()
@@ -43,21 +46,16 @@ def main():
     actionDim = env.action_space.shape[0]
     actionRange = [env.action_space.low, env.action_space.high]
 
-    transit = TransitGymPendulum()
-    getReward = RewardGymPendulum(angle_normalize)
-    sampleOneStep = SampleOneStep(transit, getReward)
-    seed = None
-    reset = ResetGymPendulum(seed)
-
     getValueTargetList = GetValueTargetList(gamma)
-    isTerminal = lambda state: False
-
     globalCount = Count()
     globalReward = GlobalReward()
 
     session = tf.Session()
     coord = tf.train.Coordinator()
-    fileName = 'a3cPendulumModel1'
+    bootStr = 'withBoot' if bootstrap else 'noBoot'
+    fileName = 'a3cPendulumCont{}{}eps{}steps{}actlr{}crtlr{}beta{}updt{}weightDev{}gamma{}worker'.format(bootStr, maxGlobalEpisode,
+            maxTimeStepPerEps, hyperparamDict['actorLR'], hyperparamDict['criticLR'], hyperparamDict['entropyBeta'],
+            updateInterval, weightSd, gamma, numWorkers)
     modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
     modelSaveRate = 500
     saveModel = SaveModel(modelSaveRate, saveVariables, modelPath, session, saveAllmodels=False)
@@ -67,29 +65,31 @@ def main():
         globalModel = GlobalNet(stateDim, actionDim, hyperparamDict)
 
         for workerID in range(numWorkers):
+            workerEnv = gym.make(game)
             workerName = 'worker_%i' % workerID
             workerNet = WorkerNet(stateDim, actionDim, hyperparamDict, actionRange, workerName, globalModel, session)
-            worker = A3CWorker(maxGlobalEpisode, coord, reset, getValueTargetList, isTerminal,
-                         maxTimeStepPerEps, sampleOneStep, globalCount, globalReward, updateInterval, workerNet, saveModel, pendulum = True,
-                         observe = observe)
+            worker = A3CWorkerUsingGym(maxGlobalEpisode, coord, getValueTargetList, workerEnv, maxTimeStepPerEps,
+                                       globalCount, globalReward, updateInterval, workerNet, saveModel, bootstrap, pendulum = True)
 
             workers.append(worker)
 
     saver = tf.train.Saver(max_to_keep=None)
     tf.add_to_collection("saver", saver)
-    session.run(tf.global_variables_initializer())
+    restoreVariables(session, modelPath)
 
-    writer = tf.summary.FileWriter('tensorBoardA3C/', graph=session.graph)
-    tf.add_to_collection("writer", writer)
+    for i in range(20):
+        epsReward = 0
+        state = env.reset()
+        for timestep in range(maxTimeStepPerEps):
+            env.render()
+            action = workerNet.act(state)
+            nextState, reward, done, info = env.step(action)
+            if done:
+                epsReward += reward
+                break
+            state = nextState
+        print(epsReward)
 
-    worker_threads = []
-    for worker in workers:
-        job = lambda: worker.work()
-        t = threading.Thread(target=job)
-        t.start()
-        worker_threads.append(t)
-
-    coord.join(worker_threads)
 
 
 if __name__ == '__main__':

@@ -12,36 +12,54 @@ import multiprocessing
 import threading
 import gym
 import matplotlib.pyplot as plt
-
 from algorithm.a3cContinuous import *
 from functionTools.loadSaveModel import saveVariables
+import json
 
 def main():
+    debug = 1
     hyperparamDict = dict()
-    weightSd = .1
-    hyperparamDict['actorLR'] = 0.0001
-    hyperparamDict['criticLR'] = 0.001
-    hyperparamDict['weightInit'] = tf.random_normal_initializer(0., weightSd)
+
+    if debug:
+        weightSd = 0.1
+        hyperparamDict['actorLR'] = 1e-4
+        hyperparamDict['criticLR'] = 1e-3
+        hyperparamDict['entropyBeta'] = 0.01
+        maxTimeStepPerEps = 200
+        maxGlobalEpisode = 10000
+        updateInterval = 20
+        gamma = 0.99
+        numWorkers = multiprocessing.cpu_count()
+        bootStrap = 0
+
+    else:
+        condition = json.loads(sys.argv[1])
+        weightSd = float(condition['weightSd'])
+        hyperparamDict['actorLR'] = float(condition['actorLR'])
+        hyperparamDict['criticLR'] = float(condition['criticLR'])
+        hyperparamDict['entropyBeta'] = float(condition['entropyBeta'])
+        maxTimeStepPerEps = int(condition['maxTimeStepPerEps'])
+        maxGlobalEpisode = int(condition['maxGlobalEpisode'])
+        updateInterval = int(condition['updateInterval'])
+        gamma = float(condition['gamma'])
+        numWorkers = int(condition['numWorkers'])
+        bootStrap = int(condition['bootStrap'])
+
+    # fixed parameters
+    hyperparamDict['weightInit'] = tf.truncated_normal_initializer(mean=0.0, stddev=weightSd)
     hyperparamDict['actorActivFunction'] = tf.nn.relu6
     hyperparamDict['actorMuOutputActiv'] = tf.nn.tanh
     hyperparamDict['actorSigmaOutputActiv'] = tf.nn.softplus
     hyperparamDict['criticActivFunction'] = tf.nn.relu6
     hyperparamDict['actorLayersWidths'] = [200]
-    hyperparamDict['criticLayersWidths'] = [100]
-    hyperparamDict['entropyBeta'] = 0.01
-    bootstrap = True
+    hyperparamDict['criticLayersWidths'] = [200]
 
-    game = 'Pendulum-v0'
-    numWorkers = multiprocessing.cpu_count()
-    maxTimeStepPerEps = 200
-    maxGlobalEpisode = 2000
-    updateInterval = 10
-    gamma = 0.9
+    # environment
+    game = 'InvertedDoublePendulum-v2'
     env = gym.make(game)
-
-    stateDim = env.observation_space.shape[0]
-    actionDim = env.action_space.shape[0]
-    actionRange = [env.action_space.low, env.action_space.high]
+    stateDim = env.observation_space.shape[0] #11
+    actionDim = env.action_space.shape[0] #1
+    actionRange = [env.action_space.low, env.action_space.high] #-1 ~ 1
 
     getValueTargetList = GetValueTargetList(gamma)
     globalCount = Count()
@@ -49,10 +67,12 @@ def main():
 
     session = tf.Session()
     coord = tf.train.Coordinator()
-    bootStr = 'withBoot' if bootstrap else 'noBoot'
-    fileName = 'a3cPendulumCont{}{}eps{}steps{}actlr{}crtlr{}beta{}updt{}weightDev{}gamma{}worker'.format(bootStr, maxGlobalEpisode,
+
+    bootStr = 'withBoot' if bootStrap else 'noBoot'
+    fileName = 'a3cInvDblPendCont{}{}eps{}steps{}actlr{}crtlr{}beta{}updt{}weightDev{}gamma{}worker'.format(bootStr, maxGlobalEpisode,
             maxTimeStepPerEps, hyperparamDict['actorLR'], hyperparamDict['criticLR'], hyperparamDict['entropyBeta'],
             updateInterval, weightSd, gamma, numWorkers)
+
     modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
     modelSaveRate = 500
     saveModel = SaveModel(modelSaveRate, saveVariables, modelPath, session, saveAllmodels=False)
@@ -65,8 +85,7 @@ def main():
             workerEnv = gym.make(game)
             workerName = 'worker_%i' % workerID
             workerNet = WorkerNet(stateDim, actionDim, hyperparamDict, actionRange, workerName, globalModel, session)
-            worker = A3CWorkerUsingGym(maxGlobalEpisode, coord, getValueTargetList, workerEnv, maxTimeStepPerEps,
-                                       globalCount, globalReward, updateInterval, workerNet, saveModel, bootstrap, pendulum = True)
+            worker = A3CWorkerUsingGym(maxGlobalEpisode, coord, getValueTargetList, workerEnv, maxTimeStepPerEps, globalCount, globalReward, updateInterval, workerNet, saveModel, bootStrap)
 
             workers.append(worker)
 
@@ -89,5 +108,10 @@ def main():
     plt.plot(range(len(globalReward.reward)), globalReward.reward)
     plt.savefig(os.path.join(imageSavePath, fileName + str('.png')))
 
+
 if __name__ == '__main__':
     main()
+
+
+
+

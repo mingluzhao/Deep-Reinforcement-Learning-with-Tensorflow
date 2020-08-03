@@ -1,2 +1,2 @@
-model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/a3c/exec/../trainedModels/a3cPendulumModel"
-all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/a3c/exec/../trainedModels/a3cPendulumModel"
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/a3c/exec/../trainedModels/a3cInvDblPendRNNwithBoot10000eps200steps0.0001actlr0.001crtlr0.01beta20updt0.1weightDev0.99gamma4worker"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/a3c/exec/../trainedModels/a3cInvDblPendRNNwithBoot10000eps200steps0.0001actlr0.001crtlr0.01beta20updt0.1weightDev0.99gamma4worker"

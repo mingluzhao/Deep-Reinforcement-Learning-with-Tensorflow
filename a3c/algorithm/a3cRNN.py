@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-import time
 
 class GlobalNet(object):
     def __init__(self, stateDim, actionDim, hyperparamDict):
@@ -29,7 +28,7 @@ class GlobalNet(object):
                 rnnCellOutput = tf.reshape(rnnOutputs, [-1, self.cellSize], name='flatten_rnn_outputs')  # joined state representation # back to [batch, feature]
                 criticTrainActivation_ = rnnCellOutput
                 for numUnits in self.criticLayersWidths:
-                    criticTrainActivation_ = tf.layers.dense(self.states_, numUnits, self.criticActivFunction, kernel_initializer=self.weightInit)
+                    criticTrainActivation_ = tf.layers.dense(criticTrainActivation_, numUnits, self.criticActivFunction, kernel_initializer=self.weightInit)
                 value_ = tf.layers.dense(criticTrainActivation_, 1, kernel_initializer=self.weightInit)  # state value
 
             with tf.variable_scope('actorNet'):  # state representation is based on critic
@@ -81,7 +80,7 @@ class WorkerNet(object):
                 rnnCellOutput_ = tf.reshape(rnnOutputs_, [-1, self.cellSize], name='flatten_rnn_outputs')  # joined state representation # back to [batch, feature]
                 criticTrainActivation_ = rnnCellOutput_
                 for numUnits in self.criticLayersWidths:
-                    criticTrainActivation_ = tf.layers.dense(self.states_, numUnits, self.criticActivFunction, kernel_initializer=self.weightInit)
+                    criticTrainActivation_ = tf.layers.dense(criticTrainActivation_, numUnits, self.criticActivFunction, kernel_initializer=self.weightInit)
                 self.value_ = tf.layers.dense(criticTrainActivation_, 1, kernel_initializer=self.weightInit)  # state value
 
             with tf.variable_scope('actorNet'):  # state representation is based on critic
@@ -218,7 +217,8 @@ class Experience:
 
 class A3CWorker:
     def __init__(self, globalMaxT, coord, reset, getValueTargetList, isTerminal,
-                 maxTimeStepPerEps, sampleOneStep, globalCount, globalReward, updateInterval, workerNet, saveModel, pendulum = False, observe = None):
+                 maxTimeStepPerEps, sampleOneStep, globalCount, globalReward, updateInterval, workerNet, saveModel,
+                 bootstrap, pendulum = False, observe = None):
         self.globalMaxT = globalMaxT
         self.coord = coord
         self.globalCount = globalCount
@@ -236,6 +236,7 @@ class A3CWorker:
         self.workerNet = workerNet
         self.pendulum = pendulum
         self.saveModel = saveModel
+        self.bootstrap = bootstrap
 
     def work(self):
         stateBuffer = []
@@ -253,9 +254,8 @@ class A3CWorker:
                 observation = self.observe(state) if self.observe is not None else state
                 action, rnnFinalState = self.workerNet.act(observation, rnnInitState)
                 reward, nextState = self.sampleOneStep(state, action)
-                done = self.isTerminal(nextState)
+                terminal = self.isTerminal(nextState)
                 nextObservation = self.observe(nextState) if self.observe is not None else nextState
-                if reward == -100: reward = -2 ###
 
                 stateBuffer.append(observation)
                 actionsBuffer.append(action)
@@ -265,12 +265,15 @@ class A3CWorker:
                 else:
                     rewardBuffer.append(reward)
 
-                done = True if timeStep == (self.maxTimeStepPerEps - 1) or done else False
+                done = True if timeStep == (self.maxTimeStepPerEps - 1) or terminal else False
                 epsReward += reward
 
                 if self.workerTotalSteps % self.updateInterval == 0 or done:
                     lastState = nextStateBuffer[-1]
-                    valueFromBootStrap = 0 if done else self.workerNet.getBootStrapValue(lastState, rnnFinalState)
+                    if self.bootstrap:
+                        valueFromBootStrap = 0 if terminal else self.workerNet.getBootStrapValue(lastState, rnnFinalState)
+                    else:
+                        valueFromBootStrap = 0 # mujoco env does not want bootstrap (acc. paper)
                     valueTargetList = self.getValueTargetList(valueFromBootStrap, rewardBuffer)
                     stateBatch, actionBatch, valueTargetBatch = np.vstack(stateBuffer), np.vstack(actionsBuffer), np.vstack(valueTargetList)
 
@@ -297,12 +300,11 @@ class A3CWorker:
                         self.globalReward.addReward(0.9 * self.globalReward.reward[-1] + 0.1 * epsReward)
 
                     print(self.workerNet.scope, "Ep:", self.globalCount.count, "| Ep_r: %i" % self.globalReward.reward[-1])
-                    # print(self.workerNet.scope, "Ep:", self.globalCount.count, "| Ep_r: %i" % epsReward)
                     break
 
 
 class A3CWorkerUsingGym:
-    def __init__(self, globalMaxT, coord, getValueTargetList, env, maxTimeStepPerEps, globalCount, globalReward, updateInterval, workerNet, saveModel, pendulum = False):
+    def __init__(self, globalMaxT, coord, getValueTargetList, env, maxTimeStepPerEps, globalCount, globalReward, updateInterval, workerNet, saveModel, bootstrap, pendulum = False):
         self.globalMaxT = globalMaxT
         self.coord = coord
         self.globalCount = globalCount
@@ -317,6 +319,7 @@ class A3CWorkerUsingGym:
         self.workerNet = workerNet
         self.saveModel = saveModel
         self.pendulum = pendulum
+        self.bootstrap = bootstrap
 
     def work(self):
         stateBuffer = []
@@ -332,8 +335,7 @@ class A3CWorkerUsingGym:
 
             for timeStep in range(self.maxTimeStepPerEps):
                 action, rnnFinalState = self.workerNet.act(state, rnnInitState)
-                nextState, reward, done, info = self.env.step(action)
-                if reward == -100: reward = -2 ##
+                nextState, reward, terminal, info = self.env.step(action)
 
                 stateBuffer.append(state)
                 actionsBuffer.append(action)
@@ -343,12 +345,15 @@ class A3CWorkerUsingGym:
                 else:
                     rewardBuffer.append(reward)
 
-                done = True if timeStep == (self.maxTimeStepPerEps - 1) or done else False
+                done = True if timeStep == (self.maxTimeStepPerEps - 1) or terminal else False
                 epsReward += reward
 
                 if self.workerTotalSteps % self.updateInterval == 0 or done:
                     lastState = nextStateBuffer[-1]
-                    valueFromBootStrap = 0 if done else self.workerNet.getBootStrapValue(lastState, rnnFinalState)
+                    if self.bootstrap:
+                        valueFromBootStrap = 0 if terminal else self.workerNet.getBootStrapValue(lastState, rnnFinalState)
+                    else:
+                        valueFromBootStrap = 0 # mujoco env does not want bootstrap (acc. paper)
                     valueTargetList = self.getValueTargetList(valueFromBootStrap, rewardBuffer)
                     stateBatch, actionBatch, valueTargetBatch = np.vstack(stateBuffer), np.vstack(actionsBuffer), np.vstack(valueTargetList)
 
@@ -372,102 +377,13 @@ class A3CWorkerUsingGym:
                     if len(self.globalReward.reward) == 0:
                         self.globalReward.addReward(epsReward)
                     else:
-                        self.globalReward.addReward(0.95 * self.globalReward.reward[-1] + 0.05 * epsReward)
+                        self.globalReward.addReward(0.9 * self.globalReward.reward[-1] + 0.1 * epsReward)
 
-                    print(self.workerNet.scope, "Ep:", self.globalCount.count, "| Ep_r: %.1f" % self.globalReward.reward[-1], '| EpR: %.1f' % epsReward)
+                    print(self.workerNet.scope, "Ep:", self.globalCount.count, "| Ep_r: %.1f" % self.globalReward.reward[-1], '| EpR: %.1f' % epsReward, '| steps: ', timeStep)
                     break
 
 
 
-
-# class Update:
-#     def __init__(self, buffer, updateInterval, getValueTargetList):
-#         self.buffer = buffer
-#         self.updateInterval = updateInterval
-#         self.getValueTargetList = getValueTargetList
-#
-#     def __call__(self, workerTotalSteps, done, workerNet):
-#         if workerTotalSteps % self.updateInterval == 0 or done:
-#             lastState = self.buffer.nextStateBuffer[-1]
-#             valueFromBootStrap = 0 if done else workerNet.getBootStrapValue(lastState)
-#             valueTargetList = self.getValueTargetList(valueFromBootStrap, self.buffer.rewardBuffer)
-#             stateBatch, actionBatch, valueTargetBatch = np.vstack(self.buffer.stateBuffer), np.vstack(self.buffer.actionsBuffer), np.vstack(
-#                 valueTargetList)
-#
-#             workerNet.pushToGlobalNet(stateBatch, actionBatch, valueTargetBatch)
-#             workerNet.pullFromGlobalNet()
-#
-#             self.buffer.reset()
-#         else:
-#             return
-#
-#
-# class Buffer:
-#     def __init__(self, isTerminal, sampleOneStep, observe=None):
-#         self.isTerminal = isTerminal
-#         self.sampleOneStep = sampleOneStep
-#         self.observe = observe
-#         self.resetBuffer()
-#
-#     def resetBuffer(self):
-#         self.stateBuffer = []
-#         self.actionsBuffer = []
-#         self.rewardBuffer = []
-#         self.nextStateBuffer = []
-#
-#     def getNewExperience(self, workerNet, state):
-#         observation = self.observe(state) if self.observe is not None else state
-#         action = workerNet.act(observation)
-#         reward, nextState = self.sampleOneStep(state, action)
-#         done = self.isTerminal(nextState)
-#         nextObservation = self.observe(nextState) if self.observe is not None else nextState
-#         self.stateBuffer.append(observation)
-#         self.actionsBuffer.append(action)
-#         self.nextStateBuffer.append(nextObservation)
-#         self.rewardBuffer.append((reward + 8) / 8)  # for pendulum v0 only
-#
-#         return reward, nextState
-#
-#
-# class A3CWorker:
-#     def __init__(self, globalMaxT, coord, reset, update, buffer,
-#                  maxTimeStepPerEps, globalCount, globalReward, workerNet, observe = None):
-#         self.globalMaxT = globalMaxT
-#         self.coord = coord
-#         self.globalCount = globalCount
-#         self.reset = reset
-#         self.update = update
-#         self.maxTimeStepPerEps = maxTimeStepPerEps
-#         self.buffer = buffer
-#         self.maxTimeStepPerEps = maxTimeStepPerEps
-#         self.globalCount = globalCount
-#         self.observe = observe
-#         self.globalReward = globalReward
-#         self.workerTotalSteps = 1
-#         self.workerNet = workerNet
-#
-#     def work(self):
-#         while not self.coord.should_stop() and self.globalCount.count < self.globalMaxT:
-#             state = self.reset()
-#             epsReward = 0
-#
-#             for timeStep in range(self.maxTimeStepPerEps):
-#                 reward, nextState = self.buffer.getNewExperience(self.workerNet, state)
-#                 epsReward += reward
-#                 done = True if timeStep == (self.maxTimeStepPerEps - 1) else False # for pendulum v0 only
-#                 self.update(self.workerTotalSteps, done, self.workerNet)
-#                 state = nextState
-#                 self.workerTotalSteps += 1
-#
-#                 if done:
-#                     self.globalCount()
-#                     if len(self.globalReward.reward) == 0:
-#                         self.globalReward.addReward(epsReward)
-#                     else:
-#                         self.globalReward.addReward(0.9 * self.globalReward.reward[-1] + 0.1 * epsReward)
-#
-#                     print(self.workerNet.scope, "Ep:", self.globalCount.count, "| Ep_r: %i" % self.globalReward.reward[-1])
-#                     break
 class SaveModel:
     def __init__(self, modelSaveRate, saveVariables, modelSavePath, sess, saveAllmodels = False):
         self.modelSaveRate = modelSaveRate
