@@ -39,7 +39,7 @@ def evaluateWolfSheepTrain(df):
     numWolves = df.index.get_level_values('numWolves')[0]
     sheepSpeedMultiplier = df.index.get_level_values('sheepSpeedMultiplier')[0]# [1, 1.25]
     wolfIndividual = df.index.get_level_values('wolfIndividual')[0] #[shared, individ]
-
+# 3， 1， shared
     numSheeps = 1
     numBlocks = 2
     maxTimeStep = 75
@@ -141,14 +141,14 @@ def main():
     levelValues = list(independentVariables.values())
     levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
     toSplitFrame = pd.DataFrame(index=levelIndex)
-    # resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
+    resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
 
     resultPath = os.path.join(dirName, '..', 'evalResults')
     resultLoc = os.path.join(resultPath, 'evalWolfNumberWithOneSheep_75steps_sample75.pkl')
 
     # saveToPickle(resultDF, resultLoc)
 
-    resultDF = loadFromPickle(resultLoc)
+    # resultDF = loadFromPickle(resultLoc)
 
     figure = plt.figure(figsize=(10, 5))
     plotCounter = 1

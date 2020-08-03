@@ -33,6 +33,13 @@ def calcTrajRewardWithSharedWolfReward(traj):
     trajReward = np.sum(rewardList)
     return trajReward
 
+def calcTrajRewardWithIndividualWolfReward(traj, wolvesID):
+    rewardIDinTraj = 2
+    getWolfReward = lambda allAgentsReward: np.sum([allAgentsReward[wolfID] for wolfID in wolvesID])
+    rewardList = [getWolfReward(timeStepInfo[rewardIDinTraj]) for timeStepInfo in traj]
+    trajReward = np.sum(rewardList)
+    return trajReward
+
 
 def main():
     numWolves = 3

@@ -42,10 +42,10 @@ class EvaluateWolfSheepTrain:
         self.getSampledSheepPath = lambda sheepPaths: sheepPaths[random.randint(0, len(sheepPaths) - 1)]
 
     def __call__(self, df):
-        numWolves = df.index.get_level_values('numWolves')[0]
         fileID = df.index.get_level_values('fileID')[0]
         wolfIndividual = df.index.get_level_values('wolfIndividual')[0] #[shared, individ]
 
+        numWolves = 3
         numSheeps = 1
         numBlocks = 2
         maxTimeStep = 75
@@ -74,10 +74,10 @@ class EvaluateWolfSheepTrain:
 
         isCollision = IsCollision(getPosFromAgentState)
         punishForOutOfBound = PunishForOutOfBound()
-        rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision, punishForOutOfBound)
+        rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision, punishForOutOfBound, collisionPunishment= 10)
 
-        rewardWolfIndivid = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-        rewardWolfShared = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+        rewardWolfIndivid = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward= 10)
+        rewardWolfShared = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward= 30, individual= False)
 
         rewardFuncIndividWolf = lambda state, action, nextState: \
             list(rewardWolfIndivid(state, action, nextState)) + list(rewardSheep(state, action, nextState))
@@ -117,7 +117,7 @@ class EvaluateWolfSheepTrain:
         dirName = os.path.dirname(__file__)
         fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost0.0{}file{}_agent".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, wolfIndividual, fileID)
-        folderName = 'runManyTimes75'
+        folderName = 'calculateVar3v1'
         wolfModelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in wolvesID]
         [restoreVariables(model, path) for model, path in zip(wolvesModels, wolfModelPaths)]
 
@@ -151,7 +151,7 @@ class GetSheepModelPaths:
 
     def __call__(self, numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier):
         dirName = os.path.dirname(__file__)
-        folderName = 'runManyTimes75'
+        folderName = 'calculateVar3v1'
         fileNameList = ["maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost0.0{}file{}_agent{}".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, wolfIndividual, fileID, numWolves)
             for wolfIndividual in self.wolfTypeList for fileID in self.fileIDList]
@@ -163,8 +163,7 @@ class GetSheepModelPaths:
 def main():
     independentVariables = OrderedDict()
     independentVariables['wolfIndividual'] = ['shared', 'individ']
-    independentVariables['numWolves'] = [3, 4, 5, 6]
-    independentVariables['fileID'] = list(range(3))
+    independentVariables['fileID'] = list(range(20))
 
     getSheepModelPaths = GetSheepModelPaths(independentVariables['wolfIndividual'], independentVariables['fileID'])
     evaluateWolfSheepTrain = EvaluateWolfSheepTrain(getSheepModelPaths)
@@ -176,36 +175,36 @@ def main():
     resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
 
     resultPath = os.path.join(dirName, '..', 'evalResults')
-    resultLoc = os.path.join(resultPath, 'evalTrainManyTimes.pkl')
+    resultLoc = os.path.join(resultPath, 'evalTrain3v1Variance.pkl')
 
     saveToPickle(resultDF, resultLoc)
 
     resultDF = loadFromPickle(resultLoc)
     print(resultDF)
-    figure = plt.figure(figsize=(10, 5))
-    plotCounter = 1
-    numRows = 1
-    numColumns = len(independentVariables['wolfIndividual'])
-    for keyCol, outterSubDf in resultDF.groupby('wolfIndividual'):
-        outterSubDf.index = outterSubDf.index.droplevel('wolfIndividual')
-        axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
-        for keyRow, innerSubDf in outterSubDf.groupby('fileID'):
-            innerSubDf.index = innerSubDf.index.droplevel('fileID')
-            plt.ylim([0, 500])
-            innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
-
-        axForDraw.title.set_text('wolfIndividual ' + keyCol)
-        if plotCounter == 1:
-            axForDraw.set_ylabel('Mean Eps Reward')
-        axForDraw.set_xlabel('Number of Wolves')
-        plotCounter += 1
-        axForDraw.set_aspect(0.01, adjustable='box')
-
-        plt.legend(title='FileID')
-
-    plt.suptitle('eval train many times')
-    plt.savefig(os.path.join(resultPath, 'evalTrainManyTimes'))
-    plt.show()
+    # figure = plt.figure(figsize=(10, 5))
+    # plotCounter = 1
+    # numRows = 1
+    # numColumns = len(independentVariables['wolfIndividual'])
+    # for keyCol, outterSubDf in resultDF.groupby('wolfIndividual'):
+    #     outterSubDf.index = outterSubDf.index.droplevel('wolfIndividual')
+    #     axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+    #     for keyRow, innerSubDf in outterSubDf.groupby('fileID'):
+    #         innerSubDf.index = innerSubDf.index.droplevel('fileID')
+    #         plt.ylim([0, 500])
+    #         innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
+    #
+    #     axForDraw.title.set_text('wolfIndividual ' + keyCol)
+    #     if plotCounter == 1:
+    #         axForDraw.set_ylabel('Mean Eps Reward')
+    #     axForDraw.set_xlabel('Number of Wolves')
+    #     plotCounter += 1
+    #     axForDraw.set_aspect(0.01, adjustable='box')
+    #
+    #     plt.legend(title='FileID')
+    #
+    # plt.suptitle('eval train many times')
+    # plt.savefig(os.path.join(resultPath, 'evalTrainManyTimes'))
+    # plt.show()
 
 
 if __name__ == '__main__':

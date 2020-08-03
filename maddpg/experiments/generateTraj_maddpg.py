@@ -14,7 +14,6 @@ from environment.chasingEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import saveToPickle, restoreVariables
 from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *
-from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import *
 import json
@@ -24,8 +23,28 @@ sheepColor = np.array([0.35, 0.85, 0.35])
 blockColor = np.array([0.25, 0.25, 0.25])
 
 maxEpisode = 60000
-maxRunningStepsToSample = 50  # num of timesteps in one eps
+maxRunningStepsToSample = 75  # num of timesteps in one eps
 
+
+# def calcTrajRewardWithSharedWolfReward(traj):
+#     rewardIDinTraj = 2
+#     rewardList = [timeStepInfo[rewardIDinTraj][0] for timeStepInfo in traj]
+#     trajReward = np.sum(rewardList)
+#     return trajReward
+#
+# def calcTrajRewardWithIndividualWolfReward(traj, wolvesID):
+#     rewardIDinTraj = 2
+#     getWolfReward = lambda allAgentsReward: np.sum([allAgentsReward[wolfID] for wolfID in wolvesID])
+#     rewardList = [getWolfReward(timeStepInfo[rewardIDinTraj]) for timeStepInfo in traj]
+#     trajReward = np.sum(rewardList)
+#     return trajReward
+
+def calcWolvesTrajReward(traj, wolvesID):
+    rewardIDinTraj = 2
+    getWolfReward = lambda allAgentsReward: np.sum([allAgentsReward[wolfID] for wolfID in wolvesID])
+    rewardList = [getWolfReward(timeStepInfo[rewardIDinTraj]) for timeStepInfo in traj]
+    trajReward = np.sum(rewardList)
+    return trajReward
 
 def main():
     debug = 1
@@ -33,11 +52,11 @@ def main():
         numWolves = 3
         numSheeps = 1
         numBlocks = 2
-        saveTraj = False
-        visualizeTraj = True
+        saveAllmodels = False
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 0
+        individualRewardWolf = 1
+        costActionRatio = 0.1
 
     else:
         print(sys.argv)
@@ -45,15 +64,16 @@ def main():
         numWolves = int(condition['numWolves'])
         numSheeps = int(condition['numSheeps'])
         numBlocks = int(condition['numBlocks'])
-        saveTraj = True
-        visualizeTraj = False
-        maxTimeStep = 50
-        sheepSpeedMultiplier = 1.25
-        individualRewardWolf = 1
 
-    print("maddpg: {} wolves, {} sheep, {} blocks, saveTraj: {}, visualize: {}".format(numWolves, numSheeps, numBlocks,
-                                                                                       str(saveTraj),
-                                                                                       str(visualizeTraj)))
+        maxTimeStep = int(condition['maxTimeStep'])
+        sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
+        individualRewardWolf = int(condition['individualRewardWolf'])
+        costActionRatio = float(condition['costActionRatio'])
+
+        saveAllmodels = False
+
+    print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, costActionRatio: {}".
+          format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, costActionRatio))
 
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
@@ -70,30 +90,31 @@ def main():
     blockMaxSpeed = None
     sheepMaxSpeedOriginal = 1.3
     sheepMaxSpeed = sheepMaxSpeedOriginal * sheepSpeedMultiplier
-    entityMaxSpeedList = [wolfMaxSpeed] * numWolves + [sheepMaxSpeed] * numSheeps + [blockMaxSpeed] * numBlocks
 
+    entityMaxSpeedList = [wolfMaxSpeed] * numWolves + [sheepMaxSpeed] * numSheeps + [blockMaxSpeed] * numBlocks
     entitiesMovableList = [True] * numAgents + [False] * numBlocks
     massList = [1.0] * numEntities
 
+    collisionReward = 30 # originalPaper = 10*3
     isCollision = IsCollision(getPosFromAgentState)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
-                              punishForOutOfBound)
+                              punishForOutOfBound, collisionPunishment = collisionReward)
 
-    if individualRewardWolf:
-        rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    else:
-        rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
+    reshapeAction = ReshapeAction()
+    getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost=True)
+    getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
+    rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
 
-    rewardFunc = lambda state, action, nextState: list(rewardWolf(state, action, nextState)) + list(
-        rewardSheep(state, action, nextState))
+    rewardFunc = lambda state, action, nextState: \
+        list(rewardWolfWithActionCost(state, action, nextState)) + list(rewardSheep(state, action, nextState))
 
     reset = ResetMultiAgentChasing(numAgents, numBlocks)
     observeOneAgent = lambda agentID: Observe(agentID, wolvesID, sheepsID, blocksID, getPosFromAgentState,
                                               getVelFromAgentState)
     observe = lambda state: [observeOneAgent(agentID)(state) for agentID in range(numAgents)]
 
-    reshapeAction = ReshapeAction()
     getCollisionForce = GetCollisionForce()
     applyActionForce = ApplyActionForce(wolvesID, sheepsID, entitiesMovableList)
     applyEnvironForce = ApplyEnvironForce(numEntities, entitiesMovableList, entitiesSizeList,
@@ -103,10 +124,10 @@ def main():
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: False
-    sampleTrajectory = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFunc, reset)
-
     initObsForParams = observe(reset())
     obsShape = [initObsForParams[obsID].shape[0] for obsID in range(len(initObsForParams))]
+
+    sampleTrajectory = SampleTrajectory(maxRunningStepsToSample, transit, isTerminal, rewardFunc, reset)
 
     worldDim = 2
     actionDim = worldDim * 2 + 1
@@ -119,38 +140,48 @@ def main():
 
     dirName = os.path.dirname(__file__)
     individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    folderName = 'evalOneSheep_2575steps_1to6wolves_11.25speed'
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i))
-        for i in range(numAgents)]
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+
+    folderName = 'neeewTTraiin'
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
     actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
+    rewardList = []
+    numTrajToSample = 300
     trajList = []
-    numTrajToSample = 50
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
+        rew = calcWolvesTrajReward(traj, wolvesID)
+        rewardList.append(rew)
         trajList.append(list(traj))
 
-    trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
-    if not os.path.exists(trajectoryDirectory):
-        os.makedirs(trajectoryDirectory)
-    trajFileName = "maddpg{}wolves{}sheep{}blocks{}eps{}stepSheepSpeed{}{}Traj".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
-    trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
-    saveToPickle(trajList, trajSavePath)
+    meanTrajReward = np.mean(rewardList)
+    seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
+    print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
 
-    # visualize
-    if visualizeTraj:
-        entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
-        render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
-        trajToRender = np.concatenate(trajList)
-        render(trajToRender)
+    # trajSavePath = os.path.join(dirName, '..', 'trajectory', fileName)
+    # saveToPickle(trajList, trajSavePath)
 
+    # trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
+    # if not os.path.exists(trajectoryDirectory):
+    #     os.makedirs(trajectoryDirectory)
+    # trajFileName = "maddpg{}wolves{}sheep{}blocks{}eps{}stepSheepSpeed{}{}Traj".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    # trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
+    # saveToPickle(trajList, trajSavePath)
+
+    # wolfColor = np.array([0.85, 0.35, 0.35])
+    # sheepColor = np.array([0.35, 0.85, 0.35])
+    # blockColor = np.array([0.25, 0.25, 0.25])
+    # entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
+    # render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
+    # trajToRender = np.concatenate(trajList)
+    # render(trajToRender)
 
 if __name__ == '__main__':
     main()
