@@ -1,25 +1,13 @@
-import os
-import sys
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
-dirName = os.path.dirname(__file__)
-sys.path.append(os.path.join(dirName, '..'))
-sys.path.append(os.path.join(dirName, '..', '..'))
-import logging
-logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import tensorflow as tf
 import numpy as np
 import random
-from collections import  deque
-import gym
-from functionTools.loadSaveModel import saveVariables
-import matplotlib.pyplot as plt
+from collections import deque
 
 class GetActorNetwork:
     def __init__(self, hyperparamDict, batchNorm = False):
         self.actorWeightInit = hyperparamDict['actorWeightInit']
-        # self.actorBiasInit = hyperparamDict['actorBiasInit']
+        self.actorBiasInit = hyperparamDict['actorBiasInit']
         self.actorActivFunctionList = hyperparamDict['actorActivFunction']
         self.actorLayersWidths = hyperparamDict['actorLayersWidths']
         self.batchNorm = batchNorm
@@ -40,9 +28,9 @@ class GetActorNetwork:
                 for i in range(layerNum):
                     layerWidth = self.actorLayersWidths[i]
                     activFunction = self.actorActivFunctionList[i]
-                    net = tf.layers.dense(net, layerWidth, activation = activFunction, kernel_initializer = self.actorWeightInit)
+                    net = tf.layers.dense(net, layerWidth, activation = activFunction, kernel_initializer = self.actorWeightInit, bias_initializer= self.actorBiasInit)
 
-            out = tf.layers.dense(net, actionDim, activation = self.actorActivFunctionList[-1], kernel_initializer = self.actorWeightInit )
+            out = tf.layers.dense(net, actionDim, activation = self.actorActivFunctionList[-1], kernel_initializer = self.actorWeightInit, bias_initializer= self.actorBiasInit)
             scaled_out = tf.multiply(out, actionBound)
 
         return inputs, out, scaled_out
@@ -101,17 +89,17 @@ class Actor(object):
 class GetCriticNetwork:
     def __init__(self, hyperparamDict, addActionToLastLayer = False, batchNorm = False):
         self.criticWeightInit = hyperparamDict['criticWeightInit']
-        # self.criticBiasInit = hyperparamDict['criticBiasInit']
+        self.criticBiasInit = hyperparamDict['criticBiasInit']
         self.criticActivFunctionList = hyperparamDict['criticActivFunction']
         self.criticLayersWidths = hyperparamDict['criticLayersWidths']
         self.batchNorm = batchNorm
-        self.addActionToLastLayer  = addActionToLastLayer
+        self.addActionToLastLayer = addActionToLastLayer
 
     def __call__(self, stateDim, actionDim, scope):
         with tf.variable_scope(scope):
             statesInput_ = tf.placeholder(tf.float32, shape=(None, stateDim))
             actionsInput_ = tf.placeholder(tf.float32, shape = (None, actionDim))
-            layerNum = len(self.criticActivFunctionList)
+            layerNum = len(self.criticLayersWidths)
             if self.addActionToLastLayer:
                 net = statesInput_
                 if self.batchNorm:
@@ -127,28 +115,35 @@ class GetCriticNetwork:
                     lastLayerActiv = tf.add(net, actorLastLayerActiv)
                     lastLayerActiv = tf.layers.batch_normalization(lastLayerActiv)
                     net = self.criticActivFunctionList[-1](lastLayerActiv)
-                    out = tf.layers.dense(net,1, kernel_initializer=self.criticWeightInit)
+                    out = tf.layers.dense(net,1, kernel_initializer=self.criticWeightInit, bias_initializer= self.criticBiasInit)
 
                 else:
                     for i in range(layerNum - 1):
                         layerWidth = self.criticLayersWidths[i]
                         activFunction = self.criticActivFunctionList[i]
-                        net = tf.layers.dense(net, layerWidth, activation=activFunction, kernel_initializer=self.criticWeightInit)
-                    lastLayerWidth = self.criticLayersWidths[-1]
+                        net = tf.layers.dense(net, layerWidth, activation=activFunction, kernel_initializer=self.criticWeightInit, bias_initializer= self.criticBiasInit)
+
+                    secondLastFCUnit = self.criticLayersWidths[-2] if len(self.criticLayersWidths) >= 2 else stateDim
+                    lastFCUnit = self.criticLayersWidths[-1]
+                    trainStateFCToLastFCWeights_ = tf.get_variable(name='trainStateFCToLastFCWeights_', shape=[secondLastFCUnit, lastFCUnit], initializer= self.criticWeightInit)
+                    trainActionFCToLastFCWeights_ = tf.get_variable(name='trainActionFCToLastFCWeights_', shape=[actionDim, lastFCUnit], initializer= self.criticWeightInit)
+                    trainLastFCBias_ = tf.get_variable(name='trainActionLastFCBias_', shape=[lastFCUnit], initializer=self.criticBiasInit)
+
+                    trainLastFCZ_ = tf.matmul(net, trainStateFCToLastFCWeights_) + \
+                                    tf.matmul(actionsInput_, trainActionFCToLastFCWeights_) + trainLastFCBias_
+
                     lastLayerActivFunc = self.criticActivFunctionList[-1]
-                    net = tf.layers.dense(net, lastLayerWidth)
-                    actorLastLayerActiv = tf.layers.dense(actionsInput_, lastLayerWidth)
-                    lastLayerActiv = tf.add(net, actorLastLayerActiv)
-                    lastLayerActiv = tf.layers.dense(lastLayerActiv, lastLayerWidth, activation=lastLayerActivFunc, kernel_initializer=self.criticWeightInit)
-                    net = self.criticActivFunctionList[-1](lastLayerActiv)
-                    out = tf.layers.dense(net,1, kernel_initializer=self.criticWeightInit)
+                    trainLastFCActivation_ = lastLayerActivFunc(trainLastFCZ_)
+
+                    out = tf.layers.dense(trainLastFCActivation_, units=1, kernel_initializer=self.criticWeightInit, bias_initializer= self.criticBiasInit, activation=None)
+
             else:
                 net = tf.concat([statesInput_, actionsInput_], axis=1)
                 for i in range(layerNum):
                     layerWidth = self.criticLayersWidths[i]
                     activFunction = self.criticActivFunctionList[i]
-                    net = tf.layers.dense(net, layerWidth, activation=activFunction, kernel_initializer=self.criticWeightInit)
-                out = tf.layers.dense(net, 1, kernel_initializer=self.criticWeightInit)
+                    net = tf.layers.dense(net, layerWidth, activation=activFunction, kernel_initializer=self.criticWeightInit, bias_initializer= self.criticBiasInit)
+                out = tf.layers.dense(net, 1, kernel_initializer=self.criticWeightInit, bias_initializer= self.criticBiasInit)
 
         return statesInput_, actionsInput_, out
 
@@ -233,7 +228,7 @@ class TrainDDPGModelsOneStep:
 
     def __call__(self, miniBatch):
         stateBatch, actionBatch, nextStateBatch, rewardBatch = self.reshapeBatchToGetSASR(miniBatch)
-
+        # stateBatch, actionBatch, rewardBatch, nextStateBatch = list(zip(*miniBatch))
         targetActionBatch = self.actor.actByTarget(nextStateBatch)
         targetQValue = self.critic.getTargetNetValue(nextStateBatch, targetActionBatch)
         self.critic.train(stateBatch, actionBatch, rewardBatch, targetQValue)
@@ -298,15 +293,19 @@ class OrnsteinUhlenbeckActionNoise(object):
         return 'OrnsteinUhlenbeckActionNoise(mu={}, sigma={})'.format(self.mu, self.sigma)
 
 class ActOneStep:
-    def __init__(self, actor, noise):
+    def __init__(self, actor, actionLow, actionHigh):
         self.actor = actor
-        self.noise = noise
+        self.actionLow = actionLow
+        self.actionHigh = actionHigh
 
-    def __call__(self, state, episodeID):
-        action = self.actor.actByTrain(state)
-        noise = self.noise.getNoise()
-        action += noise
-        return action
+    def __call__(self, state, episodeID, noise):
+        state = np.asarray(state).reshape(1, -1)
+        actionPerfect = self.actor.actByTrain(state)
+        noiseVal = noise.getNoise()
+        noisyAction = np.clip(noiseVal + actionPerfect, self.actionLow, self.actionHigh)
+
+        return noisyAction
+
 
 class ActOneStepForInvPendulum:
     def __init__(self, actor, maxEpisode, action_space):
@@ -338,12 +337,14 @@ class TrainDDPGWithGym:
         episodeRewardList = []
         for episodeID in range(self.maxEpisode):
             state = self.env.reset()
+            state = state.reshape(1, -1)
             epsReward = 0
             self.noise.reset()
 
             for timeStep in range(self.maxTimeStep):
                 action = self.actOneStep(state, episodeID, self.noise)
                 nextState, reward, terminal, info = self.env.step(action)
+                nextState = nextState.reshape(1, -1)
                 self.memoryBuffer.add(state, action, reward, nextState)
                 epsReward += reward
 
@@ -357,10 +358,34 @@ class TrainDDPGWithGym:
             self.saveModel()
             episodeRewardList.append(epsReward)
             last100EpsMeanReward = np.mean(episodeRewardList[-1000: ])
-            if episodeID % 5000 == 0:
+            if episodeID % 1 == 0:
                 print('episode: {}, last 1000eps mean reward: {}, last eps reward: {} with {} steps'.format(episodeID, last100EpsMeanReward, epsReward, timeStep))
 
         return episodeRewardList
+
+
+class ExponentialDecayGaussNoise:
+    def __init__(self, noiseInitVariance, varianceDiscount, noiseDecayStartStep, minVar = 0):
+        self.noiseInitVariance = noiseInitVariance
+        self.varianceDiscount = varianceDiscount
+        self.noiseDecayStartStep = noiseDecayStartStep
+        self.minVar = minVar
+        self.runStep = 0
+
+    def getNoise(self):
+        var = self.noiseInitVariance
+        if self.runStep > self.noiseDecayStartStep:
+            var = self.noiseInitVariance* self.varianceDiscount ** (self.runStep - self.noiseDecayStartStep)
+            var = max(var, self.minVar)
+
+        noise = np.random.normal(0, var)
+        if self.runStep % 1000 == 0:
+            print('noise Variance', var)
+        self.runStep += 1
+        return noise
+
+    def reset(self):
+        return
 
 class SaveModel:
     def __init__(self, modelSaveRate, saveVariables, modelSavePath, sess, saveAllmodels = False):
@@ -378,66 +403,4 @@ class SaveModel:
             with self.sess.as_default():
                 self.saveVariables(self.sess, modelSavePathToUse)
 
-def main():
-    env_name = 'InvertedDoublePendulum-v2'
-    env = gym.make(env_name)
 
-    hyperparamDict = dict()
-    hyperparamDict['actorWeightInit'] = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
-    hyperparamDict['actorActivFunction'] = [tf.nn.relu, tf.nn.relu, tf.nn.tanh]
-    hyperparamDict['actorLayersWidths'] = [400, 300]
-    hyperparamDict['actorLR'] = 1e-4
-
-    hyperparamDict['criticWeightInit'] = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
-    hyperparamDict['criticActivFunction']= [tf.nn.relu, tf.nn.relu]
-    hyperparamDict['criticLayersWidths'] = [400, 300]
-    hyperparamDict['criticLR'] = 1e-3
-
-    hyperparamDict['tau'] = 0.001
-    hyperparamDict['gamma'] = 0.99
-    hyperparamDict['gradNormClipValue'] = 5
-
-    maxEpisode = 5000* 1000
-    maxTimeStep = 100
-    bufferSize = 1e5
-    minibatchSize = 128
-
-    session = tf.Session()
-
-    stateDim = env.observation_space.shape[0] #11
-    actionDim = env.action_space.shape[0] #1
-    getActorNetwork = GetActorNetwork(hyperparamDict, batchNorm= True)
-    actor = Actor(getActorNetwork, stateDim, actionDim, session, hyperparamDict, actionRange= 3)
-
-    getCriticNetwork = GetCriticNetwork(hyperparamDict, addActionToLastLayer = True, batchNorm = True)
-    critic = Critic(getCriticNetwork, stateDim, actionDim, session, hyperparamDict)
-
-    saver = tf.train.Saver(max_to_keep=None)
-    tf.add_to_collection("saver", saver)
-    session.run(tf.global_variables_initializer())
-
-    fileName = 'ddpg_mujoco_invDblPendulum'
-    modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
-    modelSaveRate = 500
-    saveModel = SaveModel(modelSaveRate, saveVariables, modelPath, session)
-
-    trainDDPGOneStep = TrainDDPGModelsOneStep(reshapeBatchToGetSASR, actor, critic)
-
-    learningStartBufferSize = minibatchSize
-    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainDDPGOneStep, learnInterval = 1)
-
-    buffer = MemoryBuffer(bufferSize, minibatchSize)
-
-    noiseMu = np.zeros((actionDim, 1))
-    noiseSigma = 0.05
-    noise = OrnsteinUhlenbeckActionNoise(noiseMu, noiseSigma)
-
-    actOneStep = ActOneStepForInvPendulum(actor, maxEpisode, env.action_space)
-    ddpg = TrainDDPGWithGym(maxEpisode, maxTimeStep, buffer, noise, actOneStep, learnFromBuffer, env, saveModel)
-
-    episodeRewardList = ddpg()
-    plt.plot(range(len(episodeRewardList)), episodeRewardList)
-
-
-if __name__ == '__main__':
-    main()
