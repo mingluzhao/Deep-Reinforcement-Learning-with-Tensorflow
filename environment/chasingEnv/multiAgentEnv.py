@@ -259,7 +259,7 @@ class IntegrateState:
 
             entityMaxSpeed = self.entityMaxSpeedList[entityID]
             if entityMaxSpeed is not None:
-                speed = np.sqrt(np.square(entityVel[0]) + np.square(entityVel[1]))
+                speed = np.sqrt(np.square(entityNextVel[0]) + np.square(entityNextVel[1])) #
                 if speed > entityMaxSpeed:
                     entityNextVel = entityNextVel / speed * entityMaxSpeed
 
