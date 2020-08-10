@@ -7,7 +7,7 @@ sys.path.append(os.path.join(dirName, '..'))
 
 import unittest
 from ddt import ddt, data, unpack
-from src.ddpg import *
+from src.functional.ddpg import *
 
 
 @ddt

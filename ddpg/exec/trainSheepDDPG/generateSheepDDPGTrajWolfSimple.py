@@ -7,12 +7,12 @@ sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
 
 
-from src.ddpg import actByPolicyTrain, BuildActorModel
+from src.functional.ddpg import actByPolicyTrain, BuildActorModel
 from environment.chasingEnv.reward import RewardFunctionCompete, GetBoundaryPunishment, RewardSheepWithBoundaryHeuristics
 from environment.chasingEnv.chasingPolicy import HeatSeekingContinuousDeterministicPolicy
 from src.policy import ActDDPGOneStep
-from environment.chasingEnv.envNoPhysics import Reset, TransitForNoPhysics, getIntendedNextState, StayWithinBoundary, \
-    TransitWithSingleWolf, GetAgentPosFromState, IsTerminal
+from environment.chasingEnv.envNoPhysics import TransitForNoPhysics, getIntendedNextState, StayWithinBoundary, \
+    GetAgentPosFromState, IsTerminal
 from functionTools.trajectory import SampleTrajectory
 from environment.chasingEnv.continuousChasingVisualization import initializeScreen, Observe, ScaleTrajectory,\
     AdjustDfFPStoTraj, DrawBackground, DrawState, ChaseTrialWithTraj

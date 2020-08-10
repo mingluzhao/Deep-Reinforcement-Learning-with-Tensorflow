@@ -8,7 +8,7 @@ sys.path.append(os.path.join(dirName, '..'))
 from collections import deque
 import matplotlib.pyplot as plt
 
-from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+from src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
 from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
@@ -18,7 +18,7 @@ from functionTools.loadSaveModel import GetSavePath, saveVariables
 from environment.noise.noise import GetExponentialDecayGaussNoise
 from environment.chasingEnv.reward import RewardSheepWithBoundaryHeuristics, GetBoundaryPunishment, RewardFunctionCompete
 from environment.chasingEnv.chasingPolicy import HeatSeekingContinuousDeterministicPolicy
-from environment.chasingEnv.envNoPhysics import Reset, TransitForNoPhysics, getIntendedNextState, StayWithinBoundary, \
+from environment.chasingEnv.envNoPhysics import TransitForNoPhysics, getIntendedNextState, StayWithinBoundary, \
     TransitWithSingleWolf, GetAgentPosFromState, IsTerminal
 import numpy as np
 

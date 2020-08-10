@@ -7,9 +7,9 @@ sys.path.append(os.path.join(dirName, '..'))
 
 import numpy as np
 import unittest
-from ddt import ddt, data, unpack
+from ddt import ddt
 
-from src.ddpg import BuildActorModel, BuildCriticModel,TrainActorFromGradients, \
+from src.functional.ddpg import BuildActorModel, BuildCriticModel,TrainActorFromGradients, \
     TrainCriticBySASRQ, actByPolicyTrain, evaluateCriticTrain, getActionGradients, TrainActorOneStep
 
 from RLframework.RLrun import UpdateParameters

@@ -8,7 +8,7 @@ dirName = os.path.dirname(__file__)
 sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
 
-from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+from src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
 from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\

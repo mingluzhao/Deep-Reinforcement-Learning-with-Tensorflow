@@ -9,11 +9,9 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import gym
 from functionTools.loadSaveModel import saveVariables
-import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from ddpg.src.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
-    ExponentialDecayGaussNoise, SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
+from src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, SaveModel
 from functionTools.loadSaveModel import restoreVariables
 # def main():
 #     env_name = 'InvertedDoublePendulum-v2'

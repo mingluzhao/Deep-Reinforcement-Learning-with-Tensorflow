@@ -8,7 +8,7 @@ sys.path.append(os.path.join(dirName, '..'))
 from collections import deque
 import matplotlib.pyplot as plt
 
-from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+from src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
 from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\

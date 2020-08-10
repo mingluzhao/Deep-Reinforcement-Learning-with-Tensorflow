@@ -5,11 +5,20 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import tensorflow.contrib.layers as layers
 import maddpg.maddpgAlgor.common.tf_util as U
 
+'''
+tested, but haven't used on tasks yet
+functional with AC combined
+'''
+
 class BuildDDPGModels:
     def __init__(self, numStateSpace, actionDim, weightInitializerList = None, actionRange = 1):
         self.numStateSpace = numStateSpace
         self.actionDim = actionDim
         self.actionRange = actionRange
+        # self.actorWeightInit = layers.xavier_initializer()
+        # self.actorBiasInit = tf.zeros_initializer()
+        # self.criticWeightInit = layers.xavier_initializer()
+        # self.criticBiasInit = tf.zeros_initializer()
         self.actorWeightInit, self.actorBiasInit, self.criticWeightInit, self.criticBiasInit = weightInitializerList if weightInitializerList is not None \
             else [layers.xavier_initializer(), tf.zeros_initializer(), layers.xavier_initializer(), tf.zeros_initializer()]
 

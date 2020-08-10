@@ -5,6 +5,10 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import tensorflow.contrib.layers as layers
 import maddpg.maddpgAlgor.common.tf_util as U
 
+'''
+separated AC following training of MADDPG paper:
+    
+'''
 
 class ActOneStepMADDPGWithNoise:
     def __init__(self, actorModel, actByPolicyTrain):
@@ -12,25 +16,17 @@ class ActOneStepMADDPGWithNoise:
         self.actByPolicyTrain = actByPolicyTrain
 
     def __call__(self, agentObs, runTimeStep = None):
-        Action = self.actByPolicyTrain(self.actorModel, agentObs)
-        action = Action[0]
+        actionOutput = self.actByPolicyTrain(self.actorModel, agentObs)
+        action = actionOutput[0]
 
         return action
 
 
 def actByPolicyTrain(actorModel, stateBatch):
-    # stateBatch = np.array([[ 0., 0., -0.91739134,  0.96584283,  0.30922375, -0.95104116, 0. , 0.]])
-
     actorGraph = actorModel.graph
     states_ = actorGraph.get_collection_ref("states_")[0]
     noisyTrainAction_ = actorGraph.get_collection_ref("noisyTrainAction_")[0]
     noisyTrainAction = actorModel.run(noisyTrainAction_, feed_dict={states_: stateBatch})
-
-    # trainAction_ = actorGraph.get_collection_ref('trainAction_')[0]
-    # trainAction = actorModel.run(trainAction_, feed_dict={states_: stateBatch})
-    #
-    # sampleNoiseTrain_ = actorGraph.get_collection_ref('sampleNoiseTrain_')[0]
-    # sampleNoiseTrain = actorModel.run(sampleNoiseTrain_, feed_dict={states_: stateBatch})
 
     return noisyTrainAction
 
@@ -56,6 +52,7 @@ def evaluateCriticTrain(criticModel, stateBatch, actionsBatch):
     trainQ_ = criticGraph.get_collection_ref("trainQ_")[0]
     trainQ = criticModel.run(trainQ_, feed_dict={states_: stateBatch, action_: actionsBatch})
     return trainQ
+
 
 class BuildActorModel:
     def __init__(self, numStateSpace, actionDim, actionRange = 1):
@@ -86,8 +83,7 @@ class BuildActorModel:
                 for i in range(len(layersWidths)):
                     # activation_ = layers.fully_connected(activation_, num_outputs= layersWidths[i], activation_fn=tf.nn.relu,
                     #                                      scope="fc{}".format(i+1), weights_initializer=tf.initializers.glorot_uniform(seed=0))
-                    activation_ = layers.fully_connected(activation_, num_outputs= layersWidths[i], activation_fn=tf.nn.relu,
-                                                         scope="fc{}".format(i+1))
+                    activation_ = layers.fully_connected(activation_, num_outputs= layersWidths[i], activation_fn=tf.nn.relu, scope="fc{}".format(i+1))
 
                 trainActivationOutput_ = layers.fully_connected(activation_, num_outputs= self.actionDim, activation_fn= None,
                                                                 scope="fc{}".format(len(layersWidths)+1))
@@ -138,12 +134,6 @@ class BuildActorModel:
 
                 tf.summary.scalar("pg_loss", pg_loss)
                 tf.add_to_collection("actorLoss_", actorLoss_)
-
-                # optimizer = tf.train.AdamOptimizer(learningRate_, name='adamOptimizer')
-                # grad_norm_clipping = 0.5
-                # trainOpt_ = U.minimize_and_clip(optimizer, actorLoss_, trainParams_, grad_norm_clipping)
-
-
                 optimizer = tf.train.AdamOptimizer(learningRate_, name='adamOptimizer')
                 grad_norm_clipping = 0.5
 
@@ -163,9 +153,7 @@ class BuildActorModel:
                     tf.summary.histogram("allGradients", allGradTensor_)
                     tf.summary.scalar("allGradNorm", allGradNorm_)
 
-
                 trainOpt_ =  optimizer.apply_gradients(gradients)
-
                 tf.add_to_collection("trainOpt_", trainOpt_)
 
             with tf.name_scope("summary"+ agentStr):

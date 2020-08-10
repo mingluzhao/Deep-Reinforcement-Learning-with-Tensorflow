@@ -6,7 +6,7 @@ dirName = os.path.dirname(__file__)
 sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
 
-from src.ddpg import actByPolicyTrain, BuildActorModel
+from src.functional.ddpg import actByPolicyTrain, BuildActorModel
 from functionTools.trajectory import SampleTrajectory
 from functionTools.loadSaveModel import restoreVariables
 from environment.gymEnv.continousMountainCarEnv import IsTerminalMountCarContin, TransitGymMountCarContinuous, \

@@ -12,7 +12,7 @@ from functionTools.loadSaveModel import saveVariables
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from ddpg.src.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
+from src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
     ExponentialDecayGaussNoise, SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
 
 def main():
@@ -20,35 +20,44 @@ def main():
     env = gym.make(env_name)
 
     hyperparamDict = dict()
-    hyperparamDict['actorWeightInit'] = tf.random_uniform_initializer(minval=0, maxval=0.3)
-    hyperparamDict['actorBiasInit'] = tf.constant_initializer(0.1)
-    hyperparamDict['actorActivFunction'] = [tf.nn.relu, tf.nn.tanh]
-    hyperparamDict['actorLayersWidths'] = [30]
+    hyperparamDict['actorHiddenLayersWidths'] = [256]
+    hyperparamDict['actorActivFunction'] = [tf.nn.relu]* len(hyperparamDict['actorHiddenLayersWidths'])+ [tf.nn.tanh]
+    hyperparamDict['actorHiddenLayersWeightInit'] = [tf.random_uniform_initializer(minval=0, maxval=0.3) for units in hyperparamDict['actorHiddenLayersWidths']]
+    hyperparamDict['actorHiddenLayersBiasInit'] = [tf.constant_initializer(0.1) for units in hyperparamDict['actorHiddenLayersWidths']]
+    hyperparamDict['actorOutputWeightInit'] = tf.random_uniform_initializer(minval=0, maxval=0.3)
+    hyperparamDict['actorOutputBiasInit'] = tf.constant_initializer(0.1)
     hyperparamDict['actorLR'] = 0.001
 
-    hyperparamDict['criticWeightInit'] = tf.random_uniform_initializer(minval=0, maxval=0.1)
-    hyperparamDict['criticBiasInit'] = tf.constant_initializer(0.1)
-    hyperparamDict['criticActivFunction']= [tf.nn.relu]
-    hyperparamDict['criticLayersWidths'] = [30]
+    hyperparamDict['criticHiddenLayersWidths'] = [256]
+    hyperparamDict['criticActivFunction'] = [tf.nn.relu]* len(hyperparamDict['criticHiddenLayersWidths'])+ [None]
+    hyperparamDict['criticHiddenLayersWeightInit'] = [tf.random_uniform_initializer(minval=0, maxval=0.1) for units in hyperparamDict['criticHiddenLayersWidths']]
+    hyperparamDict['criticHiddenLayersBiasInit'] = [tf.constant_initializer(0.1) for units in hyperparamDict['criticHiddenLayersWidths']]
+    hyperparamDict['criticOutputWeightInit'] = tf.random_uniform_initializer(minval=0, maxval=0.1)
+    hyperparamDict['criticOutputBiasInit'] = tf.constant_initializer(0.1)
     hyperparamDict['criticLR'] = 0.001
 
     hyperparamDict['tau'] = 0.01
     hyperparamDict['gamma'] = 0.9
     hyperparamDict['gradNormClipValue'] = 5
 
-    maxEpisode = 200
-    maxTimeStep = 200
-    bufferSize = 1e4
-    minibatchSize = 128
+    hyperparamDict['maxEpisode'] = 200
+    hyperparamDict['maxTimeStep'] = 200
+    hyperparamDict['bufferSize'] = 1e4
+    hyperparamDict['minibatchSize'] = 128
+
+    hyperparamDict['noiseInitVariance'] = 3
+    hyperparamDict['varianceDiscount'] = .9995
+    hyperparamDict['noiseDecayStartStep'] = hyperparamDict['bufferSize']
+    hyperparamDict['minVar'] = .1
+    hyperparamDict['normalizeEnv'] = False
 
     actionHigh = env.action_space.high
     actionLow = env.action_space.low
     actionBound = (actionHigh - actionLow)/2
 
     session = tf.Session()
-
-    stateDim = env.observation_space.shape[0] #11
-    actionDim = env.action_space.shape[0] #1
+    stateDim = env.observation_space.shape[0]
+    actionDim = env.action_space.shape[0]
     getActorNetwork = GetActorNetwork(hyperparamDict, batchNorm= False)
     actor = Actor(getActorNetwork, stateDim, actionDim, session, hyperparamDict, agentID= None, actionRange=actionBound)
 
@@ -59,30 +68,23 @@ def main():
     tf.add_to_collection("saver", saver)
     session.run(tf.global_variables_initializer())
 
-    fileName = 'ddpg_mujoco_Pendulum'
-    modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
+    fileName = 'ddpg_mujoco_Pendulum_normalized_confirm'
+    modelSavePath = os.path.join(dirName, '..', 'trainedModels', fileName)
     modelSaveRate = 500
-    saveModel = SaveModel(modelSaveRate, saveVariables, modelPath, session)
+    saveModel = SaveModel(modelSaveRate, saveVariables, modelSavePath, session)
 
     trainDDPGOneStep = TrainDDPGModelsOneStep(reshapeBatchToGetSASR, actor, critic)
+    learningStartBufferSize = hyperparamDict['minibatchSize']
+    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainDDPGOneStep, learnInterval=1)
+    buffer = MemoryBuffer(hyperparamDict['bufferSize'], hyperparamDict['minibatchSize'])
 
-    learningStartBufferSize = minibatchSize
-    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainDDPGOneStep, learnInterval = 1)
-
-    buffer = MemoryBuffer(bufferSize, minibatchSize)
-
-    noiseInitVariance = 3
-    varianceDiscount = .9995
-    noiseDecayStartStep = bufferSize
-    noise = ExponentialDecayGaussNoise(noiseInitVariance, varianceDiscount, noiseDecayStartStep, minVar=0)
-
+    noise = ExponentialDecayGaussNoise(hyperparamDict['noiseInitVariance'], hyperparamDict['varianceDiscount'], hyperparamDict['noiseDecayStartStep'], hyperparamDict['minVar'])
     actOneStep = ActOneStep(actor, actionLow, actionHigh)
-    ddpg = TrainDDPGWithGym(maxEpisode, maxTimeStep, buffer, noise, actOneStep, learnFromBuffer, env, saveModel)
+    ddpg = TrainDDPGWithGym(hyperparamDict['maxEpisode'], hyperparamDict['maxTimeStep'], buffer, noise, actOneStep, learnFromBuffer, env, saveModel)
 
     episodeRewardList = ddpg()
     plt.plot(range(len(episodeRewardList)), episodeRewardList)
     plt.show()
-
 
 if __name__ == '__main__':
     main()

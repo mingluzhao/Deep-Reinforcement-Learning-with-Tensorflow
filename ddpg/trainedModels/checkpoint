@@ -1,2 +1,2 @@
-model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedModels/ddpg_mujoco_DblInvPendulum"
-all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedModels/ddpg_mujoco_DblInvPendulum"
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedModels/ddpg_mujoco_MountCar_normalized_paperParams"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedModels/ddpg_mujoco_MountCar_normalized_paperParams"

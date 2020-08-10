@@ -9,7 +9,7 @@ sys.path.append(os.path.join(dirName, '..'))
 from collections import deque
 import matplotlib.pyplot as plt
 
-from src.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+from src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
 from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
@@ -21,7 +21,6 @@ from environment.chasingEnv.reward import GetActionCost, RewardFunctionCompete, 
 from environment.chasingEnv.chasingPolicy import HeatSeekingContinuousDeterministicPolicy
 from environment.chasingEnv.envNoPhysics import Reset, TransitForNoPhysics, getIntendedNextState, StayWithinBoundary, \
     TransitWithSingleWolf, GetAgentPosFromState, IsTerminal, IsBoundaryTerminal
-import numpy as np
 
 learningRateCritic = 0.001
 gamma = 0.95

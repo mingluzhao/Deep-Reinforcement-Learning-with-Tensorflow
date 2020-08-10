@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import sys
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 dirName = os.path.dirname(__file__)
@@ -7,12 +6,11 @@ sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
 
 
-from src.ddpg import actByPolicyTrain,BuildActorModel
+from src.functional.ddpg import actByPolicyTrain,BuildActorModel
 from src.policy import ActDDPGOneStep
 from environment.chasingEnv.reward import GetActionCost, RewardFunctionCompete, RewardWithActionCost
-from environment.chasingEnv.chasingPolicy import HeatSeekingContinuousDeterministicPolicy
 from environment.chasingEnv.envNoPhysics import Reset, TransitForNoPhysics, getIntendedNextState, StayWithinBoundary, \
-    TransitWithSingleWolf, GetAgentPosFromState, IsTerminal
+    GetAgentPosFromState, IsTerminal
 from functionTools.trajectory import SampleTrajectory
 from environment.chasingEnv.continuousChasingVisualization import initializeScreen, Observe, ScaleTrajectory,\
     AdjustDfFPStoTraj, DrawBackground, DrawState, ChaseTrialWithTraj

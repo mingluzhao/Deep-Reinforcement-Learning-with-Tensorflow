@@ -1,14 +1,12 @@
 import tensorflow as tf
 import numpy as np
 import os
-
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import tensorflow.contrib.layers as layers
 import maddpg.maddpgAlgor.common.tf_util as U
 
-
 class BuildDDPGModels:
-    def __init__(self, numStateSpace, actionDim, actionRange=1):
+    def __init__(self, numStateSpace, actionDim, actionRange = 1):
         self.numStateSpace = numStateSpace
         self.actionDim = actionDim
         self.actionRange = actionRange
@@ -165,8 +163,7 @@ class BuildDDPGModels:
 
                 criticOptimizer = tf.train.AdamOptimizer(learningRate_, name='criticOptimizer')
                 grad_norm_clipping = 0.5
-                crticTrainOpt_ = U.minimize_and_clip(criticOptimizer, criticLoss_, criticTrainParams_,
-                                                     grad_norm_clipping)
+                crticTrainOpt_ = U.minimize_and_clip(criticOptimizer, criticLoss_, criticTrainParams_, grad_norm_clipping)
 
                 tf.add_to_collection("crticTrainOpt_", crticTrainOpt_)
 
@@ -484,21 +481,6 @@ class TrainActor:
 
         return model
 
-
-class TrainDDPGModels:
-    def __init__(self, updateParameters, trainActor, trainCritic, model):
-        self.updateParameters = updateParameters
-        self.trainActor = trainActor
-        self.trainCritic = trainCritic
-        self.model = model
-
-    def __call__(self, miniBatch):
-        criticLoss, self.model = self.trainCritic(self.model, miniBatch)
-        self.model = self.trainActor(self.model, miniBatch)
-        self.model = self.updateParameters(self.model)
-
-    def getTrainedModels(self):
-        return self.model
 
 
 class TrainDDPGModelsWithBuffer:
