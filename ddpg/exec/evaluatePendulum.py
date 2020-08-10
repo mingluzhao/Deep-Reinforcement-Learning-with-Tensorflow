@@ -75,7 +75,7 @@ class EvaluateNoiseAndMemorySize:
         ddpg = RunAlgorithm(runEpisode, self.fixedParameters['maxEpisode'])
 
         replayBuffer = deque(maxlen=int(memorySize))
-        meanRewardList, trajectory = ddpg(replayBuffer)
+        meanRewardList = ddpg(replayBuffer)
 
         trainedActorModel, trainedCriticModel = trainModels.getTrainedModels()
 

@@ -12,7 +12,7 @@ import json
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import BuildMADDPGModels, TrainCritic, TrainActor, TrainCriticBySASR, \
     TrainActorFromSA, TrainMADDPGModelsWithBuffer, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
-from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
+from RLframework.RLrun import UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
@@ -31,9 +31,10 @@ minibatchSize = 1024#
 
 # 7.13 add action cost
 # 7.29 constant sheep bonus = 30
+# 8.9 add degree of individuality
 
 def main():
-    debug = 0
+    debug = 1
     if debug:
         numWolves = 4
         numSheeps = 1
@@ -53,7 +54,7 @@ def main():
 
         maxTimeStep = int(condition['maxTimeStep'])
         sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
-        individualRewardWolf = int(condition['individualRewardWolf'])
+        individualRewardWolf = float(condition['individualRewardWolf'])
         costActionRatio = float(condition['costActionRatio'])
 
         saveAllmodels = False
@@ -148,7 +149,7 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 1000
+    modelSaveRate = 10000
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
 
@@ -158,7 +159,7 @@ def main():
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
     replayBuffer = getBuffer(bufferSize)
-    meanRewardList, trajectory = maddpg(replayBuffer)
+    meanRewardList = maddpg(replayBuffer)
 
 
 if __name__ == '__main__':

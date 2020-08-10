@@ -11,7 +11,7 @@ sys.path.append(os.path.join(dirName, '..'))
 from src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
-from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
+from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
     LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm, SaveModel
 from src.policy import ActDDPGOneStep
 from functionTools.loadSaveModel import saveVariables, saveToPickle
@@ -88,20 +88,10 @@ def main():
     modelSaveRate = 50
     saveModel = SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath)
 
-    ddpg = RunAlgorithm(runEpisode, maxEpisode, [saveModel])
+    ddpg = RunAlgorithm(runEpisode, maxEpisode, saveModel)
 
     replayBuffer = deque(maxlen=int(bufferSize))
-    meanRewardList, trajectory = ddpg(replayBuffer)
-
-    dirName = os.path.dirname(__file__)
-    trajectoryPath = os.path.join(dirName, '..', 'trajectory', 'pendulumTrajectory1.pickle')
-    saveToPickle(trajectory, trajectoryPath)
-
-# plots& plot
-    showDemo = True
-    if showDemo:
-        visualize = VisualizeGymPendulum()
-        visualize(trajectory)
+    meanRewardList = ddpg(replayBuffer)
 
     plotResult = True
     if plotResult:

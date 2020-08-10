@@ -1,2 +1,2 @@
-model_checkpoint_path: "Eps=300_High=0.4_batch=128_criticModel=0_env=MountainCarContinuous-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=1_resetLow=-1_timeStep=2000_varDiscout=0.99995.ckpt"
-all_model_checkpoint_paths: "Eps=300_High=0.4_batch=128_criticModel=0_env=MountainCarContinuous-v0_gam=0.9_lrActor=0.001_lrCritic=0.001_noiseVar=1_resetLow=-1_timeStep=2000_varDiscout=0.99995.ckpt"
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedDDPGModels/pendulum"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/ddpg/exec/../trainedDDPGModels/pendulum"

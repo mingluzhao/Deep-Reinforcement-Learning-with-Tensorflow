@@ -160,7 +160,7 @@ def main():
     ddpg = RunAlgorithm(runEpisode, maxEpisode)
     # replayBuffer = deque(maxlen=int(bufferSize))
     replayBuffer = getBuffer(bufferSize)
-    meanRewardList, trajectory = ddpg(replayBuffer)
+    meanRewardList = ddpg(replayBuffer)
 
     plotResult = True
     if plotResult:

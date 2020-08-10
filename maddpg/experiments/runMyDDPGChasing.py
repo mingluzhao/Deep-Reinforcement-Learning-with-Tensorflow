@@ -12,7 +12,7 @@ import json
 
 from ddpg.src.ddpg_ACcombined_centralControlFollowMAddpg import BuildDDPGModels, TrainActorFromState, TrainCriticBySASR, TrainActor, \
     TrainCritic, reshapeBatchToGetSASR, TrainDDPGModelsWithBuffer, ActOneStepWithSoftMaxNoise, actByPolicyTrainNoisy
-from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
+from RLframework.RLrun import UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
@@ -143,7 +143,7 @@ def main():
 
     ddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
     replayBuffer = getBuffer(bufferSize)
-    meanRewardList, trajectory = ddpg(replayBuffer)
+    meanRewardList = ddpg(replayBuffer)
 
 if __name__ == '__main__':
     main()

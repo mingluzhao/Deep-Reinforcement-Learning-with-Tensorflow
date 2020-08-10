@@ -89,7 +89,7 @@ def main():
 
     ddpg = RunAlgorithm(runEpisode, maxEpisode)
     replayBuffer = deque(maxlen=int(bufferSize))
-    meanRewardList, trajectory = ddpg(replayBuffer)
+    meanRewardList = ddpg(replayBuffer)
 
     trainedActorModel, trainedCriticModel = trainModels.getTrainedModels()
 
@@ -112,16 +112,6 @@ def main():
         saveVariables(trainedActorModel, savePathActor)
     with criticModel.as_default():
         saveVariables(trainedCriticModel, savePathCritic)
-
-    dirName = os.path.dirname(__file__)
-    trajectoryPath = os.path.join(dirName, '..', 'trajectory', 'mountCarTrajectoryOriginalReset1.pickle')
-    saveToPickle(trajectory, trajectoryPath)
-
-# plots& plot
-    showDemo = False
-    if showDemo:
-        visualize = VisualizeMountCarContin()
-        visualize(trajectory)
 
     plotResult = True
     if plotResult:

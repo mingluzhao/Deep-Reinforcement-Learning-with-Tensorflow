@@ -16,39 +16,50 @@ import numpy as np
 from src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
     ExponentialDecayGaussNoise, SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
 from environment.gymEnv.normalize import env_norm
+from functionTools.loadSaveModel import saveToPickle, loadFromPickle
 
-def myDDPG(hyperparamDict, env, modelSavePath):
-    actionHigh = env.action_space.high
-    actionLow = env.action_space.low
-    actionBound = (actionHigh - actionLow) / 2
+class LucyDDPG:
+    def __init__(self, hyperparamDict):
+        self.hyperparamDict = hyperparamDict
 
-    session = tf.Session()
-    stateDim = env.observation_space.shape[0]
-    actionDim = env.action_space.shape[0]
-    getActorNetwork = GetActorNetwork(hyperparamDict, batchNorm=True)
-    actor = Actor(getActorNetwork, stateDim, actionDim, session, hyperparamDict, agentID=None, actionRange=actionBound)
+    def __call__(self, env):
+        actionHigh = env.action_space.high
+        actionLow = env.action_space.low
+        actionBound = (actionHigh - actionLow) / 2
 
-    getCriticNetwork = GetCriticNetwork(hyperparamDict, addActionToLastLayer=True, batchNorm=True)
-    critic = Critic(getCriticNetwork, stateDim, actionDim, session, hyperparamDict)
+        session = tf.Session()
+        stateDim = env.observation_space.shape[0]
+        actionDim = env.action_space.shape[0]
+        getActorNetwork = GetActorNetwork(self.hyperparamDict, batchNorm=True)
+        actor = Actor(getActorNetwork, stateDim, actionDim, session, self.hyperparamDict, agentID=None,
+                      actionRange=actionBound)
 
-    saver = tf.train.Saver(max_to_keep=None)
-    tf.add_to_collection("saver", saver)
-    session.run(tf.global_variables_initializer())
+        getCriticNetwork = GetCriticNetwork(self.hyperparamDict, addActionToLastLayer=True, batchNorm=True)
+        critic = Critic(getCriticNetwork, stateDim, actionDim, session, self.hyperparamDict)
 
-    modelSaveRate = 100
-    saveModel = SaveModel(modelSaveRate, saveVariables, modelSavePath, session)
+        saver = tf.train.Saver(max_to_keep=None)
+        tf.add_to_collection("saver", saver)
+        session.run(tf.global_variables_initializer())
 
-    trainDDPGOneStep = TrainDDPGModelsOneStep(reshapeBatchToGetSASR, actor, critic)
-    learningStartBufferSize = hyperparamDict['minibatchSize']
-    learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainDDPGOneStep, learnInterval=1)
-    buffer = MemoryBuffer(hyperparamDict['bufferSize'], hyperparamDict['minibatchSize'])
+        modelSaveRate = 100
+        saveModel = SaveModel(modelSaveRate, saveVariables, self.hyperparamDict['modelSavePathLucy'], session)
 
-    noise = ExponentialDecayGaussNoise(hyperparamDict['noiseInitVariance'], hyperparamDict['varianceDiscount'], hyperparamDict['noiseDecayStartStep'], hyperparamDict['minVar'])
-    actOneStep = ActOneStep(actor, actionLow, actionHigh)
+        trainDDPGOneStep = TrainDDPGModelsOneStep(reshapeBatchToGetSASR, actor, critic)
+        learningStartBufferSize = self.hyperparamDict['minibatchSize']
+        learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainDDPGOneStep, learnInterval=1)
+        buffer = MemoryBuffer(self.hyperparamDict['bufferSize'], self.hyperparamDict['minibatchSize'])
 
-    env = env_norm(env) if hyperparamDict['normalizeEnv'] else env
-    ddpg = TrainDDPGWithGym(hyperparamDict['maxEpisode'], hyperparamDict['maxTimeStep'], buffer, noise, actOneStep, learnFromBuffer, env, saveModel)
-    return ddpg
+        noise = ExponentialDecayGaussNoise(self.hyperparamDict['noiseInitVariance'], self.hyperparamDict['varianceDiscount'],
+                                           self.hyperparamDict['noiseDecayStartStep'], self.hyperparamDict['minVar'])
+        actOneStep = ActOneStep(actor, actionLow, actionHigh)
+
+        env = env_norm(env) if self.hyperparamDict['normalizeEnv'] else env
+        ddpg = TrainDDPGWithGym(self.hyperparamDict['maxEpisode'], self.hyperparamDict['maxTimeStep'], buffer, noise,
+                                actOneStep, learnFromBuffer, env, saveModel)
+        meanEpsRewardList = ddpg()
+        saveToPickle(meanEpsRewardList, self.hyperparamDict['rewardSavePathLucy'])
+
+        return
 
 
 def main():
@@ -87,13 +98,24 @@ def main():
     hyperparamDict['minVar'] = .1
     hyperparamDict['normalizeEnv'] = False
 
-    fileName = 'ddpg_mujoco_MountCar_normalized_paperParams'
-    modelSavePath = os.path.join(dirName, '..', 'trainedModels', fileName)
+    fileName = 'mountainCarContinuous_'
+    modelDir = os.path.join(dirName, '..', 'trainedModels', 'models')
+    if not os.path.exists(modelDir):
+        os.makedirs(modelDir)
+    hyperparamDict['modelSavePathLucy'] = os.path.join(modelDir, fileName + 'Lucy')
+    hyperparamDict['modelSavePathPhil'] = os.path.join(modelDir, fileName + 'Phil')
+    hyperparamDict['modelSavePathMartin'] = os.path.join(modelDir, fileName + 'Martin')
 
-    ddpg = myDDPG(hyperparamDict, env, modelSavePath)
-    episodeRewardList = ddpg()
-    plt.plot(range(len(episodeRewardList)), episodeRewardList)
-    plt.show()
+    rewardDir = os.path.join(dirName, '..', 'trainedModels', 'rewards')
+    if not os.path.exists(rewardDir):
+        os.makedirs(rewardDir)
+    hyperparamDict['rewardSavePathLucy'] = os.path.join(rewardDir, fileName + 'Lucy')
+    hyperparamDict['rewardSavePathPhil'] = os.path.join(rewardDir, fileName + 'Phil')
+    hyperparamDict['rewardSavePathMartin'] = os.path.join(rewardDir, fileName + 'Martin')
+
+    lucyDDPG = LucyDDPG(hyperparamDict)
+    lucyDDPG(env)
+
 
 
 if __name__ == '__main__':

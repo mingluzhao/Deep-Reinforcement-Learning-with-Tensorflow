@@ -12,7 +12,7 @@ import json
 
 from maddpg.maddpgAlgor.trainer.myMADDPG_centralControl import BuildMADDPGModels, BuildMADDPGModelsForCentralControl, TrainCritic, TrainActor, TrainCriticBySASR, \
     TrainActorFromSA, TrainMADDPGModelsWithBuffer, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
-from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
+from RLframework.RLrun import UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
@@ -171,7 +171,7 @@ def main():
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numModels)
     replayBuffer = getBuffer(bufferSize)
-    meanRewardList, trajectory = maddpg(replayBuffer)
+    meanRewardList = maddpg(replayBuffer)
 
 
 

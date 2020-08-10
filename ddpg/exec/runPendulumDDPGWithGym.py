@@ -8,12 +8,13 @@ dirName = os.path.dirname(__file__)
 sys.path.append(os.path.join(dirName, '..', '..'))
 sys.path.append(os.path.join(dirName, '..'))
 
-from src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
+from ddpg.src.functional.ddpg import actByPolicyTrain, actByPolicyTarget, evaluateCriticTarget, getActionGradients, \
     BuildActorModel, BuildCriticModel, TrainCriticBySASRQ, TrainCritic, TrainActorFromGradients, TrainActorOneStep, \
     TrainActor, TrainDDPGModels
 from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStepUsingGym, SampleFromMemory,\
-    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm
-from src.policy import ActDDPGOneStep
+    LearnFromBuffer, RunTimeStep, RunEpisode, RunAlgorithm, SaveModel
+from functionTools.loadSaveModel import saveVariables
+from ddpg.src.policy import ActDDPGOneStep
 
 from environment.noise.noise import GetExponentialDecayGaussNoise
 from environment.gymEnv.pendulumEnv import isTerminalGymPendulum
@@ -80,15 +81,18 @@ def main():
     reset = lambda: env.reset()
     runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep, isTerminalGymPendulum)
 
-    ddpg = RunAlgorithm(runEpisode, maxEpisode)
+    dirName = os.path.dirname(__file__)
+    modelPath = os.path.join(dirName, '..', 'trainedDDPGModels', 'pendulum')
+    getTrainedModel = lambda: trainModels.actorModel
+    modelSaveRate = 50
+    saveModel = SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath)
+
+    ddpg = RunAlgorithm(runEpisode, maxEpisode, saveModel)
 
     replayBuffer = deque(maxlen=int(bufferSize))
     meanRewardList, trajectory = ddpg(replayBuffer)
 
-    trainedActorModel, trainedCriticModel = trainModels.getTrainedModels()
-
     env.close()
-
     plotResult = True
     if plotResult:
         plt.plot(list(range(maxEpisode)), meanRewardList)

@@ -13,7 +13,7 @@ import random
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import BuildMADDPGModels, TrainCritic, TrainActor, TrainCriticBySASR, \
     TrainActorFromSA, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
-from RLframework.RLrun_MultiAgent import UpdateParameters, SampleOneStep, SampleFromMemory,\
+from RLframework.RLrun import UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \

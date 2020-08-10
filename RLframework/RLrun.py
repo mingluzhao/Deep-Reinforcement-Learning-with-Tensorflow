@@ -73,11 +73,12 @@ class LearnFromBuffer:
         self.sampleFromMemory = sampleFromMemory
         self.trainModels = trainModels
         self.learnInterval = learnInterval
+        self.getAgentBuffer = lambda buffer, id: [[bufferElement[id] for bufferElement in timeStepBuffer] for timeStepBuffer in buffer]
 
-    def __call__(self, replayBuffer, runTime):
+    def __call__(self, replayBuffer, runTime, agentID = None):
         if runTime >= self.learningStartBufferSize and runTime % self.learnInterval == 0:
-            # print('learn')
-            miniBatch = self.sampleFromMemory(replayBuffer)
+            agentBuffer = self.getAgentBuffer(replayBuffer, agentID) if agentID is not None else replayBuffer
+            miniBatch = self.sampleFromMemory(agentBuffer)
             self.trainModels(miniBatch)
 
 
@@ -87,65 +88,39 @@ class RunTimeStep:
         self.sampleOneStep = sampleOneStep
         self.learnFromBuffer = learnFromBuffer
         self.observe = observe
+        self.runTime = 0
 
-    def __call__(self, state, replayBuffer, trajectory):
-        runTime = len(trajectory)
+    def __call__(self, state, replayBuffer):
         observation = self.observe(state) if self.observe is not None else state
-        action = self.actOneStep(observation, runTime)
+        action = self.actOneStep(observation, self.runTime)
         reward, nextState = self.sampleOneStep(state, action)
-        # print('state: ', state, ', action: ', action, ', reward: ', reward)
-
         nextObservation = self.observe(nextState) if self.observe is not None else nextState
         replayBuffer.append((observation, action, reward, nextObservation))
-        trajectory.append((state, action, reward, nextState))
-        self.learnFromBuffer(replayBuffer, runTime)
 
-        return reward, nextState, replayBuffer, trajectory
+        isMultiAgent = isinstance(self.learnFromBuffer, list)
+        if isMultiAgent:
+            for id, agentLearn in enumerate(self.learnFromBuffer):
+                agentLearn(replayBuffer, self.runTime, id)
+        else:
+            self.learnFromBuffer(replayBuffer, self.runTime)
+
+        self.runTime += 1
+        return reward, nextState, replayBuffer
+
+
+class StartLearn:
+    def __init__(self, learningStartBufferSize, learnInterval):
+        self.learningStartBufferSize = learningStartBufferSize
+        self.learnInterval = learnInterval
+
+    def __call__(self, runTime):
+        shouldStart = runTime >= self.learningStartBufferSize and runTime % self.learnInterval == 0
+        return shouldStart
 
 
 def getBuffer(bufferSize):
     replayBuffer = deque(maxlen=int(bufferSize))
     return replayBuffer
-
-
-
-class RunMultiAgentTimeStep:
-    def __init__(self, actOneStep, sampleOneStep, learnFromBuffer, observe = None, multiagent = False):
-        self.actOneStep = actOneStep
-        self.sampleOneStep = sampleOneStep
-        self.learnFromBuffer = learnFromBuffer
-        self.observe = observe
-        self.multiagent = multiagent
-        self.getAgentBuffer = lambda buffer, id: [[bufferElement[id] for bufferElement in timeStepBuffer] for timeStepBuffer in buffer]
-
-
-    def __call__(self, state, replayBuffer, trajectory):
-        runTime = len(trajectory)
-        observation = self.observe(state) if self.observe is not None else state
-        action = self.actOneStep(observation, runTime)
-        reward, nextState = self.sampleOneStep(state, action)
-        # print("reward ", reward)
-
-        nextObservation = self.observe(nextState) if self.observe is not None else nextState
-        replayBuffer.append((observation, action, reward, nextObservation))
-        trajectory.append((state, action, reward, nextState))
-
-        # if self.multiagent:
-        for id, agentLearn in enumerate(self.learnFromBuffer):
-            agentBuffer = self.getAgentBuffer(replayBuffer, id)
-            agentLearn(agentBuffer, runTime)
-
-        # if runTime % 100 == 0:
-        #     if self.multiagent:
-        #         getAgentBuffer = lambda buffer, id: [[bufferElement[id] for bufferElement in timeStepBuffer] for timeStepBuffer in buffer]
-        #         for id, agentLearn in enumerate(self.learnFromBuffer):
-        #             agentBuffer = getAgentBuffer(replayBuffer, id)
-        #             agentLearn(agentBuffer, runTime)
-        #     else:
-        #         self.learnFromBuffer(replayBuffer, runTime)
-
-        return reward, nextState, replayBuffer, trajectory
-
 
 
 class RunEpisode:
@@ -154,40 +129,38 @@ class RunEpisode:
         self.runTimeStep = runTimeStep
         self.maxTimeStep = maxTimeStep
         self.isTerminal = isTerminal
-        self.notTerminalCount = 0
 
-    def __call__(self, replayBuffer, trajectory):
+    def __call__(self, replayBuffer):
         state = self.reset()
-        episodeReward = np.zeros(2)
-        # episodeReward = 0
-        for timeStep in range(self.maxTimeStep):
-            reward, state, replayBuffer, trajectory = self.runTimeStep(state, replayBuffer, trajectory)
-            episodeReward += np.array(reward)
+        reward, state, replayBuffer = self.runTimeStep(state, replayBuffer)
+        episodeReward = np.array(reward)
+
+        for timeStep in range(self.maxTimeStep-1):
+            reward, state, replayBuffer = self.runTimeStep(state, replayBuffer)
+            episodeReward = episodeReward + np.array(reward)
             terminal = self.isTerminal(state)
             terminalCheck = (np.sum(np.array(terminal)) != 0)
             if terminalCheck:
                 break
-
-        return replayBuffer, episodeReward, trajectory
+        return replayBuffer, episodeReward
 
 
 class SaveModel:
-    def __init__(self, modelSaveRate, saveVariables, getCurrentModel, modelSavePath):
+    def __init__(self, modelSaveRate, saveVariables, getCurrentModel, modelSavePath, saveAllmodels = False):
         self.modelSaveRate = modelSaveRate
         self.saveVariables = saveVariables
         self.getCurrentModel = getCurrentModel
         self.epsNum = 0
         self.modelSavePath = modelSavePath
+        self.saveAllmodels = saveAllmodels
 
     def __call__(self):
+        self.epsNum += 1
         if self.epsNum % self.modelSaveRate == 0:
+            modelSavePathToUse = self.modelSavePath + str(self.epsNum) + "eps" if self.saveAllmodels else self.modelSavePath
             model = self.getCurrentModel()
             with model.as_default():
-                self.saveVariables(model, self.modelSavePath)
-
-        self.epsNum += 1
-
-
+                self.saveVariables(model, modelSavePathToUse)
 
 class RunAlgorithm:
     def __init__(self, runEpisode, maxEpisode, saveModels, numAgents = 1, printEpsFrequency = 1000):
@@ -196,30 +169,52 @@ class RunAlgorithm:
         self.saveModels = saveModels
         self.numAgents = numAgents
         self.printEpsFrequency = printEpsFrequency
+        self.multiAgent = (self.numAgents > 1)
 
     def __call__(self, replayBuffer):
-        episodeRewardList = []
-        meanRewardList = []
-        trajectory = []
-        agentsEpsRewardList = [list() for agentID in range(self.numAgents)]
-
+        epsReward = []
         for episode in range(self.maxEpisode):
-            replayBuffer, episodeReward, trajectory = self.runEpisode(replayBuffer, trajectory)
-            episodeRewardList.append(np.sum(episodeReward))
-            [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in zip(agentsEpsRewardList, episodeReward)]
-            # meanRewardList.append(np.mean(episodeRewardList))
-            # print('eps reward', episodeReward, 'mean reward', np.mean(episodeRewardList))
+            replayBuffer, episodeReward = self.runEpisode(replayBuffer)
+            [saveModel() for saveModel in self.saveModels] if self.multiAgent else self.saveModels()
+            if not self.multiAgent:
+                epsReward.append(episodeReward)
+                print('episode {}: mean eps reward {}'.format(len(epsReward), np.mean(epsReward)))
 
-            [saveModel() for saveModel in self.saveModels]
+        return epsReward
 
+# class RunAlgorithm:
+#     def __init__(self, runEpisode, maxEpisode, saveModels, numAgents = 1, printEpsFrequency = 1000):
+#         self.runEpisode = runEpisode
+#         self.maxEpisode = maxEpisode
+#         self.saveModels = saveModels
+#         self.numAgents = numAgents
+#         self.printEpsFrequency = printEpsFrequency
+#         self.multiAgent = (self.numAgents > 1)
+#
+#     def __call__(self, replayBuffer):
+#         episodeRewardList = []
+#         meanRewardList = []
+#         lastTimeSpanMeanRewardList = []
+#
+#         agentsEpsRewardList = [list() for agentID in range(self.numAgents)] if self.multiAgent else []
+#
+#         for episode in range(self.maxEpisode):
+#             replayBuffer, episodeReward = self.runEpisode(replayBuffer)
+#             episodeRewardList.append(np.sum(episodeReward))
+#             [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in zip(agentsEpsRewardList, episodeReward)]
+#             meanRewardList.append(np.mean(episodeRewardList))
+#             # print('eps', episode, 'reward', episodeReward, 'mean reward', np.mean(episodeRewardList))
+#
+#             [saveModel() for saveModel in self.saveModels] if self.multiAgent else self.saveModels()
+#
+#             if episode % self.printEpsFrequency == 0:
+#                 lastTimeSpanMeanReward = np.mean(episodeRewardList[-self.printEpsFrequency:])
+#                 lastTimeSpanMeanRewardList.append(lastTimeSpanMeanReward)
+#
+#                 print("steps: {}, episodes: {}, last {} eps mean episode reward: {}, agent episode reward: {}".format(
+#                     len(replayBuffer), len(episodeRewardList), self.printEpsFrequency, lastTimeSpanMeanReward,
+#                     [np.mean(rew[-self.printEpsFrequency:]) for rew in agentsEpsRewardList]))
+#
+#         return meanRewardList
 
-            if episode % self.printEpsFrequency == 0:
-                lastTimeSpanMeanReward = np.mean(episodeRewardList[-self.printEpsFrequency:])
-                meanRewardList.append(lastTimeSpanMeanReward)
-
-                print("steps: {}, episodes: {}, mean episode reward: {}, agent episode reward: {}".format(
-                    len(replayBuffer), len(episodeRewardList), np.mean(episodeRewardList[-self.printEpsFrequency:]),
-                    [np.mean(rew[-self.printEpsFrequency:]) for rew in agentsEpsRewardList]))
-
-        return meanRewardList, trajectory
 

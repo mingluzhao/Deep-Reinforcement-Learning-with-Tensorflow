@@ -321,9 +321,11 @@ class TrainDDPGWithGym:
         self.env = env
         self.learnFromBuffer = learnFromBuffer
         self.saveModel = saveModel
+        self.runTime = 0
 
     def __call__(self):
         episodeRewardList = []
+        meanEpsRewardList = []
         for episodeID in range(self.maxEpisode):
             state = self.env.reset()
             state = state.reshape(1, -1)
@@ -341,19 +343,21 @@ class TrainDDPGWithGym:
                 epsReward += reward
 
                 miniBatch= self.memoryBuffer.sample()
-                runTime = len(self.memoryBuffer.buffer)
-                self.learnFromBuffer(miniBatch, runTime)
+                self.learnFromBuffer(miniBatch, self.runTime)
                 state = nextState
+                self.runTime += 1
 
                 if terminal:
                     break
             self.saveModel()
             episodeRewardList.append(epsReward)
+            meanEpsRewardList.append(np.mean(episodeRewardList))
             last100EpsMeanReward = np.mean(episodeRewardList[-1000: ])
+
             if episodeID % 1 == 0:
                 print('episode: {}, last 1000eps mean reward: {}, last eps reward: {} with {} steps'.format(episodeID, last100EpsMeanReward, epsReward, timeStep))
 
-        return episodeRewardList
+        return meanEpsRewardList
 
 
 class ExponentialDecayGaussNoise:

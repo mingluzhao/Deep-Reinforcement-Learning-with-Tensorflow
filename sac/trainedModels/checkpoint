@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/sac/exec/../trainedModels/softACPendulum"
+all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/sac/exec/../trainedModels/softACPendulum"

@@ -11,7 +11,7 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import matplotlib.pyplot as plt
 
 from ddpg.src.ddpg_ACcombined_centralControlFollowMAddpg import *
-from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
+from RLframework.RLrun import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import *
@@ -151,7 +151,7 @@ def main():
 
     ddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
     replayBuffer = getBuffer(bufferSize)
-    meanRewardList, trajectory = ddpg(replayBuffer)
+    meanRewardList = ddpg(replayBuffer)
 
 if __name__ == '__main__':
     main()

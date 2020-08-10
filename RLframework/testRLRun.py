@@ -12,12 +12,11 @@ import numpy as np
 sys.path.append("..")
 import unittest
 from ddt import ddt, data, unpack
-from collections import deque
 
 from dqn.src.dqn import BuildModel, TrainModelBySASRQ, getTargetQValue
-from ddpg.src.ddpg import BuildActorModel, BuildCriticModel, TrainActorFromGradients, TrainCriticBySASRQ
+from src.functional.ddpg import BuildActorModel, BuildCriticModel, TrainActorFromGradients, TrainCriticBySASRQ
 from RLframework.RLrun import UpdateParameters, resetTargetParamToTrainParam, SampleFromMemory, getBuffer
-import random
+
 
 @ddt
 class TestDQNParameterUpdate(unittest.TestCase):
