@@ -25,20 +25,6 @@ blockColor = np.array([0.25, 0.25, 0.25])
 maxEpisode = 60000
 maxRunningStepsToSample = 75  # num of timesteps in one eps
 
-
-# def calcTrajRewardWithSharedWolfReward(traj):
-#     rewardIDinTraj = 2
-#     rewardList = [timeStepInfo[rewardIDinTraj][0] for timeStepInfo in traj]
-#     trajReward = np.sum(rewardList)
-#     return trajReward
-#
-# def calcTrajRewardWithIndividualWolfReward(traj, wolvesID):
-#     rewardIDinTraj = 2
-#     getWolfReward = lambda allAgentsReward: np.sum([allAgentsReward[wolfID] for wolfID in wolvesID])
-#     rewardList = [getWolfReward(timeStepInfo[rewardIDinTraj]) for timeStepInfo in traj]
-#     trajReward = np.sum(rewardList)
-#     return trajReward
-
 def calcWolvesTrajReward(traj, wolvesID):
     rewardIDinTraj = 2
     getWolfReward = lambda allAgentsReward: np.sum([allAgentsReward[wolfID] for wolfID in wolvesID])
@@ -56,7 +42,7 @@ def main():
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
         individualRewardWolf = 1
-        costActionRatio = 0.1
+        costActionRatio = 0.0
 
     else:
         print(sys.argv)
@@ -143,7 +129,7 @@ def main():
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    folderName = 'neeewTTraiin'
+    folderName = 'maddpg3v1_WolfReward_ActionCost_SheepSpeed_correctTransit'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
@@ -152,7 +138,7 @@ def main():
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
     rewardList = []
-    numTrajToSample = 300
+    numTrajToSample = 5
     trajList = []
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
@@ -162,7 +148,7 @@ def main():
 
     meanTrajReward = np.mean(rewardList)
     seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
-    print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
+    print('meanTrajReward', meanTrajReward, 'se ', seTrajReward) #69/5
 
     # trajSavePath = os.path.join(dirName, '..', 'trajectory', fileName)
     # saveToPickle(trajList, trajSavePath)
@@ -175,13 +161,13 @@ def main():
     # trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
     # saveToPickle(trajList, trajSavePath)
 
-    # wolfColor = np.array([0.85, 0.35, 0.35])
-    # sheepColor = np.array([0.35, 0.85, 0.35])
-    # blockColor = np.array([0.25, 0.25, 0.25])
-    # entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
-    # render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
-    # trajToRender = np.concatenate(trajList)
-    # render(trajToRender)
+    wolfColor = np.array([0.85, 0.35, 0.35])
+    sheepColor = np.array([0.35, 0.85, 0.35])
+    blockColor = np.array([0.25, 0.25, 0.25])
+    entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
+    render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
+    trajToRender = np.concatenate(trajList)
+    render(trajToRender)
 
 if __name__ == '__main__':
     main()

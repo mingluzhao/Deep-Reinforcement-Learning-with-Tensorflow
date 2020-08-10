@@ -37,12 +37,14 @@ class RewardWolf:
         self.entitiesSizeList = entitiesSizeList
         self.isCollision = isCollision
         self.collisionReward = collisionReward
-        self.individual = individual
+        self.individual = float(individual) # self.individual = 0.8: 0.8* reward give myself, 0.2* reward split to other agents
 
     def __call__(self, state, action, nextState):
         numWolves = len(self.wolvesID)
-        collisionRewardForSharing = self.collisionReward/numWolves
         reward = [0]* numWolves
+
+        individualReward = self.individual* self.collisionReward
+        sharedRewardForEachAgent = (1-self.individual)* self.collisionReward/ numWolves
 
         for rewardID, wolfID in enumerate(self.wolvesID):
             wolfSize = self.entitiesSizeList[wolfID]
@@ -53,12 +55,10 @@ class RewardWolf:
                 sheepNextState = nextState[sheepID]
 
                 if self.isCollision(wolfNextState, sheepNextState, wolfSize, sheepSize):
-                    if self.individual:
-                        reward[rewardID] += self.collisionReward
-                    else:
-                        reward = [oldReward+ collisionRewardForSharing for oldReward in reward]
-        return reward
+                    reward = [oldReward + sharedRewardForEachAgent for oldReward in reward]
+                    reward[rewardID] += individualReward
 
+        return reward
 
 class PunishForOutOfBound:
     def __init__(self):
@@ -297,3 +297,4 @@ class ReshapeAction:
         actionY = action[3] - action[4]
         actionReshaped = np.array([actionX, actionY]) * self.sensitivity
         return actionReshaped
+

@@ -33,7 +33,7 @@ minibatchSize = 1024#
 # 7.29 constant sheep bonus = 30
 
 def main():
-    debug = 1
+    debug = 0
     if debug:
         numWolves = 4
         numSheeps = 1
@@ -149,11 +149,10 @@ def main():
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
     modelSaveRate = 1000
-    individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
 
-    folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed'
+    folderName = 'maddpg23456Wolf_0.1ActionCost_1speed_testIndividLevel'
     modelPath = os.path.join(dirName, '..', 'trainedModels', folderName, fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 

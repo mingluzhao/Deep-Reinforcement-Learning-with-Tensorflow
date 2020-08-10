@@ -14,7 +14,7 @@ from functionTools.loadSaveModel import saveToPickle, restoreVariables
 from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *
 
-from ddpg.src.newddpg_centralController import *
+from ddpg.src.ddpg_ACcombined_centralControlFollowMAddpg import *
 
 wolfSize = 0.075
 sheepSize = 0.05

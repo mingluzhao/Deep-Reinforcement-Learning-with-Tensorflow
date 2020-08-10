@@ -108,7 +108,7 @@ class EvaluateWolfSheepTrain:
         dirName = os.path.dirname(__file__)
         fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual)
-        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed'
+        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_new'
         wolfModelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in wolvesID]
         [restoreVariables(model, path) for model, path in zip(wolvesModels, wolfModelPaths)]
 
@@ -116,7 +116,7 @@ class EvaluateWolfSheepTrain:
 
         rewardList = []
         trajList = []
-        numTrajToSample = 2000
+        numTrajToSample = 500
         for i in range(numTrajToSample):
             sheepPath = self.getSampledSheepPath(sheepPaths)
             restoreVariables(sheepModel, sheepPath)
@@ -137,7 +137,7 @@ class EvaluateWolfSheepTrain:
 
         meanTrajReward = np.mean(rewardList)
         seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
-        print('meanTrajRewardSharedWolf', meanTrajReward, 'se ', seTrajReward)
+        print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
 
         return pd.Series({'mean': meanTrajReward, 'se': seTrajReward})
 
@@ -153,7 +153,7 @@ class GetSheepModelPaths:
         fileNameList = ["maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent{}".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual, numWolves)
             for sheepSpeedMultiplier in self.sheepSpeedList for wolfIndividual in self.wolfTypeList for costActionRatio in self.costActionRatioList]
-        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed'
+        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_new'
         sheepPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName) for fileName in fileNameList]
 
         return sheepPaths
@@ -163,8 +163,10 @@ def main():
     independentVariables = OrderedDict()
     independentVariables['wolfIndividual'] = ['shared', 'individ']
     independentVariables['numWolves'] = [2, 3, 4, 5, 6]
-    independentVariables['sheepSpeedMultiplier'] = [1.0, 1.25]
-    independentVariables['costActionRatio'] = [0, 0.05, 0.1]
+    independentVariables['sheepSpeedMultiplier'] = [1.0]
+    independentVariables['costActionRatio'] = [0.0]
+    # independentVariables['sheepSpeedMultiplier'] = [1.0, 1.25]
+    # independentVariables['costActionRatio'] = [0.0, 0.05, 0.1]
 
     getSheepModelPaths = GetSheepModelPaths(independentVariables['sheepSpeedMultiplier'], independentVariables['costActionRatio'], independentVariables['wolfIndividual'])
     evaluateWolfSheepTrain = EvaluateWolfSheepTrain(getSheepModelPaths)
@@ -173,14 +175,14 @@ def main():
     levelValues = list(independentVariables.values())
     levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
     toSplitFrame = pd.DataFrame(index=levelIndex)
-    # resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
+    resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
 
     resultPath = os.path.join(dirName, '..', 'evalResults')
-    resultLoc = os.path.join(resultPath, 'newEvalWolfNum_actCost_speed500.pkl')
+    resultLoc = os.path.join(resultPath, 'newEvalWolfNum_actCost_speed500_withCorrectTransition.pkl')
 
-    # saveToPickle(resultDF, resultLoc)
+    saveToPickle(resultDF, resultLoc)
 
-    resultDF = loadFromPickle(resultLoc)
+    # resultDF = loadFromPickle(resultLoc)
     print(resultDF)
     figure = plt.figure(figsize=(7, 11))
     plotCounter = 1
@@ -212,7 +214,7 @@ def main():
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Reward', ha='center', va='center', rotation=90)
     plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    plt.savefig(os.path.join(resultPath, 'newEvalWolfNum_actCost_speed'))
+    plt.savefig(os.path.join(resultPath, 'newEvalWolfNum_actCost_speed500_withCorrectTransition'))
     plt.show()
 
 

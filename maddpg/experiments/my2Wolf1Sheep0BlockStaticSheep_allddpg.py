@@ -10,7 +10,7 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import matplotlib.pyplot as plt
 
-from ddpg.src.newddpg_withCombinedTrain import *
+from ddpg.src.ddpg_ACcombined_centralControlFollowMAddpg import *
 from RLframework.RLrun_MultiAgent import resetTargetParamToTrainParam, UpdateParameters, SampleOneStep, SampleFromMemory,\
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
