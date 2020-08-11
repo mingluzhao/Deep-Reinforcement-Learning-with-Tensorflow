@@ -12,9 +12,9 @@ from functionTools.loadSaveModel import saveVariables
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
-    ExponentialDecayGaussNoise, SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
-
+from ddpg.src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
+    SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
+from environment.noise.noise import ExponentialDecayGaussNoise
 
 def main():
     env_name = 'Reacher-v2'
@@ -64,7 +64,7 @@ def main():
     tf.add_to_collection("saver", saver)
     session.run(tf.global_variables_initializer())
 
-    fileName = 'ddpg_mujoco_DblInvPendulum'
+    fileName = 'ddpg_mujoco_Reacher'
     modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)
     modelSaveRate = 500
     saveModel = SaveModel(modelSaveRate, saveVariables, modelPath, session)

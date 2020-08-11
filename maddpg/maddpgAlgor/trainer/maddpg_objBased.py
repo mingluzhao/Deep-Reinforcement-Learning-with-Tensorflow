@@ -138,12 +138,18 @@ class Critic:
     def getActivationWithAgentTrainAction(self, allAgentsStatesBatch, allAgentsActionsBatch, agentAction, agentID):
         criticInputActionList = allAgentsActionsBatch
         criticInputActionList[agentID] = agentAction
-        criticActiv = self.session.run(self.criticTrainActivation_, feed_dict = {self.allAgentsStates_: allAgentsStatesBatch, self.allAgentsActions_: criticInputActionList})
+        stateDict = {agentState_: agentState for agentState_, agentState in zip(self.allAgentsStates_, allAgentsStatesBatch)}
+        actionDict = {agentAction_: agentAction for agentAction_, agentAction in zip(self.allAgentsActions_, criticInputActionList)}
+        criticActiv = self.session.run(self.criticTrainActivation_, feed_dict={**stateDict, **actionDict})
         return criticActiv
 
     def train(self, agentReward, allAgentsStatesBatch, allAgentsActionsBatch, allAgentsNextStateBatch, allAgentsNextStateTargetActions):
-        self.session.run(self.crticTrainOpt_, feed_dict = {self.allAgentsStates_: allAgentsStatesBatch, self.allAgentsActions_: allAgentsActionsBatch,
-                                                           self.agentReward_: agentReward, self.allAgentsNextStates_: allAgentsNextStateBatch, self.allAgentsNextActions_: allAgentsNextStateTargetActions})
+        agentReward = np.array(agentReward).reshape(-1, 1)
+        stateDict = {agentState_: agentState for agentState_, agentState in zip(self.allAgentsStates_, allAgentsStatesBatch)}
+        actionDict = {agentAction_: agentAction for agentAction_, agentAction in zip(self.allAgentsActions_, allAgentsActionsBatch)}
+        nextStateDict = {agentNextState_: agentNextState for agentNextState_, agentNextState in zip(self.allAgentsNextStates_, allAgentsNextStateBatch)}
+        nextActionDict = {agentNextAction_: agentNextAction for agentNextAction_, agentNextAction in zip(self.allAgentsNextActions_, allAgentsNextStateTargetActions)}
+        self.session.run(self.crticTrainOpt_, feed_dict={**stateDict, **nextStateDict, **nextActionDict, **actionDict, self.agentReward_: agentReward})
 
     def updateParams(self):
         self.session.run(self.criticUpdateParam_)
@@ -179,7 +185,7 @@ class MADDPGAgent:
         criticTrainActivation = self.critic.getActivationWithAgentTrainAction(allAgentsStatesBatch, allAgentsActionsBatch, agentAction, self.agentID)
 
         self.critic.train(agentReward, allAgentsStatesBatch, allAgentsActionsBatch, allAgentsNextStateBatch, allAgentsNextStateTargetActions)
-        self.actor.train(self, agentObservation, criticTrainActivation)
+        self.actor.train(agentObservation, criticTrainActivation)
 
 
 class MemoryBuffer(object):

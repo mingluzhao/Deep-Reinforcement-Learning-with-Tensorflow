@@ -13,7 +13,10 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
-    ExponentialDecayGaussNoise, SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
+    SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
+
+from environment.noise.noise import ExponentialDecayGaussNoise
+
 
 # def main():
 #     env_name = 'InvertedDoublePendulum-v2'

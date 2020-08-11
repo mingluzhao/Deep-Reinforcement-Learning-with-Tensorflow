@@ -259,27 +259,6 @@ class MemoryBuffer(object):
         return sample
 
 
-class OrnsteinUhlenbeckActionNoise(object):
-    def __init__(self, mu, sigma, theta=.15, dt=1e-2, x0=None):
-        self.theta = theta
-        self.mu = mu
-        self.sigma = sigma
-        self.dt = dt
-        self.x0 = x0
-        self.reset()
-
-    def getNoise(self):
-        x = self.x_prev + self.theta * (self.mu - self.x_prev) * self.dt + self.sigma * np.sqrt(self.dt) * np.random.normal(size=self.mu.shape)
-        self.x_prev = x
-        return x
-
-    def reset(self):
-        self.x_prev = self.x0 if self.x0 is not None else np.zeros_like(self.mu)
-
-    def __repr__(self):
-        return 'OrnsteinUhlenbeckActionNoise(mu={}, sigma={})'.format(self.mu, self.sigma)
-
-
 class ActOneStep:
     def __init__(self, actor, actionLow, actionHigh):
         self.actor = actor
@@ -293,22 +272,6 @@ class ActOneStep:
         noisyAction = np.clip(noiseVal + actionPerfect, self.actionLow, self.actionHigh)
 
         return noisyAction
-
-
-class ActOneStepForInvPendulum:
-    def __init__(self, actor, maxEpisode, action_space):
-        self.actor = actor
-        self.maxEpisode = maxEpisode
-        self.action_space = action_space
-
-    def __call__(self, state, episodeID, noise):
-        if episodeID < self.maxEpisode or ((episodeID % 9 < 5) and episodeID < 15* self.maxEpisode):
-            action = self.action_space.sample()
-        else:
-            action = self.actor.actByTrain(state)
-            noise = noise.getNoise()
-            action += noise
-        return action
 
 
 class TrainDDPGWithGym:
@@ -360,30 +323,6 @@ class TrainDDPGWithGym:
         return meanEpsRewardList
 
 
-class ExponentialDecayGaussNoise:
-    def __init__(self, noiseInitVariance, varianceDiscount, noiseDecayStartStep, minVar = 0):
-        self.noiseInitVariance = noiseInitVariance
-        self.varianceDiscount = varianceDiscount
-        self.noiseDecayStartStep = noiseDecayStartStep
-        self.minVar = minVar
-        self.runStep = 0
-
-    def getNoise(self):
-        var = self.noiseInitVariance
-        if self.runStep > self.noiseDecayStartStep:
-            var = self.noiseInitVariance* self.varianceDiscount ** (self.runStep - self.noiseDecayStartStep)
-            var = max(var, self.minVar)
-
-        noise = np.random.normal(0, var)
-        if self.runStep % 1000 == 0:
-            print('noise Variance', var)
-        self.runStep += 1
-        return noise
-
-    def reset(self):
-        return
-
-
 class SaveModel:
     def __init__(self, modelSaveRate, saveVariables, modelSavePath, sess, saveAllmodels = False):
         self.modelSaveRate = modelSaveRate
@@ -399,5 +338,6 @@ class SaveModel:
             modelSavePathToUse = self.modelSavePath + str(self.epsNum) + "eps" if self.saveAllmodels else self.modelSavePath
             with self.sess.as_default():
                 self.saveVariables(self.sess, modelSavePathToUse)
+
 
 

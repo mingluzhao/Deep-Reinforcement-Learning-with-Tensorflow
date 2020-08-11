@@ -139,7 +139,7 @@ def main():
 
     fileName = 'maddpg_objBasedTry'
     modelSavePath = os.path.join(dirName, '..', 'trainedModels', fileName)
-    modelSaveRate = 500
+    modelSaveRate = 10000
     saveModel = SaveModel(modelSaveRate, saveVariables, modelSavePath, session)
 
     maddpg = MADDPG(agents, buffer, startLearn, observe, sampleOneStep, reset, maxTimeStep, maxEpisode, saveModel)

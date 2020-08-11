@@ -172,15 +172,28 @@ class RunAlgorithm:
         self.multiAgent = (self.numAgents > 1)
 
     def __call__(self, replayBuffer):
-        epsReward = []
-        for episode in range(self.maxEpisode):
+        episodeRewardList = []
+        meanRewardList = []
+        agentsEpsRewardList = [list() for agentID in range(self.numAgents)] if self.multiAgent else []
+
+        for episodeID in range(self.maxEpisode):
             replayBuffer, episodeReward = self.runEpisode(replayBuffer)
             [saveModel() for saveModel in self.saveModels] if self.multiAgent else self.saveModels()
-            if not self.multiAgent:
-                epsReward.append(episodeReward)
-                print('episode {}: mean eps reward {}'.format(len(epsReward), np.mean(epsReward)))
+            if self.multiAgent:
+                episodeRewardList.append(np.sum(episodeReward))
+                [agentRewardList.append(agentEpsReward) for agentRewardList, agentEpsReward in zip(agentsEpsRewardList, episodeReward)]
+                meanRewardList.append(np.mean(episodeRewardList))
 
-        return epsReward
+                if episodeID % self.printEpsFrequency == 0:
+                    lastTimeSpanMeanReward = np.mean(episodeRewardList[-self.printEpsFrequency:])
+                    print("episodes: {}, last {} eps mean episode reward: {}, agent mean reward: {}".format(
+                        episodeID, self.printEpsFrequency, lastTimeSpanMeanReward,
+                        [np.mean(rew[-self.printEpsFrequency:]) for rew in agentsEpsRewardList]))
+            else:
+                episodeRewardList.append(episodeReward)
+                print('episode {}: mean eps reward {}'.format(len(episodeRewardList), np.mean(episodeRewardList)))
+
+        return episodeRewardList
 
 # class RunAlgorithm:
 #     def __init__(self, runEpisode, maxEpisode, saveModels, numAgents = 1, printEpsFrequency = 1000):

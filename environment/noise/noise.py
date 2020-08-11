@@ -39,3 +39,51 @@ class OrnsteinUhlenbeckActionNoise(object):
     def __repr__(self):
         return 'OrnsteinUhlenbeckActionNoise(mu={}, sigma={})'.format(self.mu, self.sigma)
 
+
+class ExponentialDecayGaussNoise(object):
+    def __init__(self, noiseInitVariance, varianceDiscount, noiseDecayStartStep, minVar = 0):
+        self.noiseInitVariance = noiseInitVariance
+        self.varianceDiscount = varianceDiscount
+        self.noiseDecayStartStep = noiseDecayStartStep
+        self.minVar = minVar
+        self.runStep = 0
+
+    def getNoise(self):
+        var = self.noiseInitVariance
+        if self.runStep > self.noiseDecayStartStep:
+            var = self.noiseInitVariance* self.varianceDiscount ** (self.runStep - self.noiseDecayStartStep)
+            var = max(var, self.minVar)
+
+        noise = np.random.normal(0, var)
+        if self.runStep % 1000 == 0:
+            print('noise Variance', var)
+        self.runStep += 1
+        return noise
+
+    def reset(self):
+        return
+
+
+class MinusDecayGaussNoise(object):
+    def __init__(self, noiseInitVariance, varianceDiscount, noiseDecayStartStep, minVar = 0):
+        self.noiseInitVariance = noiseInitVariance
+        self.varianceDiscount = varianceDiscount
+        self.noiseDecayStartStep = noiseDecayStartStep
+        self.minVar = minVar
+        self.runStep = 0
+
+    def getNoise(self):
+        noiseVar = self.noiseInitVariance
+        if self.runStep > self.noiseDecayStartStep:
+            noiseVar = self.noiseInitVariance - self.varianceDiscount * (self.runStep - self.noiseDecayStartStep)
+            noiseVar = max(noiseVar, self.minVar)
+
+        noise = np.random.normal(0, noiseVar)
+        if self.runStep % 1000 == 0:
+            print('noise Variance', noiseVar)
+
+        self.runStep += 1
+        return noise
+
+    def reset(self):
+        return

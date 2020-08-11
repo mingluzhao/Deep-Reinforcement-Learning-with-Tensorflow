@@ -14,9 +14,11 @@ import tensorflow as tf
 import numpy as np
 
 from src.objBased.ddpg_objBased import GetActorNetwork, Actor, GetCriticNetwork, Critic, ActOneStep, MemoryBuffer, \
-    ExponentialDecayGaussNoise, SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
+    SaveModel, TrainDDPGWithGym, LearnFromBuffer, reshapeBatchToGetSASR, TrainDDPGModelsOneStep
 from environment.gymEnv.normalize import env_norm
 from functionTools.loadSaveModel import saveToPickle, loadFromPickle
+from environment.noise.noise import ExponentialDecayGaussNoise, MinusDecayGaussNoise
+
 
 class LucyDDPG:
     def __init__(self, hyperparamDict):
@@ -49,7 +51,7 @@ class LucyDDPG:
         learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainDDPGOneStep, learnInterval=1)
         buffer = MemoryBuffer(self.hyperparamDict['bufferSize'], self.hyperparamDict['minibatchSize'])
 
-        noise = ExponentialDecayGaussNoise(self.hyperparamDict['noiseInitVariance'], self.hyperparamDict['varianceDiscount'],
+        noise = MinusDecayGaussNoise(self.hyperparamDict['noiseInitVariance'], self.hyperparamDict['varianceDiscount'],
                                            self.hyperparamDict['noiseDecayStartStep'], self.hyperparamDict['minVar'])
         actOneStep = ActOneStep(actor, actionLow, actionHigh)
 
@@ -93,7 +95,7 @@ def main():
     hyperparamDict['bufferSize'] = 1e5
 
     hyperparamDict['noiseInitVariance'] = 1
-    hyperparamDict['varianceDiscount'] = .99995
+    hyperparamDict['varianceDiscount'] = 1e-5
     hyperparamDict['noiseDecayStartStep'] = hyperparamDict['bufferSize']
     hyperparamDict['minVar'] = .1
     hyperparamDict['normalizeEnv'] = False
