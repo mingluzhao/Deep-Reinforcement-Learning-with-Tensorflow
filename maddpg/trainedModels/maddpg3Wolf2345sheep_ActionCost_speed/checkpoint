@@ -1,0 +1,2 @@
+model_checkpoint_path: "maddpg3wolves3sheep2blocks60000episodes75stepSheepSpeed1.25WolfActCost0.0individ1.0_agent5"
+all_model_checkpoint_paths: "maddpg3wolves3sheep2blocks60000episodes75stepSheepSpeed1.25WolfActCost0.0individ1.0_agent5"

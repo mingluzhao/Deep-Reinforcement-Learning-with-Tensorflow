@@ -18,8 +18,7 @@ from RLframework.RLrun import UpdateParameters, SampleOneStep, SampleFromMemory,
     RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import  ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
-    IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
-from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
+    IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState, GetActionCost
 from environment.mujocoEnv.multiAgentMujocoEnv import TransitionFunction,ResetUniformWithoutXPos,SampleBlockState,IsOverlap
 
 # fixed training parameters
@@ -32,48 +31,41 @@ bufferSize = 1e6#
 minibatchSize = 1024#
 
 def main():
-    debug = 1
+    debug = 0
     if debug:
-
-        numWolves = 2
-        numSheeps = 4
+        numWolves = 6
+        numSheeps = 1
         numBlocks = 2
-        hasWalls=1.0
+        hasWalls= 0.0
 
         dt=0.02
-        maxTimeStep = 25
+        maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = int(False)
+        individualRewardWolf = 0
 
         mujocoVisualize=False
         saveAllmodels = True
+        costActionRatio = 0.0
 
     else:
-
         print(sys.argv)
         condition = json.loads(sys.argv[1])
         numWolves = int(condition['numWolves'])
         numSheeps = int(condition['numSheeps'])
         numBlocks = int(condition['numBlocks'])
-        hasWalls=float(condition['hasWalls'])
+        hasWalls= 0.0 #float(condition['hasWalls'])
 
-        dt =float(condition['dt'])
+        dt = 0.02 #float(condition['dt'])
         maxTimeStep = int(condition['maxTimeStep'])
         sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
-        individualRewardWolf = int(condition['individualRewardWolf'])
-
-        saveAllmodels = True
+        individualRewardWolf = float(condition['individualRewardWolf'])
+        costActionRatio = float(condition['costActionRatio'])
+        saveAllmodels = 0
         mujocoVisualize=False
 
     print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, save all models: {}".format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, str(saveAllmodels)))
 
     dataMainFolder=os.path.join(dirName, '..', 'trainedModels', 'mujocoMADDPG')
-    modelFolder = os.path.join(dataMainFolder,'dt={}'.format(dt),'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}_individualRewardWolf={}_sheepSpeedMultiplier={}.xml'.format(hasWalls,numBlocks,numSheeps,numWolves,individualRewardWolf,sheepSpeedMultiplier))
-
-    if not os.path.exists(modelFolder):
-        os.makedirs(modelFolder)
-
-
     numAgents = numWolves + numSheeps
     numEntities = numAgents + numBlocks
     wolvesID = list(range(numWolves))
@@ -85,16 +77,18 @@ def main():
     blockSize = 0.2
     entitiesSizeList = [wolfSize] * numWolves + [sheepSize] * numSheeps + [blockSize] * numBlocks
 
-
+    collisionReward = 30 # originalPaper = 10*3
     isCollision = IsCollision(getPosFromAgentState)
-    punishForOutOfBound =lambda state :0 #PunishForOutOfBound()
-    rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,punishForOutOfBound)
-    if individualRewardWolf:
-        rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    else:
-        rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
+    punishForOutOfBound = PunishForOutOfBound() #lambda state :0
+    rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision, punishForOutOfBound, collisionReward)
+    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
+    reshapeAction = ReshapeAction()
+    getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost=True)
+    getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
+    rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
+
     rewardFunc = lambda state, action, nextState: \
-        list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
+        list(rewardWolfWithActionCost(state, action, nextState)) + list(rewardSheep(state, action, nextState))
 
 #------------ mujocoEnv ------------------------
 
@@ -109,9 +103,14 @@ def main():
 
     qPosInit = [0, 0]*numAgents
     qVelInit = [0, 0]*numAgents
-    qVelInitNoise = 0*hasWalls
-    qPosInitNoise = 0.8*hasWalls
-    getBlockRandomPos = lambda: np.random.uniform(-0.7*hasWalls, +0.7*hasWalls, 2)
+
+    qVelInitNoise = 0
+    qPosInitNoise = 0.8
+    getBlockRandomPos = lambda: np.random.uniform(-0.7, +0.7, 2)
+
+    # qVelInitNoise = 0*hasWalls
+    # qPosInitNoise = 0.8*hasWalls
+    # getBlockRandomPos = lambda: np.random.uniform(-0.7*hasWalls, +0.7*hasWalls, 2)
     getBlockSpeed = lambda: np.zeros(2)
 
     numQPos = len(physicsSimulation.data.qpos)
@@ -124,14 +123,12 @@ def main():
     isOverlap=IsOverlap(minDistance)
     sampleBlockState=SampleBlockState(numBlocks,getBlockRandomPos,getBlockSpeed,isOverlap)
 
-    reset=ResetUniformWithoutXPos(physicsSimulation,  numAgents, numBlocks,sampleAgentsQPos, sampleAgentsQVel,sampleBlockState)
-
+    reset= ResetUniformWithoutXPos(physicsSimulation,  numAgents, numBlocks,sampleAgentsQPos, sampleAgentsQVel,sampleBlockState)
 
     transitTimePerStep=0.1
     numSimulationFrames = int(transitTimePerStep/dt)
 
     isTerminal = lambda state: [False]* numAgents
-    reshapeAction = ReshapeAction()
     transit = TransitionFunction(physicsSimulation,numAgents , numSimulationFrames,mujocoVisualize,isTerminal,reshapeAction)
 
     observeOneAgent = lambda agentID: Observe(agentID, wolvesID, sheepsID, blocksID, getPosFromAgentState,getVelFromAgentState)
@@ -168,23 +165,22 @@ def main():
     actOneStep = lambda allAgentsStates, runTime: [actOneStepOneModel(model, allAgentsStates) for model in modelsList]
 
     sampleOneStep = SampleOneStep(transit, rewardFunc)
-    runDDPGTimeStep = RunTimeStep(actOneStep, sampleOneStep, trainMADDPGModels, observe = observe)
+    runTimeStep = RunTimeStep(actOneStep, sampleOneStep, trainMADDPGModels, observe = observe)
 
-    runEpisode = RunEpisode(reset, runDDPGTimeStep, maxTimeStep, isTerminal)
+    runEpisode = RunEpisode(reset, runTimeStep, maxTimeStep, isTerminal)
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 1000
-    individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpghasWalls={}{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(hasWalls,numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
+    modelSaveRate = 10000
+    fileName = "maddpg{}wall{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
+        hasWalls, numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
 
-    modelPath = os.path.join(modelFolder, fileName)
-
+    modelPath = os.path.join(dataMainFolder, fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 
     maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
     replayBuffer = getBuffer(bufferSize)
-    meanRewardList, trajectory = maddpg(replayBuffer)
+    meanRewardList = maddpg(replayBuffer)
 
 
 if __name__ == '__main__':

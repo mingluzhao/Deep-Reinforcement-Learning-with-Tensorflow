@@ -36,13 +36,12 @@ def main():
     debug = 1
     if debug:
         numWolves = 3
-        numSheeps = 1
+        numSheeps = 3
         numBlocks = 2
-        saveAllmodels = False
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 1
-        costActionRatio = 0.0
+        individualRewardWolf = 1.0
+        costActionRatio = 0.05
 
     else:
         print(sys.argv)
@@ -55,8 +54,6 @@ def main():
         sheepSpeedMultiplier = float(condition['sheepSpeedMultiplier'])
         individualRewardWolf = int(condition['individualRewardWolf'])
         costActionRatio = float(condition['costActionRatio'])
-
-        saveAllmodels = False
 
     print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, costActionRatio: {}".
           format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, costActionRatio))
@@ -126,10 +123,12 @@ def main():
 
     dirName = os.path.dirname(__file__)
     individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
+    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    folderName = 'maddpg3v1_WolfReward_ActionCost_SheepSpeed_correctTransit'
+    folderName = 'maddpg3Wolf2345sheep_ActionCost_speed'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
