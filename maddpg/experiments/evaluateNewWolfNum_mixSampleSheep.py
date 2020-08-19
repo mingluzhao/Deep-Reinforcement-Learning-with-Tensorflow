@@ -108,7 +108,7 @@ class EvaluateWolfSheepTrain:
         dirName = os.path.dirname(__file__)
         fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual)
-        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_new'
+        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit'
         wolfModelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in wolvesID]
         [restoreVariables(model, path) for model, path in zip(wolvesModels, wolfModelPaths)]
 
@@ -153,7 +153,7 @@ class GetSheepModelPaths:
         fileNameList = ["maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent{}".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual, numWolves)
             for sheepSpeedMultiplier in self.sheepSpeedList for wolfIndividual in self.wolfTypeList for costActionRatio in self.costActionRatioList]
-        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_new'
+        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit'
         sheepPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName) for fileName in fileNameList]
 
         return sheepPaths
@@ -163,10 +163,10 @@ def main():
     independentVariables = OrderedDict()
     independentVariables['wolfIndividual'] = ['shared', 'individ']
     independentVariables['numWolves'] = [2, 3, 4, 5, 6]
-    independentVariables['sheepSpeedMultiplier'] = [1.0]
-    independentVariables['costActionRatio'] = [0.0]
-    # independentVariables['sheepSpeedMultiplier'] = [1.0, 1.25]
-    # independentVariables['costActionRatio'] = [0.0, 0.05, 0.1]
+    # independentVariables['sheepSpeedMultiplier'] = [1.0]
+    # independentVariables['costActionRatio'] = [0.0]
+    independentVariables['sheepSpeedMultiplier'] = [1.0, 1.25]
+    independentVariables['costActionRatio'] = [0.0, 0.05, 0.1]
 
     getSheepModelPaths = GetSheepModelPaths(independentVariables['sheepSpeedMultiplier'], independentVariables['costActionRatio'], independentVariables['wolfIndividual'])
     evaluateWolfSheepTrain = EvaluateWolfSheepTrain(getSheepModelPaths)

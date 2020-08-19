@@ -35,13 +35,13 @@ def calcWolvesTrajReward(traj, wolvesID):
 def main():
     debug = 1
     if debug:
-        numWolves = 3
-        numSheeps = 3
+        numWolves = 4
+        numSheeps = 1
         numBlocks = 2
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 1.0
-        costActionRatio = 0.05
+        individualRewardWolf = 0
+        costActionRatio = 0.0
 
     else:
         print(sys.argv)
@@ -123,13 +123,16 @@ def main():
 
     dirName = os.path.dirname(__file__)
     individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
-    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
-    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
-
-    folderName = 'maddpg3Wolf2345sheep_ActionCost_speed'
+    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
+    #
+    folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in range(numAgents)]
+
+    # folderName = 'maddpg_tryRLBeforeClean'
+    # modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) + '60000eps') for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
@@ -137,7 +140,7 @@ def main():
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
     rewardList = []
-    numTrajToSample = 5
+    numTrajToSample =3
     trajList = []
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
@@ -147,7 +150,7 @@ def main():
 
     meanTrajReward = np.mean(rewardList)
     seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
-    print('meanTrajReward', meanTrajReward, 'se ', seTrajReward) #69/5
+    print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
 
     # trajSavePath = os.path.join(dirName, '..', 'trajectory', fileName)
     # saveToPickle(trajList, trajSavePath)

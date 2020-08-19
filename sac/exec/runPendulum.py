@@ -9,7 +9,7 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import gym
-from sac.src.algorithm import *
+from sac.src.algorithm1 import *
 from functionTools.loadSaveModel import saveVariables
 import matplotlib.pyplot as plt
 
@@ -63,7 +63,7 @@ def main():
     bufferSize= 1000000
     minibatchSize= 64
     learningStartBufferSize = minibatchSize
-    maxEpisode = 50
+    maxEpisode = 100
     maxTimeStep = 500
 
     env = gym.make("Pendulum-v0")

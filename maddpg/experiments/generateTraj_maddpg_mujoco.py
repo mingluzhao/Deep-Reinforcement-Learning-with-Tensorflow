@@ -44,7 +44,7 @@ def main():
         dt=0.02
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 0
+        individualRewardWolf = 0.0
 
         mujocoVisualize=True
         saveAllmodels = True
@@ -149,7 +149,7 @@ def main():
 
     fileName = "maddpg{}wall{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         hasWalls, numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
-    modelPaths = [os.path.join(dataMainFolder, fileName + str(i) + '100eps') for i in range(numAgents)]
+    modelPaths = [os.path.join(dataMainFolder, fileName + str(i)) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
@@ -157,7 +157,7 @@ def main():
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
     rewardList = []
-    numTrajToSample = 5
+    numTrajToSample = 20
     trajList = []
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)

@@ -62,7 +62,7 @@ class EvaluateWolfSheepTrain:
         blockSize = 0.2
         entitiesSizeList = [wolfSize] * numWolves + [sheepSize] * numSheeps + [blockSize] * numBlocks
 
-        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed'
+        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit'
         trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
         trajFileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_mixTraj".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual)
@@ -144,7 +144,7 @@ class GetSheepModelPaths:
         fileNameList = ["maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent{}".format(
             numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, wolfIndividual, numWolves)
             for sheepSpeedMultiplier in self.sheepSpeedList for wolfIndividual in self.wolfTypeList for costActionRatio in self.costActionRatioList]
-        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed'
+        folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit'
         sheepPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName) for fileName in fileNameList]
 
         return sheepPaths
@@ -164,82 +164,82 @@ def main():
     levelValues = list(independentVariables.values())
     levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
     toSplitFrame = pd.DataFrame(index=levelIndex)
-    # resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
+    resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
 
     resultPath = os.path.join(dirName, '..', 'evalResults')
-    resultLoc = os.path.join(resultPath, 'newEvalWolfNum_actCost_speed_fullInfo.pkl')
+    resultLoc = os.path.join(resultPath, 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit_fullInfo.pkl')
 
-    # saveToPickle(resultDF, resultLoc)
+    saveToPickle(resultDF, resultLoc)
 
-    resultDF = loadFromPickle(resultLoc)
+    # resultDF = loadFromPickle(resultLoc)
     print(resultDF.to_string())
     # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
     #     print(resultDF)
-    # figure = plt.figure(figsize=(11, 7))
-    # plotCounter = 1
-    #
-    # numRows = len(independentVariables['sheepSpeedMultiplier'])
-    # numColumns = len(independentVariables['costActionRatio'])
-    #
-    # for key, outmostSubDf in resultDF.groupby('sheepSpeedMultiplier'):
-    #     outmostSubDf.index = outmostSubDf.index.droplevel('sheepSpeedMultiplier')
-    #     for keyCol, outterSubDf in outmostSubDf.groupby('costActionRatio'):
-    #         outterSubDf.index = outterSubDf.index.droplevel('costActionRatio')
-    #         axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
-    #         for keyRow, innerSubDf in outterSubDf.groupby('wolfIndividual'):
-    #             innerSubDf.index = innerSubDf.index.droplevel('wolfIndividual')
-    #             plt.ylim([0, 2000])
-    #
-    #             innerSubDf.plot.line(ax = axForDraw, y='meanTrajActionMagnitude', yerr='seAction', label = keyRow, uplims=True, lolims=True, capsize=3)
-    #             if plotCounter <= numColumns:
-    #                 axForDraw.title.set_text('actionCost/actionMagnitude = ' + str(keyCol))
-    #             if plotCounter% numColumns == 1:
-    #                 axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
-    #             axForDraw.set_xlabel('Number of Wolves')
-    #
-    #         plotCounter += 1
-    #         axForDraw.set_aspect(0.002, adjustable='box')
-    #         plt.xticks(independentVariables['numWolves'])
-    #
-    #         plt.legend(title='Wolf type')
-    #
-    # figure.text(x=0.03, y=0.5, s='Average Wolves Moving Distance Per Episode', ha='center', va='center', rotation=90)
-    # plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    # plt.savefig(os.path.join(resultPath, 'newEvalWolfNum_actCost_speed_fullInfo_actionMagnitude'))
-    # plt.show()
+    figure = plt.figure(figsize=(11, 7))
+    plotCounter = 1
 
-    # figure = plt.figure(figsize=(8, 8))
-    # plotCounter = 1
-    #
-    # numRows = len(independentVariables['sheepSpeedMultiplier'])
-    # numColumns = len(independentVariables['wolfIndividual'])
-    #
-    # for key, outmostSubDf in resultDF.groupby('sheepSpeedMultiplier'):
-    #     outmostSubDf.index = outmostSubDf.index.droplevel('sheepSpeedMultiplier')
-    #     for keyCol, outterSubDf in outmostSubDf.groupby('wolfIndividual'):
-    #         outterSubDf.index = outterSubDf.index.droplevel('wolfIndividual')
-    #         axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
-    #         for keyRow, innerSubDf in outterSubDf.groupby('costActionRatio'):
-    #             innerSubDf.index = innerSubDf.index.droplevel('costActionRatio')
-    #             plt.ylim([0, 2000])
-    #
-    #             innerSubDf.plot.line(ax = axForDraw, y='meanTrajActionMagnitude', yerr='seAction', label = keyRow, uplims=True, lolims=True, capsize=3)
-    #             if plotCounter <= numColumns:
-    #                 axForDraw.title.set_text('Wolf type = ' + str(keyCol))
-    #             if plotCounter% numColumns == 1:
-    #                 axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
-    #             axForDraw.set_xlabel('Number of Wolves')
-    #
-    #         plotCounter += 1
-    #         axForDraw.set_aspect(0.002, adjustable='box')
-    #         plt.xticks(independentVariables['numWolves'])
-    #
-    #         plt.legend(title='costActionRatio')
-    #
-    # figure.text(x=0.03, y=0.5, s='Average Wolves Moving Distance Per Episode', ha='center', va='center', rotation=90)
-    # plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    # plt.savefig(os.path.join(resultPath, 'newEvalWolfNum_actCost_speed_fullInfo_actionMagnitude_groupByIndivid'))
-    # plt.show()
+    numRows = len(independentVariables['sheepSpeedMultiplier'])
+    numColumns = len(independentVariables['costActionRatio'])
+
+    for key, outmostSubDf in resultDF.groupby('sheepSpeedMultiplier'):
+        outmostSubDf.index = outmostSubDf.index.droplevel('sheepSpeedMultiplier')
+        for keyCol, outterSubDf in outmostSubDf.groupby('costActionRatio'):
+            outterSubDf.index = outterSubDf.index.droplevel('costActionRatio')
+            axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+            for keyRow, innerSubDf in outterSubDf.groupby('wolfIndividual'):
+                innerSubDf.index = innerSubDf.index.droplevel('wolfIndividual')
+                plt.ylim([0, 2000])
+
+                innerSubDf.plot.line(ax = axForDraw, y='meanTrajActionMagnitude', yerr='seAction', label = keyRow, uplims=True, lolims=True, capsize=3)
+                if plotCounter <= numColumns:
+                    axForDraw.title.set_text('actionCost/actionMagnitude = ' + str(keyCol))
+                if plotCounter% numColumns == 1:
+                    axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
+                axForDraw.set_xlabel('Number of Wolves')
+
+            plotCounter += 1
+            axForDraw.set_aspect(0.002, adjustable='box')
+            plt.xticks(independentVariables['numWolves'])
+
+            plt.legend(title='Wolf type')
+
+    figure.text(x=0.03, y=0.5, s='Average Wolves Moving Distance Per Episode', ha='center', va='center', rotation=90)
+    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
+    plt.savefig(os.path.join(resultPath, 'newEvalWolfNum_actCost_speed_fullInfo_actionMagnitude'))
+    plt.show()
+
+    figure = plt.figure(figsize=(8, 8))
+    plotCounter = 1
+
+    numRows = len(independentVariables['sheepSpeedMultiplier'])
+    numColumns = len(independentVariables['wolfIndividual'])
+
+    for key, outmostSubDf in resultDF.groupby('sheepSpeedMultiplier'):
+        outmostSubDf.index = outmostSubDf.index.droplevel('sheepSpeedMultiplier')
+        for keyCol, outterSubDf in outmostSubDf.groupby('wolfIndividual'):
+            outterSubDf.index = outterSubDf.index.droplevel('wolfIndividual')
+            axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+            for keyRow, innerSubDf in outterSubDf.groupby('costActionRatio'):
+                innerSubDf.index = innerSubDf.index.droplevel('costActionRatio')
+                plt.ylim([0, 2000])
+
+                innerSubDf.plot.line(ax = axForDraw, y='meanTrajActionMagnitude', yerr='seAction', label = keyRow, uplims=True, lolims=True, capsize=3)
+                if plotCounter <= numColumns:
+                    axForDraw.title.set_text('Wolf type = ' + str(keyCol))
+                if plotCounter% numColumns == 1:
+                    axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
+                axForDraw.set_xlabel('Number of Wolves')
+
+            plotCounter += 1
+            axForDraw.set_aspect(0.002, adjustable='box')
+            plt.xticks(independentVariables['numWolves'])
+
+            plt.legend(title='costActionRatio')
+
+    figure.text(x=0.03, y=0.5, s='Average Wolves Moving Distance Per Episode', ha='center', va='center', rotation=90)
+    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
+    plt.savefig(os.path.join(resultPath, 'newEvalWolfNum_actCost_speed_fullInfo_actionMagnitude_groupByIndivid'))
+    plt.show()
 
 
     figure = plt.figure(figsize=(11, 7))

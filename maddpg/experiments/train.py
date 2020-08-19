@@ -14,21 +14,21 @@ sys.path.append(os.path.join(dirName, '..'))
 sys.path.append(os.path.join(dirName, '..', '..'))
 import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
-
+from functionTools.loadSaveModel import saveToPickle
 import maddpg.maddpgAlgor.common.tf_util as U
 from maddpg.maddpgAlgor.trainer.maddpg_ref import MADDPGAgentTrainer
 import tensorflow.contrib.layers as layers
 
 modelNameList = ['policy3WolfMADDPG1SheepMADDPG', 'policy3WoolfMADDPG1SheepMADDPG',
                  'policy3WoolfMADDPG1SheepMADDPG11111', 'policy3WoolfMADDPG1SheepMADDPG111111', 'policy3WoolfMADDPG1SheepMADDPG11111111']
-trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'newtry3v1', 'policy3WoolfMADDPG1SheepMADDPG11111111')
+trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'policy6WolfMADDPG1SheepMADDPG11111')
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
     # Environment
     parser.add_argument("--scenario", type=str, default="simple", help="name of the scenario script")
     parser.add_argument("--max-episode-len", type=int, default=75, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=5000, help="number of episodes") #60000
+    parser.add_argument("--num-episodes", type=int, default=300, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
     parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
     parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
@@ -44,7 +44,7 @@ def parse_args():
     parser.add_argument("--load-dir", type=str, default="", help="directory in which training state and model are loaded")
     # Evaluation
     parser.add_argument("--restore", action="store_true", default=False)
-    parser.add_argument("--display", action="store_true", default=False)
+    parser.add_argument("--display", action="store_true", default=True)
     parser.add_argument("--benchmark", action="store_true", default=False)
     parser.add_argument("--benchmark-iters", type=int, default=100000, help="number of iterations run for benchmarking")
     parser.add_argument("--benchmark-dir", type=str, default=os.path.join(dirName, '..', 'benchmark_files'), help="directory where benchmark data is saved")
@@ -125,8 +125,13 @@ def train(arglist):
         train_step = 0
         t_start = time.time()
 
+        trajList = []
+        traj = []
+
         print('Starting iterations...')
         while True:
+            state = [np.append(agent.state.p_pos, agent.state.p_vel) for agent in env.agents] + [np.append(landmark.state.p_pos, landmark.state.p_vel) for landmark in env.world.landmarks]
+
             # get action
             action_n = [agent.action(obs) for agent, obs in zip(trainers,obs_n)]
             # environment step
@@ -134,6 +139,10 @@ def train(arglist):
             episode_step += 1
             done = all(done_n)
             terminal = (episode_step >= arglist.max_episode_len)
+
+            nextState = [np.append(agent.state.p_pos, agent.state.p_vel) for agent in env.agents] + [np.append(landmark.state.p_pos, landmark.state.p_vel) for landmark in env.world.landmarks]
+            traj.append((state, action_n, rew_n, nextState))
+
             # collect experience
             for i, agent in enumerate(trainers):
                 agent.experience(obs_n[i], action_n[i], rew_n[i], new_obs_n[i], done_n[i], terminal)
@@ -150,9 +159,13 @@ def train(arglist):
                 for a in agent_rewards:
                     a.append(0)
                 agent_info.append([[]])
+                trajList.append(traj)
+                traj = []
+                # saveToPickle(trajList, os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', ' try3v1', '3v1Traj111.pkl'))
 
             # increment global step counter
             train_step += 1
+
 
             # for benchmarking learned policies
             if arglist.benchmark:
