@@ -46,7 +46,7 @@ def main():
         sheepSpeedMultiplier = 1
         individualRewardWolf = 0
         costActionRatio = 0.0
-        initHurtProb = 0.8
+        initHurtProb = 0.25
 
     else:
         print(sys.argv)

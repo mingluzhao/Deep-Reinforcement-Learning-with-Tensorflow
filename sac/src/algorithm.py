@@ -247,14 +247,14 @@ class ValueNet:
             self.targetValue_ = self.buildValueNet(self.nextStates_, scope='targetValueNet')
 
             with tf.variable_scope("valueNetUpdateParameters"):
-                trainValueParams_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.scope + 'trainValueNet')
-                targetValueParams_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.scope + 'targetValueNet')
-                self.valueNetUpdateParam_ = [targetValueParams_[i].assign(
-                    (1 - self.tau) * targetValueParams_[i] + self.tau * trainValueParams_[i]) for i in
-                    range(len(targetValueParams_))]
+                self.trainValueParams_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.scope + 'trainValueNet')
+                self.targetValueParams_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.scope + 'targetValueNet')
+                self.valueNetUpdateParam_ = [self.targetValueParams_[i].assign(
+                    (1 - self.tau) * self.targetValueParams_[i] + self.tau * self.trainValueParams_[i]) for i in
+                    range(len(self.targetValueParams_))]
 
                 self.hardReplaceTargetParam_ = [tf.assign(trainParam, targetParam) for trainParam, targetParam in
-                                                  zip(trainValueParams_, targetValueParams_)]
+                                                  zip(self.trainValueParams_, self.targetValueParams_)]
 
             with tf.variable_scope("valueNetTrain"):
                 self.minQ_ = tf.placeholder(tf.float32, [None, 1], name='minQ_')
@@ -262,7 +262,7 @@ class ValueNet:
                 self.valueTargetOfUpdate_ = tf.stop_gradient(self.minQ_ - self.logPi_)
                 self.valueLoss_ = tf.losses.mean_squared_error(self.valueTargetOfUpdate_, self.trainValue_)
                 self.valueOptimizer = tf.train.AdamOptimizer(self.valueNetLR, name='valueOptimizer')
-                self.valueOpt_ = self.valueOptimizer.minimize(self.valueLoss_, var_list=trainValueParams_)
+                self.valueOpt_ = self.valueOptimizer.minimize(self.valueLoss_, var_list=self.trainValueParams_)
 
     def hardReplaceTargetParam(self):
         self.session.run(self.hardReplaceTargetParam_)

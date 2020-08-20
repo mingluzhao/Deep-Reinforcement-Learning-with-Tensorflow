@@ -130,8 +130,6 @@ class GetRewardFromFightBackProb:
     def __call__(self, fightBackProb):
         killProb = (1 - fightBackProb) * self.killProportion
         biteProb = 1 - fightBackProb - killProb
-        assert (killProb + biteProb + fightBackProb == 1)
-
         wolfRewardDist = {self.biteReward: biteProb, self.killReward: killProb, self.fightedBackReward: fightBackProb}
         # print(wolfRewardDist)
         wolfReward = self.sampleFromDistribution(wolfRewardDist)

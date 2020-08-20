@@ -61,19 +61,17 @@ class TestSACQNet(unittest.TestCase):
     @unpack
     def testValueTargetCalculation(self, rewardBatch, nextStateValueTarget):
         tf.reset_default_graph()
-        rewardBatch = [[0]]
-        nextStateValueTarget = [[1]]
         session = tf.Session()
         qNet = DoubleQNet(self.buildQNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
         valueNet = ValueNet(self.buildValueNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
         policyNet = PolicyNet(self.buildPolicyNet, self.stateDim, self.actionDim, session, self.hyperparamDict, self.actionRange)
 
         session.run(tf.global_variables_initializer())
-        
+
         valueTarget = qNet.session.run(qNet.qTarget_, feed_dict = {qNet.reward_: rewardBatch, qNet.nextValueTarget_: nextStateValueTarget})
         groundTruthValueTarget = np.array(rewardBatch) + self.gamma* np.array(nextStateValueTarget)
         diff = np.concatenate(valueTarget - groundTruthValueTarget)
-        [self.assertAlmostEqual(difference, 0) for difference in diff]
+        [self.assertAlmostEqual(difference, 0, places= 5) for difference in diff]
 
 
 
@@ -120,7 +118,31 @@ class TestSACQNet(unittest.TestCase):
             print(lossBefore, lossAfter)
             self.assertTrue(lossBefore > lossAfter)
 
+    @data(([[1,1,1,1]], [[2, 2]], [[2]], [[2]]),
+          ([[1,1,1,1], [2,2,2,2]], [[2, 2], [3, 2]], [[2], [5]], [[2], [8]])
+          )
+    @unpack
+    def testMinQ(self, stateBatch, actionBatch, rewardBatch, nextStateValueTarget):
+        tf.reset_default_graph()
+        session = tf.Session()
+        qNet = DoubleQNet(self.buildQNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
+        valueNet = ValueNet(self.buildValueNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
+        policyNet = PolicyNet(self.buildPolicyNet, self.stateDim, self.actionDim, session, self.hyperparamDict, self.actionRange)
+        session.run(tf.global_variables_initializer())
 
+        for i in range(10):
+            qNet.train(stateBatch, actionBatch, rewardBatch, nextStateValueTarget)
+            stateBatchToTest = [[1, 2, -3, 1], [-2, 4, 2, 2], [2, 4, 0, 0]]
+            actionBatchToTest = [[2, 1], [3, -10], [0, 5]]
+            q1Val = qNet.session.run(qNet.q1TrainOutput_, feed_dict = {qNet.states_: stateBatchToTest, qNet.actions_: actionBatchToTest})
+            q2Val = qNet.session.run(qNet.q2TrainOutput_, feed_dict = {qNet.states_: stateBatchToTest, qNet.actions_: actionBatchToTest})
+            q1Val = np.asarray(q1Val).reshape(-1)
+            q2Val = np.asarray(q2Val).reshape(-1)
+
+            trueMin = [min(q1, q2) for q1, q2 in zip(q1Val, q2Val)]
+            minQ = qNet.getMinQ(stateBatchToTest, actionBatchToTest).reshape(-1)
+            self.assertEqual(tuple(trueMin), tuple(minQ))
+        session.close()
 
 
 if __name__ == '__main__':

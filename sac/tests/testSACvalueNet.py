@@ -14,7 +14,7 @@ from ddt import ddt, data, unpack
 from sac.src.algorithm import *
 
 @ddt
-class TestSACQNet(unittest.TestCase):
+class TestSACValueNet(unittest.TestCase):
     def setUp(self):
         self.hyperparamDict = dict()
         self.hyperparamDict['valueNetWeightInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
@@ -59,10 +59,8 @@ class TestSACQNet(unittest.TestCase):
           ([[2], [5]], [[2], [8]])
           )
     @unpack
-    def testValueTargetCalculation(self, rewardBatch, nextStateValueTarget):
+    def testValueTargetCalculation(self, logpi, minQCurrentState):
         tf.reset_default_graph()
-        rewardBatch = [[0]]
-        nextStateValueTarget = [[1]]
         session = tf.Session()
         qNet = DoubleQNet(self.buildQNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
         valueNet = ValueNet(self.buildValueNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
@@ -70,18 +68,17 @@ class TestSACQNet(unittest.TestCase):
 
         session.run(tf.global_variables_initializer())
         
-        valueTarget = qNet.session.run(qNet.qTarget_, feed_dict = {qNet.reward_: rewardBatch, qNet.nextValueTarget_: nextStateValueTarget})
-        groundTruthValueTarget = np.array(rewardBatch) + self.gamma* np.array(nextStateValueTarget)
+        valueTarget = valueNet.session.run(valueNet.valueTargetOfUpdate_, feed_dict = {valueNet.logPi_: logpi, valueNet.minQ_: minQCurrentState})
+        groundTruthValueTarget = np.array(minQCurrentState) - np.array(logpi)
         diff = np.concatenate(valueTarget - groundTruthValueTarget)
         [self.assertAlmostEqual(difference, 0) for difference in diff]
 
 
-
-    @data(([[1,1,1,1]], [[2, 2]], [[2]], [[2]]),
-          ([[1,1,1,1], [2,2,2,2]], [[2, 2], [3, 2]], [[2], [5]], [[2], [8]])
+    @data(([[1,1,1,1]],  [[2]], [[2]]),
+          ([[1,1,1,1], [2,2,2,2]], [[2], [5]], [[2], [8]])
           )
     @unpack
-    def testQLossCalculation(self, stateBatch, actionBatch, rewardBatch, nextStateValueTarget):
+    def testValueLossCalculation(self, stateBatch, logpi, minQCurrentState):
         tf.reset_default_graph()
         session = tf.Session()
         qNet = DoubleQNet(self.buildQNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
@@ -89,21 +86,20 @@ class TestSACQNet(unittest.TestCase):
         policyNet = PolicyNet(self.buildPolicyNet, self.stateDim, self.actionDim, session, self.hyperparamDict, self.actionRange)
         session.run(tf.global_variables_initializer())
 
-        loss = qNet.session.run(qNet.q1Loss_, feed_dict = {qNet.states_: stateBatch, qNet.actions_: actionBatch,
-                                                              qNet.reward_: rewardBatch, qNet.nextValueTarget_: nextStateValueTarget})
+        loss = valueNet.session.run(valueNet.valueLoss_, feed_dict = {valueNet.states_: stateBatch, valueNet.logPi_: logpi, valueNet.minQ_: minQCurrentState})
 
-        q1Val = qNet.session.run(qNet.q1TrainOutput_, feed_dict = {qNet.states_: stateBatch, qNet.actions_: actionBatch})
-        valueTarget = np.array(rewardBatch) + self.gamma* np.array(nextStateValueTarget)
-        trueLoss = np.mean(np.square(valueTarget - q1Val))
+        valueTrain = valueNet.session.run(valueNet.trainValue_, feed_dict = {valueNet.states_: stateBatch})
+        valueTarget = np.array(minQCurrentState) - np.array(logpi)
+        trueLoss = np.mean(np.square(valueTarget - valueTrain))
         self.assertAlmostEqual(trueLoss, loss, places=3)
         session.close()
 
 
-    @data(([[1,1,1,1]], [[2, 2]], [[2]], [[2]]),
-          ([[1,1,1,1], [2,2,2,2]], [[2, 2], [3, 2]], [[2], [5]], [[2], [8]])
+    @data(([[1,1,1,1]],  [[10]], [[2]]),
+          ([[1,1,1,1], [2,2,2,2]], [[2], [5]], [[2], [8]])
           )
     @unpack
-    def testQImprovement(self, stateBatch, actionBatch, rewardBatch, nextStateValueTarget):
+    def testValueImprovement(self, stateBatch, logpi, minQCurrentState):
         tf.reset_default_graph()
         session = tf.Session()
         qNet = DoubleQNet(self.buildQNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
@@ -112,15 +108,36 @@ class TestSACQNet(unittest.TestCase):
         session.run(tf.global_variables_initializer())
 
         for i in range(10):
-            lossBefore = qNet.session.run(qNet.q1Loss_, feed_dict={qNet.states_: stateBatch, qNet.actions_: actionBatch,
-                                                             qNet.reward_: rewardBatch, qNet.nextValueTarget_: nextStateValueTarget})
-            qNet.train(stateBatch, actionBatch, rewardBatch, nextStateValueTarget)
-            lossAfter = qNet.session.run(qNet.q1Loss_, feed_dict={qNet.states_: stateBatch, qNet.actions_: actionBatch,
-                                                             qNet.reward_: rewardBatch, qNet.nextValueTarget_: nextStateValueTarget})
+            lossBefore = valueNet.session.run(valueNet.valueLoss_, feed_dict={valueNet.states_: stateBatch, valueNet.logPi_: logpi,  valueNet.minQ_: minQCurrentState})
+            valueNet.train(stateBatch, minQCurrentState, logpi)
+            lossAfter = valueNet.session.run(valueNet.valueLoss_, feed_dict={valueNet.states_: stateBatch, valueNet.logPi_: logpi,  valueNet.minQ_: minQCurrentState})
             print(lossBefore, lossAfter)
             self.assertTrue(lossBefore > lossAfter)
 
+    @data(([[1,1,1,1]],  [[10]], [[2]]),
+          ([[1,1,1,1], [2,2,2,2]], [[2], [5]], [[2], [8]])
+          )
+    @unpack
+    def testValueReplaceParam(self, stateBatch, logpi, minQCurrentState):
+        tf.reset_default_graph()
+        session = tf.Session()
+        qNet = DoubleQNet(self.buildQNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
+        valueNet = ValueNet(self.buildValueNet, self.stateDim, self.actionDim, session, self.hyperparamDict)
+        policyNet = PolicyNet(self.buildPolicyNet, self.stateDim, self.actionDim, session, self.hyperparamDict, self.actionRange)
+        session.run(tf.global_variables_initializer())
 
+        for i in range(10):
+            valueNet.train(stateBatch, minQCurrentState, logpi)
+
+        trainParams = valueNet.session.run(valueNet.trainValueParams_)
+        targetParams = valueNet.session.run(valueNet.targetValueParams_)
+
+        valueNet.updateParams()
+        targetParamsAfter = valueNet.session.run(valueNet.targetValueParams_)
+        trueTargetParam = (1- self.hyperparamDict['tau']) * np.array(targetParams) + self.hyperparamDict['tau']* np.array(trainParams)
+
+        difference = np.array(targetParamsAfter) - trueTargetParam
+        [self.assertEqual(np.mean(paramDiff), 0) for paramDiff in difference]
 
 
 if __name__ == '__main__':
