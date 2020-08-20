@@ -1,2 +1,0 @@
-model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../trainedModels/maddpg_objBasedTry"
-all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../trainedModels/maddpg_objBasedTry"
