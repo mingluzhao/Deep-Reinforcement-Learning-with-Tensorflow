@@ -29,6 +29,7 @@ def calcWolvesTrajReward(traj, wolvesID):
     rewardIDinTraj = 2
     getWolfReward = lambda allAgentsReward: np.sum([allAgentsReward[wolfID] for wolfID in wolvesID])
     rewardList = [getWolfReward(timeStepInfo[rewardIDinTraj]) for timeStepInfo in traj]
+    print(rewardList)
     trajReward = np.sum(rewardList)
     return trajReward
 
@@ -40,7 +41,7 @@ def main():
         numBlocks = 2
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 0
+        individualRewardWolf = 0.0
         costActionRatio = 0.0
 
     else:
@@ -131,7 +132,7 @@ def main():
     folderName = 'maddpgWolfNum_WolfReward_ActionCost_SheepSpeed_correctTransit'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i)) for i in range(numAgents)]
 
-    # folderName = 'maddpg_tryRLBeforeClean'
+    # folderName = 'maddpg_fullConfirm0816'
     # modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) + '60000eps') for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
