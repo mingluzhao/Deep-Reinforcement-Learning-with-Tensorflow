@@ -149,8 +149,8 @@ class BuildMADDPGModels:
 
             with tf.variable_scope("trainCriticNet/"+ agentStr):
                 yi_ = agentReward_ + gamma_ * criticTargetActivation_
-                criticLoss_ = tf.reduce_mean(tf.square(criticTrainActivationOfGivenAction_ - tf.squeeze(yi_)))
-                    #tf.reduce_mean(tf.squared_difference(tf.squeeze(yi_), tf.squeeze(criticTrainActivationOfGivenAction_)))
+                # criticLoss_ = tf.reduce_mean(tf.square(criticTrainActivationOfGivenAction_ - tf.squeeze(yi_)))
+                criticLoss_ = tf.reduce_mean(tf.squared_difference(tf.squeeze(yi_), tf.squeeze(criticTrainActivationOfGivenAction_)))
 
                 tf.add_to_collection("yi_", yi_)
                 tf.add_to_collection("valueLoss_", criticLoss_)
