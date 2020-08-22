@@ -10,10 +10,8 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import numpy as np
 import json
 
-from maddpg.maddpgAlgor.trainer.myMADDPG_try import BuildMADDPGModels, TrainCritic, TrainActor, TrainCriticBySASR, \
-    TrainActorFromSA, TrainMADDPGModelsWithBuffer, ActOneStep, actByPolicyTrainNoisy, actByPolicyTargetNoisyForNextState
-from RLframework.RLrun import UpdateParameters, SampleOneStep, SampleFromMemory,\
-    RunTimeStep, RunEpisode, RunAlgorithm, getBuffer, SaveModel, StartLearn
+from maddpg.maddpgAlgor.trainer.maddpg_objBased_withBuffer import *
+from RLframework.RLrun import StartLearn, SampleOneStep
 from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
@@ -57,7 +55,7 @@ def main():
         individualRewardWolf = float(condition['individualRewardWolf'])
         costActionRatio = float(condition['costActionRatio'])
 
-        saveAllmodels = 1
+        saveAllmodels = False
 
     print("maddpg: {} wolves, {} sheep, {} blocks, {} episodes with {} steps each eps, sheepSpeed: {}x, wolfIndividualReward: {}, save all models: {}".
           format(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individualRewardWolf, str(saveAllmodels)))
@@ -120,46 +118,34 @@ def main():
     layerWidth = [128, 128]
 
 #------------ models ------------------------
+    buildActorLayers = BuildActorLayers(layerWidth, actionDim)
+    buildCriticLayers = BuildCriticLayers(layerWidth)
 
-    buildMADDPGModels = BuildMADDPGModels(actionDim, numAgents, obsShape)
-    modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
-
-    trainCriticBySASR = TrainCriticBySASR(actByPolicyTargetNoisyForNextState, learningRateCritic, gamma)
-    trainCritic = TrainCritic(trainCriticBySASR)
-    trainActorFromSA = TrainActorFromSA(learningRateActor)
-    trainActor = TrainActor(trainActorFromSA)
-
-    paramUpdateInterval = 1 #
-    updateParameters = UpdateParameters(paramUpdateInterval, tau)
-    sampleBatchFromMemory = SampleFromMemory(minibatchSize)
+    session = tf.Session()
+    actors = [Actor(agentObsDim, buildActorLayers, tau, learningRateActor, session, agentID) for agentID, agentObsDim in enumerate(obsShape)]
+    critics = [Critic(actionDim, numAgents, obsShape, buildCriticLayers, tau, learningRateCritic, gamma, session, agentID) for agentID in range(numAgents)]
+    agentsBuffer = [MemoryBuffer(bufferSize, minibatchSize) for agentID in range(numAgents)]
 
     learnInterval = 100
     learningStartBufferSize = minibatchSize * maxTimeStep
     startLearn = StartLearn(learningStartBufferSize, learnInterval)
 
-    trainMADDPGModels = TrainMADDPGModelsWithBuffer(updateParameters, trainActor, trainCritic, sampleBatchFromMemory, startLearn, modelsList)
-
-    actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
-    actOneStep = lambda allAgentsStates, runTime: [actOneStepOneModel(model, allAgentsStates) for model in modelsList]
+    agents = [MADDPGAgent(actors[agentID], critics[agentID], agentsBuffer[agentID], agentID, startLearn)
+              for agentID in range(numAgents)]
 
     sampleOneStep = SampleOneStep(transit, rewardFunc)
-    runTimeStep = RunTimeStep(actOneStep, sampleOneStep, trainMADDPGModels, observe = observe)
 
-    runEpisode = RunEpisode(reset, runTimeStep, maxTimeStep, isTerminal)
+    saver = tf.train.Saver(max_to_keep=None)
+    tf.add_to_collection("saver", saver)
+    session.run(tf.global_variables_initializer())
 
-    getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
-    getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 10000
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
+    fileName = 'maddpg_objBasedTry_new'
+    modelSavePath = os.path.join(dirName, '..', 'trainedModels', fileName)
+    modelSaveRate = 20000
+    saveModel = SaveModel(modelSaveRate, saveVariables, modelSavePath, session)
 
-    folderName = 'maddpgTryNew'
-    modelPath = os.path.join(dirName, '..', 'trainedModels', folderName, fileName)
-    saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
-
-    maddpg = RunAlgorithm(runEpisode, maxEpisode, saveModels, numAgents)
-    replayBuffer = getBuffer(bufferSize)
-    meanRewardList = maddpg(replayBuffer)
+    maddpg = MADDPG(agents, observe, sampleOneStep, reset, maxTimeStep, maxEpisode, saveModel)
+    maddpg.runTraining()
 
 
 if __name__ == '__main__':

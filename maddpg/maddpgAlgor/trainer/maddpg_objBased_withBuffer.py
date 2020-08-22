@@ -89,7 +89,7 @@ class Actor:
     def train(self, agentObservation, criticTrainActivation):
         self.session.run(self.actorTrainOpt_, feed_dict = {self.currentAgentState_: agentObservation, self.criticTrainActivation_: criticTrainActivation})
 
-    def replaceParam(self):
+    def updateParams(self):
         self.session.run(self.actorUpdateParam_)
 
     def actOneStep(self, agentState):
@@ -130,7 +130,9 @@ class Critic:
 
             with tf.variable_scope("train"):
                 yi_ = self.agentReward_ + self.gamma * self.criticTargetActivation_
-                criticLoss_ = tf.reduce_mean(tf.squared_difference(tf.squeeze(yi_), tf.squeeze(self.criticTrainActivation_)))
+                yi_ = yi_[:, 0]
+                qTrain = self.criticTrainActivation_[:, 0]
+                criticLoss_ = tf.reduce_mean(tf.square(qTrain - yi_))
 
                 criticOptimizer = tf.train.AdamOptimizer(self.criticLR, name='criticOptimizer')
                 self.crticTrainOpt_ = U.minimize_and_clip(criticOptimizer, criticLoss_, criticTrainParams_, self.gradNormClipping)
@@ -156,37 +158,46 @@ class Critic:
 
 
 class MADDPGAgent:
-    def __init__(self, actor, critic, buffer, agentID):
+    def __init__(self, actor, critic, buffer, agentID, startLearn):
         self.actor = actor
         self.critic = critic
         self.buffer = buffer
         self.agentID = agentID
+        self.startLearn = startLearn
 
-    def reshapeBatch(self, numAgents, batch):
-        reshapedBatch = [[batchElement[agentID] for batchElement in batch] for agentID in range(numAgents)]
-        return reshapedBatch
+        self.runTime = 0
 
-    def getBatchElements(self, numAgents, miniBatch):
-        allAgentsStatesBatchRaw, allAgentsActionsBatchRaw, allAgentsRewardsBatchRaw, allAgentsNextStateBatchRaw = list(zip(*miniBatch))
-        allAgentsStatesBatch = self.reshapeBatch(numAgents, allAgentsStatesBatchRaw)
-        allAgentsActionsBatch = self.reshapeBatch(numAgents, allAgentsActionsBatchRaw)
-        allAgentsRewardsBatch = self.reshapeBatch(numAgents, allAgentsRewardsBatchRaw)
-        allAgentsNextStateBatch = self.reshapeBatch(numAgents, allAgentsNextStateBatchRaw)
-        return allAgentsStatesBatch, allAgentsActionsBatch, allAgentsRewardsBatch, allAgentsNextStateBatch
+    def experience(self, observation, action, reward, nextObservation):
+        self.buffer.add(observation, action, reward, nextObservation)
 
-    def train(self, agents, miniBatch):
-        numAgents = len(agents)
-        allAgentsStatesBatch, allAgentsActionsBatch, allAgentsRewardsBatch, allAgentsNextStateBatch = self.getBatchElements(numAgents, miniBatch)
+    def train(self, agents):
+        self.runTime += 1
+        if not self.startLearn(self.runTime):
+            return
 
+        sampleIndex = self.buffer.getSampleIndex()
+
+        allAgentsStatesBatch = []
+        allAgentsNextStateBatch = []
+        allAgentsActionsBatch = []
+
+        for agent in agents:
+            obs, act, rew, obs_next = agent.buffer.getSampleFromIndex(sampleIndex)
+            allAgentsStatesBatch.append(obs)
+            allAgentsNextStateBatch.append(obs_next)
+            allAgentsActionsBatch.append(act)
+        agentObservation, agentActionFromBatch, agentReward, agentNextObservation = self.buffer.getSampleFromIndex(sampleIndex)
+
+        # train q net
         allAgentsNextStateTargetActions =[agent.actor.actByTargetNoisy(agentNextObservation) for agent, agentNextObservation in zip(agents, allAgentsNextStateBatch)]
-        agentReward = allAgentsRewardsBatch[self.agentID]
+        self.critic.train(agentReward, allAgentsStatesBatch, allAgentsActionsBatch, allAgentsNextStateBatch, allAgentsNextStateTargetActions)
 
-        agentObservation = allAgentsStatesBatch[self.agentID]
         agentAction = self.actor.actByTrainNoisy(agentObservation)
         criticTrainActivation = self.critic.getActivationWithAgentTrainAction(allAgentsStatesBatch, allAgentsActionsBatch, agentAction, self.agentID)
-
-        self.critic.train(agentReward, allAgentsStatesBatch, allAgentsActionsBatch, allAgentsNextStateBatch, allAgentsNextStateTargetActions)
         self.actor.train(agentObservation, criticTrainActivation)
+
+        self.actor.updateParams()
+        self.critic.updateParams()
 
 
 class MemoryBuffer(object):
@@ -195,27 +206,25 @@ class MemoryBuffer(object):
         self.buffer = self.reset()
         self.minibatchSize = minibatchSize
 
+    def getSampleIndex(self):
+        sampleIndex = [random.randint(0, len(self.buffer) - 1) for _ in range(self.minibatchSize)]
+        return sampleIndex
+
+    def getSampleFromIndex(self, sampleIndex):
+        sample = [self.buffer[index] for index in sampleIndex]
+        obs, act, rew, obs_next = list(zip(*sample))
+        return obs, act, rew, obs_next
+
     def reset(self):
         return deque(maxlen=int(self.size))
 
     def add(self, observation, action, reward, nextObservation):
         self.buffer.append((observation, action, reward, nextObservation))
 
-    def sample(self):
-        if len(self.buffer) < self.minibatchSize:
-            return []
-        sampleIndex = [random.randint(0, len(self.buffer) - 1) for _ in range(self.minibatchSize)]
-        sample = [self.buffer[index] for index in sampleIndex]
-
-        return sample
-
 
 class MADDPG:
-    def __init__(self, agents, buffer, startLearn, observe, sampleOneStep, reset, maxTimeStep, maxEpisode, saveModel):
+    def __init__(self, agents, observe, sampleOneStep, reset, maxTimeStep, maxEpisode, saveModel):
         self.agents = agents
-        self.startLearn = startLearn
-        self.buffer = buffer
-        self.runTime = 0
         self.observe = observe
         self.sampleOneStep = sampleOneStep
         self.reset = reset
@@ -226,30 +235,19 @@ class MADDPG:
         self.numAgents = len(agents)
 
     def resetBuffer(self):
-        self.buffer.reset()
-
-    def trainOneStep(self):
-        self.runTime += 1
-        if not self.startLearn(self.runTime):
-            return
-        numAgents = len(self.agents)
-        for agentID in range(numAgents):
-            miniBatch = self.buffer.sample()
-            self.agents[agentID].train(self.agents, miniBatch)
+        for agent in self.agents:
+            agent.buffer.reset()
 
     def allActOneStep(self, observation):
         actions = [agent.actor.actOneStep(agentObs) for agent, agentObs in zip(self.agents, observation)]
         return actions
 
-    def experience(self, observation, actions, reward, nextObservation):
-        self.buffer.add(observation, actions, reward, nextObservation)
-
     def act(self, state):
         observation = self.observe(state)
         actions = self.allActOneStep(observation)
-        reward, nextState = self.sampleOneStep(state, actions)
+        rewards, nextState = self.sampleOneStep(state, actions)
         nextObservation = self.observe(nextState)
-        return observation, actions, reward, nextObservation, nextState
+        return observation, actions, rewards, nextObservation, nextState
 
     def runTraining(self):
         episodeRewardList = []
@@ -260,10 +258,14 @@ class MADDPG:
             epsReward = np.zeros(len(self.agents))
             state = self.reset()
             for timeStep in range(self.maxTimeStep):
-                observation, actions, reward, nextObservation, state = self.act(state)
-                self.experience(observation, actions, reward, nextObservation)
-                self.trainOneStep()
-                epsReward += np.array(reward)
+                observation, actions, rewards, nextObservation, state = self.act(state)
+                for i, agent in enumerate(self.agents):
+                    agent.experience(observation[i], actions[i], rewards[i], nextObservation[i])
+
+                for agent in self.agents:
+                    agent.train(self.agents)
+
+                epsReward += np.array(rewards)
             self.saveModel()
 
             episodeRewardList.append(np.sum(epsReward))
@@ -273,8 +275,8 @@ class MADDPG:
             if episodeID % self.printEpsFrequency == 0:
                 lastTimeSpanMeanReward = np.mean(episodeRewardList[-self.printEpsFrequency:])
 
-                print("steps: {}, episodes: {}, last {} eps mean episode reward: {}, agent mean reward: {}".format(
-                    self.runTime, episodeID, self.printEpsFrequency, lastTimeSpanMeanReward,
+                print("episode: {}, last {} eps mean episode reward: {}, agent mean reward: {}".format(
+                    episodeID, self.printEpsFrequency, lastTimeSpanMeanReward,
                     [np.mean(rew[-self.printEpsFrequency:]) for rew in agentsEpsRewardList]))
 
         return

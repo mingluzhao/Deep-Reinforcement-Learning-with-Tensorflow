@@ -33,7 +33,7 @@ def p_train(observPlaceHolderList, actionSpaceList, agentIndex, p_func, q_func, 
         act_pd = actionPlaceHolderTypeList[agentIndex].pdfromflat(p)
 
         act_sample = act_pd.sample()
-        p_reg = tf.reduce_mean(tf.square(act_pd.flatparam()))
+        p_reg = tf.reduce_mean(tf.square(p))
 
         # for q
         act_input_n = act_ph_n + []
