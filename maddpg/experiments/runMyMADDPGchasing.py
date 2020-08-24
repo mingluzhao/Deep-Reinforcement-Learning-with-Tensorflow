@@ -32,6 +32,7 @@ minibatchSize = 1024#
 # 7.13 add action cost
 # 7.29 constant sheep bonus = 30
 # 8.9 add degree of individuality
+# TODO: 8.23 changed sheep punishment to 10 to test consistency with source performance
 
 def main():
     debug = 1
@@ -39,7 +40,7 @@ def main():
         numWolves = 3
         numSheeps = 1
         numBlocks = 2
-        saveAllmodels = False
+        saveAllmodels = 1
         maxTimeStep = 75
         sheepSpeedMultiplier = 1
         individualRewardWolf = 0
@@ -86,7 +87,7 @@ def main():
     isCollision = IsCollision(getPosFromAgentState)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
-                              punishForOutOfBound, collisionPunishment = collisionReward)
+                              punishForOutOfBound, collisionPunishment = 10) # TODO collisionReward = collisionPunishment
 
     rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
     reshapeAction = ReshapeAction()
@@ -149,11 +150,11 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 10000
+    modelSaveRate = 20000
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
 
-    folderName = 'maddpgTryNew'
+    folderName = 'maddpgWithOldReward/f1'
     modelPath = os.path.join(dirName, '..', 'trainedModels', folderName, fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath+ str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 

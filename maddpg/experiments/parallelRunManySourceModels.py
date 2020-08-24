@@ -5,6 +5,7 @@ DIRNAME = os.path.dirname(__file__)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 sys.path.append(os.path.join(DIRNAME, '..', '..', '..'))
 
+import subprocess
 from subprocess import Popen, PIPE
 import json
 import math
@@ -48,7 +49,7 @@ def main():
     numWolvesLevels = [3]
     numSheepsLevels = [1]
     numBlocksLevels = [2]
-    fileIDList = list(range(2))
+    fileIDList = [0]
 
     conditionLevels = [(wolfNum, sheepNum, blockNum, fileID)
                        for wolfNum in numWolvesLevels
@@ -61,7 +62,6 @@ def main():
         numWolves, numSheeps, numBlocks, fileID = condition
         parameters = {'numWolves': numWolves, 'numSheeps': numSheeps, 'numBlocks': numBlocks,'fileID': fileID}
         conditions.append(parameters)
-
 
     cmdList = excuteCodeParallel(conditions)
     print(cmdList)

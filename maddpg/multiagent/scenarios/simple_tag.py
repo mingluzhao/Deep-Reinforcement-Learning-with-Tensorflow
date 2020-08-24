@@ -96,7 +96,7 @@ class Scenario(BaseScenario):
         if agent.collide:
             for a in adversaries:
                 if self.is_collision(a, agent):
-                    rew -= 10
+                    rew -= 30 #------------------10 TODO: 8.23 modified original sheep reward (-10 for each catch) to -30
 
         # agents are penalized for exiting the screen, so that they can be caught by the adversaries
         def bound(x):

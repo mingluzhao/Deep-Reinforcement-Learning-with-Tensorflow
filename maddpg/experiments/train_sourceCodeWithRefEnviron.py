@@ -9,6 +9,7 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import numpy as np
 import json
+import tensorflow as tf
 
 import argparse
 import tensorflow.contrib.layers as layers
@@ -19,7 +20,6 @@ from environment.chasingEnv.multiAgentEnv import *
 from visualize.visualizeMultiAgent import *
 import maddpg.maddpgAlgor.common.tf_util as U
 from maddpg.maddpgAlgor.trainer.maddpg_try import MADDPGAgentTrainer
-from environment.chasingEnv.multiAgentEnvWithIndividReward import *
 
 ddpg = False
 
@@ -65,37 +65,42 @@ def mlp_model(input, num_outputs, scope, reuse=False, num_units=128, rnn_cell=No
         return out
 
 def main():
-    debug = 0
+    debug = 1
     if debug:
-        numWolves = 2
+        numWolves = 3
         numSheeps = 1
-        numBlocks = 0
+        numBlocks = 2
         fileID = 0
 
     else:
         print(sys.argv)
         condition = json.loads(sys.argv[1])
-        numWolves = int(condition["numWolves"])
-        numSheeps = int(condition["numSheeps"])
-        numBlocks = int(condition["numBlocks"])
-        fileID = int(condition["fileID"])
+        numWolves = int(condition['numWolves'])
+        numSheeps = int(condition['numSheeps'])
+        numBlocks = int(condition['numBlocks'])
+        fileID = int(condition['fileID'])
         print('a')
 
-    fileName = "maddpg{}wolves{}sheep{}blocksfile{}_agent".format(numWolves, numSheeps, numBlocks,fileID)
-    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', fileName)
+    costActionRatio = 0
+    individualRewardWolf = 0
+
+    fileName = "maddpgSourceCode{}wolves{}sheep{}blocksfile{}_agent".format(numWolves, numSheeps, numBlocks,fileID)
+    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModelsWithRefEnv', fileName)
 
     def parse_args():
         parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
         # Environment
         parser.add_argument("--max-episode-len", type=int, default=75, help="maximum episode length")
-        parser.add_argument("--num-episodes", type=int, default=600, help="number of episodes")  # 60000
+        parser.add_argument("--num-episodes", type=int, default=60000, help="number of episodes")  # 60000
         parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
         parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
         # Core training parameters
         parser.add_argument("--lr", type=float, default=1e-2, help="learning rate for Adam optimizer")
         parser.add_argument("--gamma", type=float, default=0.95, help="discount factor")
-        parser.add_argument("--batch-size", type=int, default=1024,
-                            help="number of episodes to optimize at the same time")
+        # parser.add_argument("--batch-size", type=int, default=1024,
+        #                     help="number of episodes to optimize at the same time")
+        parser.add_argument("--batch-size", type=int, default=1024, help="number of episodes to optimize at the same time")
+
         parser.add_argument("--num-units", type=int, default=128, help="number of units in the mlp")
         # Checkpointing
         parser.add_argument("--exp-name", type=str, default='exp', help="name of the experiment")
@@ -136,25 +141,20 @@ def main():
     entitiesMovableList = [True] * numAgents + [False] * numBlocks
     massList = [1.0] * numEntities
 
+    collisionReward = 30 # originalPaper = 10*3
     isCollision = IsCollision(getPosFromAgentState)
-    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
-                              punishForOutOfBound)
+                              punishForOutOfBound, collisionPunishment = 10) # TODO: collisionPunishment = collisionReward
+
+    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
+    reshapeAction = ReshapeAction()
+    getActionCost = GetActionCost(costActionRatio, reshapeAction, individualCost=True)
+    getWolvesAction = lambda action: [action[wolfID] for wolfID in wolvesID]
+    rewardWolfWithActionCost = lambda state, action, nextState: np.array(rewardWolf(state, action, nextState)) - np.array(getActionCost(getWolvesAction(action)))
 
     rewardFunc = lambda state, action, nextState: \
-        list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
-
-    # individualRewardWolf = True
-    # print('individualRewardWolf: ', str(individualRewardWolf))
-    # if individualRewardWolf:
-    #     rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    # else:
-    #     rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    #
-    # rewardFunc = lambda state, action, nextState: \
-    #     list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
-
+        list(rewardWolfWithActionCost(state, action, nextState)) + list(rewardSheep(state, action, nextState))
 
     reset = ResetMultiAgentChasing(numAgents, numBlocks)
     observeOneAgent = lambda agentID: Observe(agentID, wolvesID, sheepsID, blocksID, getPosFromAgentState,
@@ -164,10 +164,8 @@ def main():
     reshapeAction = ReshapeAction()
     getCollisionForce = GetCollisionForce()
     applyActionForce = ApplyActionForce(wolvesID, sheepsID, entitiesMovableList)
-    applyEnvironForce = ApplyEnvironForce(numEntities, entitiesMovableList, entitiesSizeList,
-                                          getCollisionForce, getPosFromAgentState)
-    integrateState = IntegrateState(numEntities, entitiesMovableList, massList,
-                                    entityMaxSpeedList, getVelFromAgentState, getPosFromAgentState)
+    applyEnvironForce = ApplyEnvironForce(numEntities, entitiesMovableList, entitiesSizeList, getCollisionForce, getPosFromAgentState)
+    integrateState = IntegrateState(numEntities, entitiesMovableList, massList, entityMaxSpeedList, getVelFromAgentState, getPosFromAgentState)
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
     isTerminal = lambda state: [False]* numAgents
@@ -201,16 +199,10 @@ def main():
         print('Starting iterations...')
         while True:
             obs_n = observe(state)
-            # print('state', state[0], state[1])
-            # action_n = [trainers[0].action(obs_n[0]), [0, 0, 0, 0, 0]]
             action_n = [agent.action(obs) for agent, obs in zip(trainers,obs_n)]
-
             nextState = transit(state, action_n)
             new_obs_n = observe(nextState)
             rew_n = rewardFunc(state, action_n, nextState)
-            # print('reward ', rew_n)
-            # print('state', nextState[0], nextState[1])
-            # print('--')
             done_n = isTerminal(state)
 
             episode_step += 1
@@ -219,7 +211,6 @@ def main():
 
             for i, agent in enumerate(trainers):
                 agent.experience(obs_n[i], action_n[i], rew_n[i], new_obs_n[i], done_n[i], terminal)
-
             state = nextState
 
             for i, rew in enumerate(rew_n):
@@ -227,27 +218,21 @@ def main():
                 agent_rewards[i][-1] += rew
 
             if done or terminal:
-
                 state = reset()
                 episode_step = 0
                 episode_rewards.append(0)
                 for a in agent_rewards:
                     a.append(0)
 
-            # increment global step counter
             train_step += 1
 
-            # update all trainers, if not in display or benchmark mode
-            loss = None
             for agent in trainers:
                 agent.preupdate()
             for agent in trainers:
-                loss = agent.update(trainers, train_step)
+                agent.update(trainers, train_step)
 
             # save model, display training output
             if terminal and (len(episode_rewards) % arglist.save_rate == 0):
-                # print('eps rewards', episode_rewards)
-
                 U.save_state(arglist.save_dir, saver=saver)
                 print("steps: {}, episodes: {}, mean episode reward: {}, agent episode reward: {}, time: {}".format(
                     train_step, len(episode_rewards), np.mean(episode_rewards[-arglist.save_rate:]),
@@ -259,15 +244,7 @@ def main():
                 for rew in agent_rewards:
                     final_ep_ag_rewards.append(np.mean(rew[-arglist.save_rate:]))
 
-
-            # saves final episode reward for plotting training curve later
             if len(episode_rewards) > arglist.num_episodes:
-                rew_file_name = arglist.plots_dir + arglist.exp_name + '_rewards.pkl'
-                with open(rew_file_name, 'wb') as fp:
-                    pickle.dump(final_ep_rewards, fp)
-                agrew_file_name = arglist.plots_dir + arglist.exp_name + '_agrewards.pkl'
-                with open(agrew_file_name, 'wb') as fp:
-                    pickle.dump(final_ep_ag_rewards, fp)
                 print('...Finished total of {} episodes.'.format(len(episode_rewards)))
                 break
 

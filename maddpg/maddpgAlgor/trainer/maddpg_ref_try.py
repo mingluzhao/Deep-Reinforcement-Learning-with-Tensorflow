@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import tensorflow as tf
 import maddpg.maddpgAlgor.common.tf_util as U
 from maddpg.maddpgAlgor.common.distributions import make_pdtype

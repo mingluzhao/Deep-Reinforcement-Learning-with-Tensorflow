@@ -21,14 +21,15 @@ import tensorflow.contrib.layers as layers
 
 modelNameList = ['policy3WolfMADDPG1SheepMADDPG', 'policy3WoolfMADDPG1SheepMADDPG',
                  'policy3WoolfMADDPG1SheepMADDPG11111', 'policy3WoolfMADDPG1SheepMADDPG111111', 'policy3WoolfMADDPG1SheepMADDPG11111111']
-trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'policy6WolfMADDPG1SheepMADDPG11111')
+
+trajectoryPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', 'policy3v1_originalCodeWithnewReward')
 
 def parse_args():
     parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
     # Environment
     parser.add_argument("--scenario", type=str, default="simple", help="name of the scenario script")
     parser.add_argument("--max-episode-len", type=int, default=75, help="maximum episode length")
-    parser.add_argument("--num-episodes", type=int, default=300, help="number of episodes") #60000
+    parser.add_argument("--num-episodes", type=int, default=60000, help="number of episodes") #60000
     parser.add_argument("--num-adversaries", type=int, default=3, help="number of adversaries")
     parser.add_argument("--good-policy", type=str, default="maddpg", help="policy for good agents")
     parser.add_argument("--adv-policy", type=str, default="maddpg", help="policy of adversaries")
