@@ -39,12 +39,12 @@ def main():
         numWolves = 3
         numSheeps = 1
         numBlocks = 2
-        hasWalls= 0.0
+        hasWalls= 2
 
         dt=0.02
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 0.0
+        individualRewardWolf = 0
 
         mujocoVisualize=True
         saveAllmodels = True
@@ -95,8 +95,10 @@ def main():
 
     # ------------ mujocoEnv ------------------------
 
-    physicsDynamicsPath = os.path.join(dirName, '..', '..', 'environment', 'mujocoEnv', 'dt={}'.format(dt),
-                                       'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}.xml'.format(hasWalls, numBlocks, numSheeps, numWolves))
+    # physicsDynamicsPath=os.path.join(dirName,'..','..','environment','mujocoEnv','dt={}'.format(dt),
+    #                                  'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}.xml'.format(hasWalls,numBlocks,numSheeps,numWolves))
+    physicsDynamicsPath=os.path.join(dirName,'..','..','environment','mujocoEnv','newMujoco',
+                                     'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}.xml'.format(hasWalls,numBlocks,numSheeps,numWolves))
 
     with open(physicsDynamicsPath) as f:
         xml_string = f.read()
@@ -149,7 +151,7 @@ def main():
 
     fileName = "maddpg{}wall{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         hasWalls, numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
-    modelPaths = [os.path.join(dataMainFolder, fileName + str(i)) for i in range(numAgents)]
+    modelPaths = [os.path.join(dataMainFolder, fileName + str(i)+ '10000eps') for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 

@@ -31,12 +31,12 @@ bufferSize = 1e6#
 minibatchSize = 1024#
 
 def main():
-    debug = 0
+    debug = 1
     if debug:
-        numWolves = 6
+        numWolves = 3
         numSheeps = 1
         numBlocks = 2
-        hasWalls= 0.0
+        hasWalls= 2
 
         dt=0.02
         maxTimeStep = 75
@@ -92,7 +92,10 @@ def main():
 
 #------------ mujocoEnv ------------------------
 
-    physicsDynamicsPath=os.path.join(dirName,'..','..','environment','mujocoEnv','dt={}'.format(dt),'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}.xml'.format(hasWalls,numBlocks,numSheeps,numWolves))
+    # physicsDynamicsPath=os.path.join(dirName,'..','..','environment','mujocoEnv','dt={}'.format(dt),
+    #                                  'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}.xml'.format(hasWalls,numBlocks,numSheeps,numWolves))
+    physicsDynamicsPath=os.path.join(dirName,'..','..','environment','mujocoEnv','newMujoco',
+                                     'hasWalls={}_numBlocks={}_numSheeps={}_numWolves={}.xml'.format(hasWalls,numBlocks,numSheeps,numWolves))
 
     with open(physicsDynamicsPath) as f:
         xml_string = f.read()
@@ -171,7 +174,7 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 10000
+    modelSaveRate = 5000
     fileName = "maddpg{}wall{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         hasWalls, numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
 

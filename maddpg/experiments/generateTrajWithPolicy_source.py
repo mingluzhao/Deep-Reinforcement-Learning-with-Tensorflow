@@ -78,7 +78,7 @@ def main():
         numWolves = 3
         numSheeps = 1
         numBlocks = 2
-        fileID = 2
+        fileID = 4
 
     else:
         print(sys.argv)
@@ -94,7 +94,8 @@ def main():
     maxRunningStepsToSample = 75
 
     fileName = "maddpgSourceCode{}wolves{}sheep{}blocksfile{}_agent".format(numWolves, numSheeps, numBlocks,fileID)
-    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModels', fileName)
+    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModelsWithRefEnv_3c', fileName)
+    print(policyPath)
 
     def parse_args():
         parser = argparse.ArgumentParser("Reinforcement Learning experiments for multiagent environments")
@@ -150,11 +151,11 @@ def main():
     entitiesMovableList = [True] * numAgents + [False] * numBlocks
     massList = [1.0] * numEntities
 
-    collisionReward = 30 # originalPaper = 10*3
+    collisionReward = 10 # originalPaper = 10*3
     isCollision = IsCollision(getPosFromAgentState)
     punishForOutOfBound = PunishForOutOfBound()
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
-                              punishForOutOfBound, collisionPunishment = collisionReward)
+                              punishForOutOfBound, collisionPunishment = 10)# TODO
 
     rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
     reshapeAction = ReshapeAction()
@@ -198,7 +199,7 @@ def main():
         policy = lambda state: [agent.action(obs) for agent, obs in zip(trainers, observe(state))]
 
         rewardList = []
-        numTrajToSample = 3
+        numTrajToSample = 300
         trajList = []
         for i in range(numTrajToSample):
             traj = sampleTrajectory(policy)
@@ -210,8 +211,7 @@ def main():
     seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
     print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
 
-    # visualize
-    visualize = 1
+    visualize = 0
     if visualize:
         entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
         render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
