@@ -48,9 +48,9 @@ def main():
     numSheepsLevels = [1]
     numBlocksLevels = [2]
     maxTimeStepLevels = [75]
-    sheepSpeedMultiplierLevels = [1]
-    individualRewardWolfLevels = [0, 1]
-    costActionRatioList = [0]
+    sheepSpeedMultiplierLevels = [1.0]
+    individualRewardWolfLevels = [0]
+    costActionRatioList = [0.03]
 
     conditionLevels = [(wolfNum, sheepNum, blockNum, timeStep, sheepSpeed, individReward, costRatio)
                        for wolfNum in numWolvesLevels

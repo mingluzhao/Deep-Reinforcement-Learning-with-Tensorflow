@@ -1,2 +1,0 @@
-model_checkpoint_path: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../trainedModels/sourceCodeModels/maddpgSourceCode3wolves1sheep2blocksfile0_agent"
-all_model_checkpoint_paths: "/Users/zhaominglu/PycharmProjects/Deep-Reinforcement-Learning-with-Tensorflow/maddpg/experiments/../trainedModels/sourceCodeModels/maddpgSourceCode3wolves1sheep2blocksfile0_agent"

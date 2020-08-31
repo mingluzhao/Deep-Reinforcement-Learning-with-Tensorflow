@@ -36,21 +36,13 @@ def calcWolvesTrajReward(traj, wolvesID):
 def main():
     debug = 1
     if debug:
-        # numWolves = 3
-        # numSheeps = 1
-        # numBlocks = 2
-        # maxTimeStep = 75
-        # sheepSpeedMultiplier = 1.0
-        # individualRewardWolf = 1.0
-        # costActionRatio = 0.0
-
         numWolves = 3
         numSheeps = 1
         numBlocks = 2
         maxTimeStep = 75
-        sheepSpeedMultiplier = 1
-        individualRewardWolf = 0
-        costActionRatio = 0.0
+        sheepSpeedMultiplier = 1.0
+        individualRewardWolf = 0.0
+        costActionRatio = 0.02
 
     else:
         print(sys.argv)
@@ -132,12 +124,12 @@ def main():
 
     dirName = os.path.dirname(__file__)
     # individStr = 'individ' if individualRewardWolf else 'shared'
-    fileName = "maddpg4{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
     # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
     #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    folderName = 'maddpgWith1010Reward'
+    folderName = 'maddpg_10reward_full'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) ) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
@@ -146,7 +138,7 @@ def main():
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
     rewardList = []
-    numTrajToSample = 3
+    numTrajToSample = 10#300
     trajList = []
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
@@ -168,7 +160,7 @@ def main():
     #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)
     # trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
     # saveToPickle(trajList, trajSavePath)
-    #
+
     wolfColor = np.array([0.85, 0.35, 0.35])
     sheepColor = np.array([0.35, 0.85, 0.35])
     blockColor = np.array([0.25, 0.25, 0.25])

@@ -75,10 +75,10 @@ def mlp_model(input, num_outputs, scope, reuse=False, num_units=128, rnn_cell=No
 def main():
     debug = 1
     if debug:
-        numWolves = 3
+        numWolves = 5
         numSheeps = 1
         numBlocks = 2
-        fileID = 4
+        fileID = 0
 
     else:
         print(sys.argv)
@@ -94,7 +94,8 @@ def main():
     maxRunningStepsToSample = 75
 
     fileName = "maddpgSourceCode{}wolves{}sheep{}blocksfile{}_agent".format(numWolves, numSheeps, numBlocks,fileID)
-    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModelsWithRefEnv_3c', fileName)
+    # fileName = "maddpgSourceCode{}wolves{}sheep{}blocksfileindivid{}_agent".format(numWolves, numSheeps, numBlocks,fileID)
+    policyPath = os.path.join(dirName, '..', 'trainedModels', 'sourceCodeModelsWithRefEnv_3c_wolf', fileName)
     print(policyPath)
 
     def parse_args():
@@ -199,7 +200,7 @@ def main():
         policy = lambda state: [agent.action(obs) for agent, obs in zip(trainers, observe(state))]
 
         rewardList = []
-        numTrajToSample = 300
+        numTrajToSample = 10
         trajList = []
         for i in range(numTrajToSample):
             traj = sampleTrajectory(policy)
@@ -211,7 +212,7 @@ def main():
     seTrajReward = np.std(rewardList) / np.sqrt(len(rewardList) - 1)
     print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
 
-    visualize = 0
+    visualize = 1
     if visualize:
         entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
         render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
