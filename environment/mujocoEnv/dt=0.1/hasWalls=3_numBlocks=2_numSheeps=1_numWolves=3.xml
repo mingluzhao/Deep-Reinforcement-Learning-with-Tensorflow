@@ -1,0 +1,66 @@
+<mujoco>
+	<option gravity="0 0 0" timestep="0.02"/>
+	<default>
+		<geom rgba="0 0 0 1"/>
+	</default>
+	<worldbody>
+		<light diffuse=".2 .2 .2" dir="0 0 -1" mode="track" pos="0 0 20"/>
+		<body>
+			<geom condim="3" mass="10000" name="floor" pos="0 0 -0.4" rgba=".9 .9 .9 1" size="10 10 .1" type="box"/>
+			<camera mode="fixed" name="center"/>
+			<camera axisangle="1 0 0 30" mode="fixed" name="30" pos="0 -5 10"/>
+		</body>
+		<body name="predator0" pos="0 0 0.075">
+			<joint axis="1 0 0" damping="2.5" frictionloss="0" name="predator00" pos="0 0 0" type="slide"/>
+			<joint axis="0 1 0" damping="2.5" frictionloss="0" name="predator01" pos="0 0 0" type="slide"/>
+			<geom conaffinity="1" mass="1" rgba="1 0 0 1" size="0.075 0.075" solimp="0.9 0.9999 0.001 0.5 1" solref="0.5 0.2" type="cylinder"/>
+			<site name="predator0" pos="-0.1 0 0.05" size="0.001" type="sphere"/>
+		</body>
+		<body name="predator1" pos="0 0 0.075">
+			<joint axis="1 0 0" damping="2.5" frictionloss="0" name="predator10" pos="0 0 0" type="slide"/>
+			<joint axis="0 1 0" damping="2.5" frictionloss="0" name="predator11" pos="0 0 0" type="slide"/>
+			<geom conaffinity="1" mass="1" rgba="1 0 0 1" size="0.075 0.075" solimp="0.9 0.9999 0.001 0.5 1" solref="0.5 0.2" type="cylinder"/>
+			<site name="predator1" pos="-0.1 0 0.05" size="0.001" type="sphere"/>
+		</body>
+		<body name="predator2" pos="0 0 0.075">
+			<joint axis="1 0 0" damping="2.5" frictionloss="0" name="predator20" pos="0 0 0" type="slide"/>
+			<joint axis="0 1 0" damping="2.5" frictionloss="0" name="predator21" pos="0 0 0" type="slide"/>
+			<geom conaffinity="1" mass="1" rgba="1 0 0 1" size="0.075 0.075" solimp="0.9 0.9999 0.001 0.5 1" solref="0.5 0.2" type="cylinder"/>
+			<site name="predator2" pos="-0.1 0 0.05" size="0.001" type="sphere"/>
+		</body>
+		<body name="prey0" pos="0 0 0.075">
+			<joint axis="1 0 0" damping="2.5" frictionloss="0" name="prey00" pos="0 0 0" type="slide"/>
+			<joint axis="0 1 0" damping="2.5" frictionloss="0" name="prey01" pos="0 0 0" type="slide"/>
+			<geom conaffinity="1" mass="1" rgba="0 1 0 1" size="0.05 0.075" solimp="0.9 0.9999 0.001 0.5 1" solref="0.5 0.2" type="cylinder"/>
+			<site name="prey0" pos="0.5 0 0.075" size="0.001" type="sphere"/>
+		</body>
+		<body name="block0" pos="0 0 0.075">
+			<geom conaffinity="1" condim="3" mass="1" rgba="0.4 0.4 0.4 0.7" size="0.2 0.2" solimp="0.9 0.9999 0.001 0.5 1" solref="0.5 0.2" type="cylinder"/>
+		</body>
+		<body name="block1" pos="0 0 0.075">
+			<geom conaffinity="1" condim="3" mass="1" rgba="0.4 0.4 0.4 0.7" size="0.2 0.2" solimp="0.9 0.9999 0.001 0.5 1" solref="0.5 0.2" type="cylinder"/>
+		</body>
+		<body>
+			<geom condim="3" mass="10000" name="wall1" pos="-3.25 0 -0.2" rgba="0.4 0.4 0.4 0.3" size="0.25 3.5 0.5" type="box"/>
+		</body>
+		<body>
+			<geom condim="3" mass="10000" name="wall2" pos="3.25 0 -0.2" rgba="0.4 0.4 0.4 0.3" size="0.25 3.5 0.5" type="box"/>
+		</body>
+		<body>
+			<geom condim="3" mass="10000" name="wall3" pos="0 -3.25 -0.2" rgba="0.4 0.4 0.4 0.3" size="3.5 0.25 0.5" type="box"/>
+		</body>
+		<body>
+			<geom condim="3" mass="10000" name="wall4" pos="0 3.25 -0.2" rgba="0.4 0.4 0.4 0.3" size="3.5 0.25 0.5" type="box"/>
+		</body>
+	</worldbody>
+	<actuator>
+		<motor gear="1" joint="predator00"/>
+		<motor gear="1" joint="predator01"/>
+		<motor gear="1" joint="predator10"/>
+		<motor gear="1" joint="predator11"/>
+		<motor gear="1" joint="predator20"/>
+		<motor gear="1" joint="predator21"/>
+		<motor gear="1" joint="prey00"/>
+		<motor gear="1" joint="prey01"/>
+	</actuator>
+</mujoco>
