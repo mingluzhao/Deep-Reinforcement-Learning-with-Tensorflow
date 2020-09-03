@@ -11,7 +11,7 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 from environment.chasingEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import saveToPickle, restoreVariables, loadFromPickle
 from functionTools.trajectory import SampleTrajectory
-from environment.chasingEnv.rewardWithProbablisticKill import *
+from environment.chasingEnv.rewardWithFightBackProb import *
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import *
 import pandas as pd

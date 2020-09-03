@@ -39,7 +39,7 @@ class ExcuteCodeOnConditionsParallel:
 
 def main():
     startTime = time.time()
-    fileName = 'runMyMADDPGchasing_rewardWithSelfHurtProb.py'
+    fileName = 'runMyMADDPGchasing_discreteFightBackProb.py'
     numSample = None
     numCpuToUse = int(0.8 * os.cpu_count())
     excuteCodeParallel = ExcuteCodeOnConditionsParallel(fileName, numSample, numCpuToUse)

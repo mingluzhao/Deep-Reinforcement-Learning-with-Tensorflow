@@ -19,7 +19,7 @@ from maddpg.maddpgAlgor.trainer.myMADDPG import BuildMADDPGModels, TrainCritic, 
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState, GetActionCost
-from environment.chasingEnv.rewardWithProbablisticKill import *
+from environment.chasingEnv.rewardWithFightBackProb import *
 
 # fixed training parameters
 maxEpisode = 60000

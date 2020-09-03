@@ -13,7 +13,7 @@ from functionTools.loadSaveModel import saveToPickle, restoreVariables
 from functionTools.trajectory import SampleTrajectory
 from visualize.visualizeMultiAgent import *
 from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
-from environment.chasingEnv.rewardWithProbablisticKill import *
+from environment.chasingEnv.rewardWithFightBackProb import *
 from maddpg.maddpgAlgor.trainer.myMADDPG import *
 import json
 import pygame as pg

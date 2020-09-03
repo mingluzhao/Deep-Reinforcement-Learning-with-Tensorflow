@@ -36,13 +36,13 @@ def calcWolvesTrajReward(traj, wolvesID):
 def main():
     debug = 1
     if debug:
-        numWolves = 3
+        numWolves = 6
         numSheeps = 1
         numBlocks = 2
         maxTimeStep = 75
         sheepSpeedMultiplier = 1.0
-        individualRewardWolf = 0.0
-        costActionRatio = 0.02
+        individualRewardWolf = 1.0
+        costActionRatio = 0.03
 
     else:
         print(sys.argv)
@@ -129,7 +129,7 @@ def main():
     # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
     #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    folderName = 'maddpg_10reward_full'
+    folderName = 'maddpg_10reward_full_1speed'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) ) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]

@@ -9,7 +9,7 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import gym
-from sac.src.algorithm1 import *
+from sac.src.algorithm import *
 from functionTools.loadSaveModel import saveVariables
 import matplotlib.pyplot as plt
 
@@ -31,22 +31,6 @@ def main():
     hyperparamDict['policyLayersWidths'] = [256, 256]
     hyperparamDict['policyMuWeightInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
     hyperparamDict['policySDWeightInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
-    # hyperparamDict['valueNetWeightInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['valueNetBiasInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['valueNetActivFunction'] = [tf.nn.relu, tf.nn.relu]
-    # hyperparamDict['valueNetLayersWidths'] = [256, 256]
-    #
-    # hyperparamDict['qNetWeightInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['qNetBiasInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['qNetActivFunction'] = [tf.nn.relu, tf.nn.relu]
-    # hyperparamDict['qNetLayersWidths'] = [256, 256]
-    #
-    # hyperparamDict['policyWeightInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['policyBiasInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['policyActivFunction'] = [tf.nn.relu, tf.nn.relu]
-    # hyperparamDict['policyLayersWidths'] = [256, 256]
-    # hyperparamDict['policyMuWeightInit'] = tf.random_uniform_initializer(0, .1)
-    # hyperparamDict['policySDWeightInit'] = tf.random_uniform_initializer(0, .1)
 
     hyperparamDict['policySDlow'] = -20
     hyperparamDict['policySDhigh'] = 2
@@ -108,6 +92,7 @@ def main():
         os.makedirs(imageSavePath)
     plt.plot(range(len(episodeRewardList)), episodeRewardList)
     plt.savefig(os.path.join(imageSavePath, fileName + str('.png')))
+    plt.show()
 
 
 if __name__ == '__main__':
