@@ -27,7 +27,7 @@ learningRateCritic = 0.01#
 gamma = 0.95 #
 tau=0.01 #
 bufferSize = 1e6#
-minibatchSize = 32#
+minibatchSize = 1024#
 
 
 # 7.13 add action cost
@@ -160,9 +160,9 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 300
-    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}_agent".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance, biteReward)
+    modelSaveRate = 30000
+    fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}_agent".format(
+        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance, biteReward, killProportion)
 
     folderName = 'maddpg_rewardSensitiveToDist'
     modelPath = os.path.join(dirName, '..', 'trainedModels', folderName, fileName)
