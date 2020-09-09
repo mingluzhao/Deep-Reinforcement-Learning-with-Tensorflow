@@ -39,7 +39,7 @@ def main():
         'maxTimeStepLevels': [75],
         'sheepSpeedMultiplierLevels': [0.5],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0]}
+        'costActionRatioList': [0.03]}
 
     conditions['blackwidow'] = {
         'numWolvesLevels': [2, 3, 4],
@@ -48,7 +48,7 @@ def main():
         'maxTimeStepLevels': [75],
         'sheepSpeedMultiplierLevels': [1.5],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0]}
+        'costActionRatioList': [0.03]}
 
     conditions['carter'] = {
         'numWolvesLevels': [2, 3, 4],
