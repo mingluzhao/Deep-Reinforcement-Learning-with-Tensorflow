@@ -163,8 +163,8 @@ def main():
     independentVariables = OrderedDict()
     independentVariables['wolfIndividual'] = [0.0, 1.0]
     independentVariables['numWolves'] = [2, 3, 4, 5, 6]
-    independentVariables['sheepSpeedMultiplier'] = [1.0]
-    independentVariables['costActionRatio'] = [0.0, 0.01, 0.02]
+    independentVariables['sheepSpeedMultiplier'] = [0.75, 1.0, 1.25]
+    independentVariables['costActionRatio'] = [0.0, 0.01, 0.02, 0.03]
 
     getSheepModelPaths = GetSheepModelPaths(independentVariables['sheepSpeedMultiplier'], independentVariables['costActionRatio'], independentVariables['wolfIndividual'])
     evaluateWolfSheepTrain = EvaluateWolfSheepTrain(getSheepModelPaths)
@@ -173,16 +173,16 @@ def main():
     levelValues = list(independentVariables.values())
     levelIndex = pd.MultiIndex.from_product(levelValues, names=levelNames)
     toSplitFrame = pd.DataFrame(index=levelIndex)
-    # resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
+    resultDF = toSplitFrame.groupby(levelNames).apply(evaluateWolfSheepTrain)
 
     resultPath = os.path.join(dirName, '..', 'evalResults')
-    resultLoc = os.path.join(resultPath, 'eval10RewardFullResult.pkl')
+    resultLoc = os.path.join(resultPath, 'eval10RewardFullResultAllSpeed.pkl')
 
-    # saveToPickle(resultDF, resultLoc)
+    saveToPickle(resultDF, resultLoc)
 
-    resultDF = loadFromPickle(resultLoc)
+    # resultDF = loadFromPickle(resultLoc)
     print(resultDF)
-    figure = plt.figure(figsize=(7, 11))
+    figure = plt.figure(figsize=(9, 11))
     plotCounter = 1
 
     numRows = len(independentVariables['costActionRatio'])
@@ -195,7 +195,7 @@ def main():
             axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
             for keyRow, innerSubDf in outterSubDf.groupby('wolfIndividual'):
                 innerSubDf.index = innerSubDf.index.droplevel('wolfIndividual')
-                plt.ylim([0, 500])
+                plt.ylim([0, 800])
 
                 innerSubDf.plot.line(ax = axForDraw, y='mean', yerr='se', label = keyRow, uplims=True, lolims=True, capsize=3)
                 if plotCounter <= numColumns:
@@ -205,14 +205,14 @@ def main():
                 axForDraw.set_xlabel('Number of Wolves')
 
             plotCounter += 1
-            axForDraw.set_aspect(0.01, adjustable='box')
+            # axForDraw.set_aspect(0.01, adjustable='box')
             plt.xticks(independentVariables['numWolves'])
 
             plt.legend(title='Wolf type')
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Reward', ha='center', va='center', rotation=90)
     plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    plt.savefig(os.path.join(resultPath, 'eval10RewardFullResult'))
+    plt.savefig(os.path.join(resultPath, 'eval10RewardFullResultAllSpeed'))
     plt.show()
 
 
