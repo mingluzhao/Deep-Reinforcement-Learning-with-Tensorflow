@@ -38,7 +38,31 @@ algebra bcdei
 'rewardSensitivityToDistance':      [0, 1, 2, 10000],
 'biteRewardLevels':                 [0, 0.05, 0.1]
 
+
 left:
+
+'numWolvesLevels':                  [6],
+'sheepSpeedMultiplierLevels':       [.75, 1],
+'costActionRatioList':              [0.01, 0.02, 0.025],
+'rewardSensitivityToDistance':      [0, 1, 2, 10000],
+'biteRewardLevels':                 [0, 0.05, 0.1]
+--------------------------------------------------------------
+
+antman bcdef
+
+'numWolvesLevels':                  [6],
+'sheepSpeedMultiplierLevels':       [.75, 1],
+'costActionRatioList':              [0.02],
+'rewardSensitivityToDistance':      [0, 1, 2, 10000],
+'biteRewardLevels':                 [0, 0.05, 0.1]
+
+
+ei:
+'numWolvesLevels': [6],
+'sheepSpeedMultiplierLevels': [0.75, 1],
+'costActionRatioList': [0.01],
+'rewardSensitivityToDistanceLevels': [0],
+'biteRewardLevels': [0, 0.05, 0.1]}
 
 '''
 
@@ -56,42 +80,42 @@ def main():
     conditions['antman'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [0.75],
-        'costActionRatioList': [0],
+        'costActionRatioList': [0.02],
         'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['blackwidow'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [0.75],
-        'costActionRatioList': [0],
+        'costActionRatioList': [0.02],
         'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0.05]}
 
     conditions['carter'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [0.75],
-        'costActionRatioList': [0],
+        'costActionRatioList': [0.02],
         'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0.1]}
 
     conditions['deadpool'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0],
+        'costActionRatioList': [0.02],
         'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['echo'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0],
+        'costActionRatioList': [0.02],
         'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0.05]}
 
     conditions['falcon'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0],
+        'costActionRatioList': [0.02],
         'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0.1]}
 
@@ -113,27 +137,27 @@ def main():
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [0.75],
         'costActionRatioList': [0.005],
-        'rewardSensitivityToDistanceLevels': [1],
+        'rewardSensitivityToDistanceLevels': [10000],
         'biteRewardLevels': [0, 0.05, 0.1]}
 
     conditions['derivative'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [1],
         'costActionRatioList': [0.005],
-        'rewardSensitivityToDistanceLevels': [1],
+        'rewardSensitivityToDistanceLevels': [10000],
         'biteRewardLevels': [0, 0.05, 0.1]}
 
     conditions['expectation'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [0.75],
-        'costActionRatioList': [0.005],
+        'costActionRatioList': [0.01],
         'rewardSensitivityToDistanceLevels': [2],
         'biteRewardLevels': [0, 0.05, 0.1]}
 
     conditions['integration'] = {
         'numWolvesLevels': [6],
         'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0.005],
+        'costActionRatioList': [0.01],
         'rewardSensitivityToDistanceLevels': [2],
         'biteRewardLevels': [0, 0.05, 0.1]}
 
@@ -142,7 +166,7 @@ def main():
         'sheepSpeedMultiplierLevels': [0.75, 1],
         'costActionRatioList': [0.005],
         'rewardSensitivityToDistanceLevels': [10000],
-        'biteRewardLevels': [0, 0.05, 0.1]}
+        'biteRewardLevels': [0, 0.05, 0.1]} # not run
 
     conditions['titanxp'] = {
         'numWolvesLevels': [4],
