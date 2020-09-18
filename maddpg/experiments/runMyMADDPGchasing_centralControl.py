@@ -18,7 +18,6 @@ from functionTools.loadSaveModel import saveVariables
 from environment.chasingEnv.multiAgentEnv import TransitMultiAgentChasing, ApplyActionForce, ApplyEnvironForce, \
     ResetMultiAgentChasing, ReshapeAction, RewardSheep, RewardWolf, Observe, GetCollisionForce, IntegrateState, \
     IsCollision, PunishForOutOfBound, getPosFromAgentState, getVelFromAgentState
-from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 
 # fixed training parameters
 maxEpisode = 60000
@@ -35,11 +34,11 @@ minibatchSize = 1024#
 def main():
     debug = 1
     if debug:
-        numWolves = 3
+        numWolves = 1
         numSheeps = 1
         numBlocks = 2
-        saveAllmodels = False
-        maxTimeStep = 25
+        saveAllmodels = 1
+        maxTimeStep = 75
         sheepSpeedMultiplier = 1
         individualRewardWolf = int(False)
 
@@ -82,14 +81,10 @@ def main():
 
     isCollision = IsCollision(getPosFromAgentState)
     punishForOutOfBound = PunishForOutOfBound()
+    collisionReward = 10
     rewardSheep = RewardSheep(wolvesID, sheepsID, entitiesSizeList, getPosFromAgentState, isCollision,
-                              punishForOutOfBound)
-
-    if individualRewardWolf:
-        rewardWolf = RewardWolfIndividual(wolvesID, sheepsID, entitiesSizeList, isCollision)
-    else:
-        rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision)
-
+                              punishForOutOfBound, collisionPunishment = collisionReward)
+    rewardWolf = RewardWolf(wolvesID, sheepsID, entitiesSizeList, isCollision, collisionReward, individualRewardWolf)
     rewardFunc = lambda state, action, nextState: \
         list(rewardWolf(state, action, nextState)) + list(rewardSheep(state, action, nextState))
 
@@ -161,7 +156,7 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numModels)]
-    modelSaveRate = 1000
+    modelSaveRate = 10000
     individStr = 'individ' if individualRewardWolf else 'shared'
     fileName = "maddpgCentralControl{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, individStr)

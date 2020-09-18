@@ -11,7 +11,6 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 from environment.chasingEnv.multiAgentEnv import *
 from functionTools.loadSaveModel import saveToPickle, restoreVariables, loadFromPickle
 from functionTools.trajectory import SampleTrajectoryResetAtTerminal
-from environment.chasingEnv.multiAgentEnvWithIndividReward import RewardWolfIndividual
 from environment.chasingEnv.rewardWithKillProbSensitiveToDist import *
 
 from maddpg.maddpgAlgor.trainer.myMADDPG import *
@@ -51,10 +50,22 @@ class CalcWolfDistance:
 '''
 until 9.6 have models for:
 
+wolfNum = 4
 'sheepSpeedMultiplierLevels':       [.75, 1, 1.25],
 'costActionRatioList':              [0.0, 0.005, 0.01, 0.02, 0.025],
 'rewardSensitivityToDistance':      [0, 2, 5, 10000],
 'biteRewardLevels':                 [0.05, 0.1, 0.5]
+
+'''
+
+'''
+until 9.15 have models for:
+
+wolfNum = 6
+'sheepSpeedMultiplierLevels':       [.75, 1],
+'costActionRatioList':              [0.0, 0.005, 0.01, 0.02, 0.025],
+'rewardSensitivityToDistance':      [0, 1, 2, 10000],
+'biteRewardLevels':                 [0, 0.05, 0.1]
 
 '''
 
@@ -71,7 +82,7 @@ class EvaluateWolfSheepTrain:
         rewardSensitivityToDistance = df.index.get_level_values('rewardSensitivityToDistance')[0]
         biteReward = df.index.get_level_values('biteReward')[0]
 
-        numWolves = 4
+        numWolves = 6
         numSheeps = 1
         numBlocks = 2
         maxTimeStep = 75
@@ -172,7 +183,7 @@ class EvaluateWolfSheepTrain:
 
             biteNumberList.append(biteNumber)
             actionMagnSumList.append(actionMagnitude)
-            trajList.append(list(traj))
+            # trajList.append(list(traj))
 
         # trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
         # if not os.path.exists(trajectoryDirectory):
@@ -217,10 +228,10 @@ class GetSheepModelPaths:
 
 def main():
     independentVariables = OrderedDict()
-    independentVariables['sheepSpeedMultiplier'] = [0.75, 1.0, 1.25]
-    independentVariables['costActionRatio'] = [0.005, 0.01, 0.02, 0.025]
-    independentVariables['rewardSensitivityToDistance'] = [0.0, 2.0, 5.0, 10000.0]
-    independentVariables['biteReward'] = [0.05, 0.1, 0.5]
+    independentVariables['sheepSpeedMultiplier'] = [0.75, 1.0]
+    independentVariables['costActionRatio'] = [0.0, 0.005, 0.01, 0.02, 0.025]
+    independentVariables['rewardSensitivityToDistance'] = [0.0, 1.0, 2.0, 10000.0]
+    independentVariables['biteReward'] = [0.0, 0.05, 0.1]
 
     getSheepModelPaths = GetSheepModelPaths(independentVariables['sheepSpeedMultiplier'], independentVariables['costActionRatio'],
                                             independentVariables['rewardSensitivityToDistance'], independentVariables['biteReward'])
@@ -236,12 +247,12 @@ def main():
     if not os.path.exists(resultPath):
         os.makedirs(resultPath)
 
-    resultLoc = os.path.join(resultPath, 'evalRewardWithKillProbAndDistSensitive.pkl')
+    resultLoc = os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive.pkl')
     # saveToPickle(resultDF, resultLoc)
 
     resultDF = loadFromPickle(resultLoc)
     print(resultDF)
-    figure = plt.figure(figsize=(11, 11))
+    figure = plt.figure(figsize=(7, 11))
     plotCounter = 1
 
     numRows = len(independentVariables['costActionRatio'])
@@ -270,8 +281,8 @@ def main():
             # plt.legend(title='reward sensitivity')
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Bite', ha='center', va='center', rotation=90)
-    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    plt.savefig(os.path.join(resultPath, 'evalRewardWithKillProbAndDistSensitive_biteNum'))
+    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
+    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_biteNum'))
     plt.show()
     plt.close()
 
@@ -290,7 +301,7 @@ def main():
             axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
             for keyRow, innerSubDf in outterSubDf.groupby('costActionRatio'):
                 innerSubDf.index = innerSubDf.index.droplevel('costActionRatio')
-                plt.ylim([0, 5000])
+                plt.ylim([0, 6000])
 
                 innerSubDf.plot.line(ax = axForDraw, y='meanTrajAction', yerr='seTrajAction', label = keyRow, uplims=True, lolims=True, capsize=3)
                 if plotCounter <= numColumns:
@@ -305,8 +316,8 @@ def main():
             plt.legend(title='action cost')
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Moving Distance', ha='center', va='center', rotation=90)
-    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    plt.savefig(os.path.join(resultPath, 'evalRewardWithKillProbAndDistSensitive_MoveDistance'))
+    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
+    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_MoveDistance'))
     plt.show()
 
 ###
@@ -339,8 +350,8 @@ def main():
             # plt.legend(title='reward sensitivity')
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Bite', ha='center', va='center', rotation=90)
-    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost')
-    plt.savefig(os.path.join(resultPath, 'evalRewardWithKillProbAndDistSensitive_biteNum_regroup'))
+    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
+    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_biteNum_regroup'))
     plt.show()
     plt.close()
 
