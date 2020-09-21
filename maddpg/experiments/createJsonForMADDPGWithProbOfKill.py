@@ -111,23 +111,23 @@ def main():
         'biteRewardLevels': [0]}
 
     conditions['deadpool'] = {
-        'numWolvesLevels': [5],
-        'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0, 0.01, 0.02, 0.03],
-        'rewardSensitivityToDistanceLevels': [2],
-        'biteRewardLevels': [0]}
-
-    conditions['echo'] = {
         'numWolvesLevels': [3],
         'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
         'costActionRatioList': [0, 0.01],
         'rewardSensitivityToDistanceLevels': [2],
         'biteRewardLevels': [0]}
 
+    conditions['echo'] = {
+        'numWolvesLevels': [5],
+        'sheepSpeedMultiplierLevels': [1],
+        'costActionRatioList': [0, 0.01, 0.02, 0.03],
+        'rewardSensitivityToDistanceLevels': [2],
+        'biteRewardLevels': [0]}
+
     conditions['falcon'] = {
-        'numWolvesLevels': [3],
-        'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
-        'costActionRatioList': [0.02, 0.03],
+        'numWolvesLevels': [4],
+        'sheepSpeedMultiplierLevels': [1],
+        'costActionRatioList': [0, 0.01, 0.02, 0.03],
         'rewardSensitivityToDistanceLevels': [2],
         'biteRewardLevels': [0]}
 
@@ -146,9 +146,9 @@ def main():
         'biteRewardLevels': [0]}
 
     conditions['calculus'] = {
-        'numWolvesLevels': [4],
-        'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0, 0.01, 0.02, 0.03],
+        'numWolvesLevels': [3],
+        'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
+        'costActionRatioList': [0.02, 0.03],
         'rewardSensitivityToDistanceLevels': [2],
         'biteRewardLevels': [0]}
 
