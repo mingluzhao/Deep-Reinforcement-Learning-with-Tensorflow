@@ -90,45 +90,45 @@ def main():
         'biteRewardLevels': [0.05]}
 
     conditions['antman'] = {
-        'numWolvesLevels': [3],
-        'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
-        'costActionRatioList': [0.02, 0.03],
-        'rewardSensitivityToDistanceLevels': [0],
+        'numWolvesLevels': [6],
+        'sheepSpeedMultiplierLevels': [0.75],
+        'costActionRatioList': [0.03],
+        'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['blackwidow'] = {
-        'numWolvesLevels': [2],
-        'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
-        'costActionRatioList': [0.02, 0.03],
-        'rewardSensitivityToDistanceLevels': [0],
+        'numWolvesLevels': [6],
+        'sheepSpeedMultiplierLevels': [1],
+        'costActionRatioList': [0.03],
+        'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['carter'] = {
-        'numWolvesLevels': [2, 3],
-        'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
+        'numWolvesLevels': [6],
+        'sheepSpeedMultiplierLevels': [0.5],
         'costActionRatioList': [0],
-        'rewardSensitivityToDistanceLevels': [10000],
+        'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['deadpool'] = {
-        'numWolvesLevels': [3],
-        'sheepSpeedMultiplierLevels': [0.5, 0.75, 1],
-        'costActionRatioList': [0, 0.01],
-        'rewardSensitivityToDistanceLevels': [2],
+        'numWolvesLevels': [6],
+        'sheepSpeedMultiplierLevels': [0.5],
+        'costActionRatioList': [0.01],
+        'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['echo'] = {
-        'numWolvesLevels': [5],
-        'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0, 0.01, 0.02, 0.03],
-        'rewardSensitivityToDistanceLevels': [2],
+        'numWolvesLevels': [6],
+        'sheepSpeedMultiplierLevels': [0.5],
+        'costActionRatioList': [0.02],
+        'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['falcon'] = {
-        'numWolvesLevels': [4],
-        'sheepSpeedMultiplierLevels': [1],
-        'costActionRatioList': [0, 0.01, 0.02, 0.03],
-        'rewardSensitivityToDistanceLevels': [2],
+        'numWolvesLevels': [6],
+        'sheepSpeedMultiplierLevels': [0.5],
+        'costActionRatioList': [0.03],
+        'rewardSensitivityToDistanceLevels': [0, 1, 2, 10000],
         'biteRewardLevels': [0]}
 
     conditions['algebra'] = {
