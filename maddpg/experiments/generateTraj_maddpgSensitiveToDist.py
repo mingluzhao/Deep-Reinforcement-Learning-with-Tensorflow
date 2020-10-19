@@ -42,10 +42,10 @@ def calcWolvesTrajReward(traj, wolvesID):
 
 def main():
     numWolves = 4
-    sheepSpeedMultiplier = 0.75
-    costActionRatio = 0.01
-    rewardSensitivityToDistance = 5.0
-    biteReward = 0.05
+    sheepSpeedMultiplier = 1.0
+    costActionRatio = 0.0
+    rewardSensitivityToDistance = 0.0
+    biteReward = 0.0
 
     #
     numSheeps = 1
@@ -128,7 +128,7 @@ def main():
     dirName = os.path.dirname(__file__)
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance, biteReward, killProportion)
-    folderName = 'maddpg_rewardSensitiveToDist'
+    folderName = 'maddpg_rewardSensitiveToDist_23456wolves'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) ) for i in range(numAgents)]
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
@@ -158,15 +158,15 @@ def main():
     print('meanTrajReward', meanTrajReward, 'se ', seTrajReward)
     # render(trajToRender)
 
-    trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
-    if not os.path.exists(trajectoryDirectory):
-        os.makedirs(trajectoryDirectory)
-    trajFileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}_Traj".format(
-        numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio,
-        rewardSensitivityToDistance, biteReward, killProportion)
-
-    trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
-    saveToPickle(trajList, trajSavePath)
+    # trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
+    # if not os.path.exists(trajectoryDirectory):
+    #     os.makedirs(trajectoryDirectory)
+    # trajFileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}_Traj".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio,
+    #     rewardSensitivityToDistance, biteReward, killProportion)
+    #
+    # trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
+    # saveToPickle(trajList, trajSavePath)
 
     # trajList = loadFromPickle(trajSavePath)
 

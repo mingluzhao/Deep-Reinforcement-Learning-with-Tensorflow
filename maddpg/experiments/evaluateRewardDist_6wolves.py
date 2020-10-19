@@ -277,7 +277,7 @@ def main():
             plotCounter += 1
             plt.xticks(independentVariables['biteReward'])
             # axForDraw.set_aspect(0.002, adjustable='box')
-            plt.legend(title='reward sensitivity', title_fontsize = 8, prop={'size': 8})
+            plt.legend(title='Selfish Index', title_fontsize = 8, prop={'size': 8})
             # plt.legend(title='reward sensitivity')
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Bite', ha='center', va='center', rotation=90)
@@ -305,7 +305,7 @@ def main():
 
                 innerSubDf.plot.line(ax = axForDraw, y='meanTrajAction', yerr='seTrajAction', label = keyRow, uplims=True, lolims=True, capsize=3)
                 if plotCounter <= numColumns:
-                    axForDraw.title.set_text('RewardSensitivity = ' + str(keyCol))
+                    axForDraw.title.set_text('Selfish Index = ' + str(keyCol))
                 if plotCounter% numColumns == 1:
                     axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
                 axForDraw.set_xlabel('biteReward')
@@ -346,7 +346,7 @@ def main():
             plotCounter += 1
             plt.xticks(independentVariables['costActionRatio'])
             # axForDraw.set_aspect(0.002, adjustable='box')
-            plt.legend(title='reward sensitivity')
+            plt.legend(title='Selfish Index')
             # plt.legend(title='reward sensitivity')
 
     figure.text(x=0.03, y=0.5, s='Mean Episode Bite', ha='center', va='center', rotation=90)
