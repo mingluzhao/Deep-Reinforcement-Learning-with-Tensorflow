@@ -4,8 +4,8 @@ def main():
     conditions = dict()
 
     conditions['Lululucyzs-MBP.lan'] = {
-        'numWolvesLevels': [4],
-        'recoveredIndividualRewardWolfLevels': [0],
+        'numWolvesLevels': [6],
+        'recoveredIndividualRewardWolfLevels': [1],
         'continueTrainRewardWolfLevels': [0, 1]}
 
     conditions['antman'] = {
