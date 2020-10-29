@@ -33,58 +33,58 @@ def main():
         'costActionRatioList': [0.03]}
 
     conditions['antman'] = {
-        'numWolvesLevels': [2, 3, 4],
+        'numWolvesLevels': [6],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [0.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0.03]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['blackwidow'] = {
-        'numWolvesLevels': [2, 3, 4],
+        'numWolvesLevels': [5],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [1.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0.03]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['carter'] = {
-        'numWolvesLevels': [2, 3, 4],
+        'numWolvesLevels': [4],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [0.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0.01]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['deadpool'] = {
-        'numWolvesLevels': [2, 3, 4],
+        'numWolvesLevels': [3],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [1.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0.01]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['echo'] = {
-        'numWolvesLevels': [2, 3, 4],
+        'numWolvesLevels': [2],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [0.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0.02]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['falcon'] = {
-        'numWolvesLevels': [2, 3, 4],
+        'numWolvesLevels': [2],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [1.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [0, 1],
-        'costActionRatioList': [0.02]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['algebra'] = {
         'numWolvesLevels': [6],
@@ -96,13 +96,13 @@ def main():
         'costActionRatioList': [0, 0.01, 0.02, 0.03]}
 
     conditions['bernoulli'] = {
-        'numWolvesLevels': [6],
+        'numWolvesLevels': [3, 4],
         'numSheepsLevels': [1],
         'numBlocksLevels': [2],
         'maxTimeStepLevels': [75],
-        'sheepSpeedMultiplierLevels': [0.5],
+        'sheepSpeedMultiplierLevels': [1],
         'individualRewardWolfLevels': [1],
-        'costActionRatioList': [0, 0.01, 0.02, 0.03]}
+        'costActionRatioList': [0, 0.02]}
 
     conditions['calculus'] = {
         'numWolvesLevels': [6],
