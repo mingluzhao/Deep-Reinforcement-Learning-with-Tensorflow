@@ -9,12 +9,17 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 
 import gym
-from sac.src.algorithm import *
+from sac.src.algorithm_withV_IP import *
 from functionTools.loadSaveModel import saveVariables
 import matplotlib.pyplot as plt
 
 def main():
     hyperparamDict = dict()
+    hyperparamDict['valueNetWeightInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
+    hyperparamDict['valueNetBiasInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
+    hyperparamDict['valueNetActivFunction'] = [tf.nn.relu, tf.nn.relu]
+    hyperparamDict['valueNetLayersWidths'] = [256, 256]
+
     hyperparamDict['qNetWeightInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
     hyperparamDict['qNetBiasInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
     hyperparamDict['qNetActivFunction'] = [tf.nn.relu, tf.nn.relu]
@@ -28,17 +33,18 @@ def main():
     hyperparamDict['policySDWeightInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
     hyperparamDict['policyMuBiasInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
     hyperparamDict['policySDBiasInit'] = tf.random_uniform_initializer(-3e-3, 3e-3)
-    hyperparamDict['muActivationFunc'] = tf.nn.tanh
 
     hyperparamDict['policySDlow'] = -20
     hyperparamDict['policySDhigh'] = 2
+    hyperparamDict['muActivationFunc'] = tf.nn.tanh
     hyperparamDict['epsilon'] = 1e-6
 
+    hyperparamDict['valueNetLR'] = 3e-3
     hyperparamDict['qNetLR'] = 3e-3
     hyperparamDict['policyNetLR'] = 3e-3
     hyperparamDict['tau'] = 0.005
     hyperparamDict['gamma'] = 0.99
-    hyperparamDict['alpha'] = 0.2
+    hyperparamDict['rewardScale'] = 1 #
 
     bufferSize= 1000000
     minibatchSize= 64
@@ -50,24 +56,30 @@ def main():
     stateDim = env.observation_space.shape[0]
     actionDim = env.action_space.shape[0]
     actionRange = [env.action_space.low, env.action_space.high]
-
+    # actionRange = (env.action_space.high - env.action_space.low)/2
+    #
+    buildValueNet = BuildValueNet(hyperparamDict)
     buildQNet = BuildQNet(hyperparamDict)
-    buildPolicyNet = BuildPolicyNet(hyperparamDict, actionRange)
+    buildPolicyNet = BuildPolicyNet(hyperparamDict)
 
     session = tf.Session()
-    sacAgent =  SACAgent(buildQNet, buildPolicyNet, stateDim, actionDim, session, hyperparamDict)
+    qNet = DoubleQNet(buildQNet, stateDim, actionDim, session, hyperparamDict)
+    valueNet = ValueNet(buildValueNet, stateDim, actionDim, session, hyperparamDict)
+    policyNet = PolicyNet(buildPolicyNet, stateDim, actionDim, session, hyperparamDict, actionRange)
 
-    policyUpdateInterval = 1
-    trainModels = TrainSoftACOneStep(sacAgent, reshapeBatchToGetSASR, policyUpdateInterval)
+    policyUpdateInterval = 2
+    trainModels = TrainSoftACOneStep(policyNet, valueNet, qNet, reshapeBatchToGetSASR, policyUpdateInterval)
     learnFromBuffer = LearnFromBuffer(learningStartBufferSize, trainModels)
     memoryBuffer = MemoryBuffer(bufferSize, minibatchSize)
-    actOneStep = lambda stateBatch: sacAgent.act(stateBatch)
+    actOneStep = ActOneStep( policyNet)
 
     saver = tf.train.Saver(max_to_keep=None)
     tf.add_to_collection("saver", saver)
-    session.run(tf.global_variables_initializer())
+    writer = tf.summary.FileWriter('tensorBoard/', graph=session.graph)
+    tf.add_to_collection("writer", writer)
 
-    sacAgent.reset()
+    session.run(tf.global_variables_initializer())
+    valueNet.hardReplaceTargetParam()
 
     fileName = 'softACPendulum'
     modelPath = os.path.join(dirName, '..', 'trainedModels', fileName)

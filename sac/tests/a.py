@@ -11,7 +11,7 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 import numpy as np
 import unittest
 from ddt import ddt, data, unpack
-from sac.src.algorithm import *
+from sac.src.algorithm_withV_IP import *
 from tensorflow.python.framework import ops
 
 hyperparamDict = dict()
