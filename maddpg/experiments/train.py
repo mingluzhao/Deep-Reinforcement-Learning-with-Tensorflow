@@ -96,6 +96,7 @@ def get_trainers(env, num_adversaries, obs_shape_n, arglist): # get_trainers(env
 
 
 def train(arglist):
+    print(arglist)
     with U.single_threaded_session():
         # Create environment
         env = make_env(arglist.scenario, arglist, arglist.benchmark)

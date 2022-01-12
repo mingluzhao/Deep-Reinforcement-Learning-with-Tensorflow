@@ -40,8 +40,8 @@ def main():
         numSheeps = 1
         numBlocks = 2
         maxTimeStep = 75
-        sheepSpeedMultiplier = 0.75
-        individualRewardWolf = 1.0
+        sheepSpeedMultiplier = 1.0
+        individualRewardWolf = 0.0
         costActionRatio = 0.0
 
     else:
@@ -123,13 +123,10 @@ def main():
     modelsList = [buildMADDPGModels(layerWidth, agentID) for agentID in range(numAgents)]
 
     dirName = os.path.dirname(__file__)
-    # individStr = 'individ' if individualRewardWolf else 'shared'
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individualRewardWolf)
-    # fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}{}_agent".format(
-    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, individStr)
 
-    folderName = 'maddpg_10reward_full'
+    folderName = 'preTrainModel'
     modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) ) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
@@ -138,7 +135,7 @@ def main():
     policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
     rewardList = []
-    numTrajToSample = 10#300
+    numTrajToSample = 100
     trajList = []
     for i in range(numTrajToSample):
         traj = sampleTrajectory(policy)
@@ -161,13 +158,13 @@ def main():
     # trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
     # saveToPickle(trajList, trajSavePath)
 
-    wolfColor = np.array([0.85, 0.35, 0.35])
-    sheepColor = np.array([0.35, 0.85, 0.35])
-    blockColor = np.array([0.25, 0.25, 0.25])
-    entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
-    render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
-    trajToRender = np.concatenate(trajList)
-    render(trajToRender)
+    # wolfColor = np.array([0.85, 0.35, 0.35])
+    # sheepColor = np.array([0.35, 0.85, 0.35])
+    # blockColor = np.array([0.25, 0.25, 0.25])
+    # entitiesColorList = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
+    # render = Render(entitiesSizeList, entitiesColorList, numAgents, getPosFromAgentState)
+    # trajToRender = np.concatenate(trajList)
+    # render(trajToRender)
 
 if __name__ == '__main__':
     main()

@@ -46,7 +46,7 @@ def main():
     numBlocks = 2
     maxTimeStep = 75
     sheepSpeedMultiplier = 1.0
-    costActionRatio = 0.0
+    costActionRatio = 0.02
     saveAllmodels = 1
 
     numAgents = numWolves + numSheeps
@@ -74,8 +74,8 @@ def main():
     dirName = os.path.dirname(__file__)
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}individ{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, recoveredIndividualRewardWolf)
-    folderName = 'maddpg_10reward_noActCost'
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) ) for i in range(numAgents)]
+    folderName = 'maddpg_NoActCost_saveAll60k'
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) + '60000eps' ) for i in range(numAgents)]
 
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
@@ -140,11 +140,11 @@ def main():
 
     getAgentModel = lambda agentId: lambda: trainMADDPGModels.getTrainedModels()[agentId]
     getModelList = [getAgentModel(i) for i in range(numAgents)]
-    modelSaveRate = 30000
+    modelSaveRate = 5000
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}initIndivid{}laterIndivid{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, recoveredIndividualRewardWolf,continueTrainRewardWolf)
 
-    folderName = 'maddpg_testEquilib'
+    folderName = 'maddpg_testEquilib_actcost'
     modelPath = os.path.join(dirName, '..', 'trainedModels', folderName, fileName)
     saveModels = [SaveModel(modelSaveRate, saveVariables, getTrainedModel, modelPath + str(i), saveAllmodels) for i, getTrainedModel in enumerate(getModelList)]
 

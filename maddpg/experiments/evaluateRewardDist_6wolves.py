@@ -47,29 +47,8 @@ class CalcWolfDistance:
 
         return epsActionTot
 
-'''
-until 9.6 have models for:
 
-wolfNum = 4
-'sheepSpeedMultiplierLevels':       [.75, 1, 1.25],
-'costActionRatioList':              [0.0, 0.005, 0.01, 0.02, 0.025],
-'rewardSensitivityToDistance':      [0, 2, 5, 10000],
-'biteRewardLevels':                 [0.05, 0.1, 0.5]
-
-'''
-
-'''
-until 9.15 have models for:
-
-wolfNum = 6
-'sheepSpeedMultiplierLevels':       [.75, 1],
-'costActionRatioList':              [0.0, 0.005, 0.01, 0.02, 0.025],
-'rewardSensitivityToDistance':      [0, 1, 2, 10000],
-'biteRewardLevels':                 [0, 0.05, 0.1]
-
-'''
-
-maxRunningStepsToSample = 200
+maxRunningStepsToSample = 75
 
 class EvaluateWolfSheepTrain:
     def __init__(self, getSheepModelPaths):
@@ -119,7 +98,7 @@ class EvaluateWolfSheepTrain:
         collisionDist = wolfSize + sheepSize
         getAgentsPercentageOfRewards = GetAgentsPercentageOfRewards(rewardSensitivityToDistance, collisionDist)
         terminalCheck = TerminalCheck()
-        biteRewardToUse = 10
+        biteRewardToUse = 0
         getCollisionWolfReward = GetCollisionWolfReward(biteRewardToUse, killReward, killProportion, sampleFromDistribution, terminalCheck)
         getWolfSheepDistance = GetWolfSheepDistance(computeVectorNorm, getPosFromAgentState)
         rewardWolf = RewardWolvesWithKillProb(wolvesID, sheepsID, entitiesSizeList, isCollision, terminalCheck,
@@ -164,11 +143,10 @@ class EvaluateWolfSheepTrain:
 
         sheepPaths = self.getSheepModelPaths(numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, killProportion)
 
-        biteNumberList = []
-        trajList = []
+        killNumberList = []
         actionMagnSumList = []
 
-        numTrajToSample = 500
+        numTrajToSample = 300
         calcWolfDistance = CalcWolfDistance(reshapeAction)
 
         for i in range(numTrajToSample):
@@ -178,39 +156,28 @@ class EvaluateWolfSheepTrain:
             policy = lambda allAgentsStates: [actOneStepOneModel(model, observe(allAgentsStates)) for model in modelsList]
 
             traj = sampleTrajectory(policy)
-            biteNumber = calcWolfTrajBiteAmount(traj, wolvesID)
+            killNumber = calcWolfTrajBiteAmount(traj, wolvesID)
             actionMagnitude = calcWolfDistance(traj, wolvesID)
 
-            biteNumberList.append(biteNumber)
+            killNumberList.append(killNumber)
             actionMagnSumList.append(actionMagnitude)
-            # trajList.append(list(traj))
 
-        # trajectoryDirectory = os.path.join(dirName, '..', 'trajectories', folderName)
-        # if not os.path.exists(trajectoryDirectory):
-        #     os.makedirs(trajectoryDirectory)
-        # trajFileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}_mixTraj".format(
-        #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio,
-        #     rewardSensitivityToDistance, biteReward, killProportion)
-        #
-        # trajSavePath = os.path.join(trajectoryDirectory, trajFileName)
-        # saveToPickle(trajList, trajSavePath)
-
-        meanTrajBite = np.mean(biteNumberList)
-        seTrajBite = np.std(biteNumberList) / np.sqrt(len(biteNumberList) - 1)
-        print('meanTrajBite', meanTrajBite, 'seTrajBite ', seTrajBite)
+        meanTrajKill = np.mean(killNumberList)
+        seTrajKill = np.std(killNumberList) / np.sqrt(len(killNumberList) - 1)
+        print('meanTrajKill', meanTrajKill, 'seTrajKill ', seTrajKill)
 
         meanTrajAction = np.mean(actionMagnSumList)
         seTrajAction = np.std(actionMagnSumList) / np.sqrt(len(actionMagnSumList) - 1)
 
-        return pd.Series({'meanBite': meanTrajBite, 'seBite': seTrajBite, 'meanTrajAction': meanTrajAction, 'seTrajAction': seTrajAction})
+        return pd.Series({'meanKill': meanTrajKill, 'seKill': seTrajKill, 'meanTrajAction': meanTrajAction, 'seTrajAction': seTrajAction})
 
 
 class GetSheepModelPaths:
     def __init__(self, sheepSpeedList, costActionRatioList, rewardSensitivityList, biteRewardList):
-        self.sheepSpeedList = sheepSpeedList
-        self.costActionRatioList = costActionRatioList
-        self.rewardSensitivityList = rewardSensitivityList
-        self.biteRewardList = biteRewardList
+        self.sheepSpeedList = [0.5, 0.75, 1.0]
+        self.costActionRatioList = [0.0, 0.01, 0.02, 0.03]
+        self.rewardSensitivityList = [0.0, 1.0, 2.0, 10000.0]
+        self.biteRewardList = [0.0, 0.05, 0.1, 1, 5, 10]
 
     def __call__(self, numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, killProportion):
         dirName = os.path.dirname(__file__)
@@ -226,12 +193,36 @@ class GetSheepModelPaths:
         return sheepPaths
 
 
+
+class Modify:
+    def __init__(self, resultDF):
+        self.resultDF = resultDF
+
+    def __call__(self, df):
+        sheepSpeedMultiplier = df.index.get_level_values('sheepSpeedMultiplier')[0]
+        costActionRatio = df.index.get_level_values('costActionRatio')[0]
+        rewardSensitivityToDistance = df.index.get_level_values('rewardSensitivityToDistance')[0]
+        biteReward = df.index.get_level_values('biteReward')[0]
+        if biteReward == 3.0:
+            biteReward = 10000.0
+
+        meanTrajKill = self.resultDF.loc[sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance]['meanKill']
+        seKill = self.resultDF.loc[sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance]['seKill']
+        meanTrajAction = self.resultDF.loc[sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance]['meanTrajAction']
+        seTrajAction = self.resultDF.loc[sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance]['seTrajAction']
+
+        return pd.Series({'meanKill': meanTrajKill, 'seKill': seKill,
+                          'meanTrajAction': meanTrajAction, 'seTrajAction': seTrajAction})
+
+
 def main():
     independentVariables = OrderedDict()
-    independentVariables['sheepSpeedMultiplier'] = [0.75, 1.0]
-    independentVariables['costActionRatio'] = [0.0, 0.005, 0.01, 0.02, 0.025]
+    independentVariables['sheepSpeedMultiplier'] = [0.5, 0.75, 1.0]
+    independentVariables['costActionRatio'] = [0.0, 0.01, 0.02, 0.03]
     independentVariables['rewardSensitivityToDistance'] = [0.0, 1.0, 2.0, 10000.0]
-    independentVariables['biteReward'] = [0.0, 0.05, 0.1]
+    independentVariables['biteReward'] = [0.0, 0.05, 0.1, 1, 5, 10] #[0.0, 0.05, 0.1, 0.15, 0.2, 0.25]
+
+    biteRewardLabels = [0.0, 0.05, 0.1, 1, 5, 10]
 
     getSheepModelPaths = GetSheepModelPaths(independentVariables['sheepSpeedMultiplier'], independentVariables['costActionRatio'],
                                             independentVariables['rewardSensitivityToDistance'], independentVariables['biteReward'])
@@ -247,12 +238,12 @@ def main():
     if not os.path.exists(resultPath):
         os.makedirs(resultPath)
 
-    resultLoc = os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive.pkl')
-    # saveToPickle(resultDF, resultLoc)
-
+    resultLoc = os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_allBiteReward.pkl')
     resultDF = loadFromPickle(resultLoc)
-    print(resultDF)
-    figure = plt.figure(figsize=(7, 11))
+
+
+    # print(resultDF)
+    figure = plt.figure(figsize=(35, 45))
     plotCounter = 1
 
     numRows = len(independentVariables['costActionRatio'])
@@ -265,9 +256,9 @@ def main():
             axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
             for keyRow, innerSubDf in outterSubDf.groupby('rewardSensitivityToDistance'):
                 innerSubDf.index = innerSubDf.index.droplevel('rewardSensitivityToDistance')
-                plt.ylim([0, 250])
+                plt.ylim([0, 25])
 
-                innerSubDf.plot.line(ax = axForDraw, y='meanBite', yerr='seBite', label = keyRow, uplims=True, lolims=True, capsize=3)
+                innerSubDf.plot.line(ax = axForDraw, y='meanKill', yerr='seKill', label = keyRow, uplims=True, lolims=True, capsize=3)
                 if plotCounter <= numColumns:
                     axForDraw.title.set_text('sheepSpeed' + str(keyCol) + 'x')
                 if plotCounter% numColumns == 1:
@@ -280,46 +271,86 @@ def main():
             plt.legend(title='Selfish Index', title_fontsize = 8, prop={'size': 8})
             # plt.legend(title='reward sensitivity')
 
-    figure.text(x=0.03, y=0.5, s='Mean Episode Bite', ha='center', va='center', rotation=90)
+    figure.text(x=0.03, y=0.5, s='Mean Episode Kill', ha='center', va='center', rotation=90)
     plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
-    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_biteNum'))
+    plt.savefig(os.path.join(resultPath, 'eval{}With{}evalReward6v1WithKillProbAndDistSensitive_killNum_allBiteReward.pdf'), dpi=600)
+
+    # plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_killNum_allBiteReward'))
     plt.show()
     plt.close()
 
-
     # --------
-    figure = plt.figure(figsize=(13, 11))
-    plotCounter = 1
-
-    numRows = len(independentVariables['sheepSpeedMultiplier'])
-    numColumns = len(independentVariables['rewardSensitivityToDistance'])
-
-    for key, outmostSubDf in resultDF.groupby('sheepSpeedMultiplier'):
-        outmostSubDf.index = outmostSubDf.index.droplevel('sheepSpeedMultiplier')
-        for keyCol, outterSubDf in outmostSubDf.groupby('rewardSensitivityToDistance'):
-            outterSubDf.index = outterSubDf.index.droplevel('rewardSensitivityToDistance')
-            axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
-            for keyRow, innerSubDf in outterSubDf.groupby('costActionRatio'):
-                innerSubDf.index = innerSubDf.index.droplevel('costActionRatio')
-                plt.ylim([0, 6000])
-
-                innerSubDf.plot.line(ax = axForDraw, y='meanTrajAction', yerr='seTrajAction', label = keyRow, uplims=True, lolims=True, capsize=3)
-                if plotCounter <= numColumns:
-                    axForDraw.title.set_text('Selfish Index = ' + str(keyCol))
-                if plotCounter% numColumns == 1:
-                    axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
-                axForDraw.set_xlabel('biteReward')
-
-            plotCounter += 1
-            plt.xticks(independentVariables['biteReward'])
-
-            plt.legend(title='action cost')
-
-    figure.text(x=0.03, y=0.5, s='Mean Episode Moving Distance', ha='center', va='center', rotation=90)
-    plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
-    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_MoveDistance'))
-    plt.show()
-
+#
+#     figure = plt.figure(figsize=(7, 11))
+#     plotCounter = 1
+#
+#     numRows = len(independentVariables['rewardSensitivityToDistance'])#
+#     numColumns = len(independentVariables['sheepSpeedMultiplier'])
+#
+#     for key, outmostSubDf in resultDF.groupby('rewardSensitivityToDistance'):#
+#         outmostSubDf.index = outmostSubDf.index.droplevel('rewardSensitivityToDistance')#
+#         for keyCol, outterSubDf in outmostSubDf.groupby('sheepSpeedMultiplier'):
+#             outterSubDf.index = outterSubDf.index.droplevel('sheepSpeedMultiplier')
+#             axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+#             for keyRow, innerSubDf in outterSubDf.groupby('costActionRatio'):
+#                 innerSubDf.index = innerSubDf.index.droplevel('costActionRatio')
+#                 plt.ylim([0, 25])
+#
+#                 innerSubDf.plot.line(ax = axForDraw, y='meanKill', yerr='seKill', label = keyRow, uplims=True, lolims=True, capsize=3)
+#                 if plotCounter <= numColumns:
+#                     axForDraw.title.set_text('sheepSpeed' + str(keyCol) + 'x')
+#                 if plotCounter% numColumns == 1:
+#                     axForDraw.set_ylabel('Wolf Selfish Level = ' + str(key))
+#                 axForDraw.set_xlabel('biteReward')
+#
+#             plotCounter += 1
+#             # plt.xticks(independentVariables['biteReward'])
+#             plt.xticks(outterSubDf.reset_index()['biteReward'], independentVariables['biteReward'] * 4)
+#
+#             # axForDraw.set_aspect(0.002, adjustable='box')
+#             plt.legend(title='Selfish Index', title_fontsize = 8, prop={'size': 8}) #
+#
+#     figure.text(x=0.03, y=0.5, s='Mean Episode Kill', ha='center', va='center', rotation=90)
+#     plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
+#     plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_killNum_allBiteReward'))
+#     plt.show()
+#     plt.close()
+#
+#
+#
+#     # --------
+#     figure = plt.figure(figsize=(13, 11))
+#     plotCounter = 1
+#
+#     numRows = len(independentVariables['sheepSpeedMultiplier'])
+#     numColumns = len(independentVariables['rewardSensitivityToDistance'])
+#
+#     for key, outmostSubDf in resultDF.groupby('sheepSpeedMultiplier'):
+#         outmostSubDf.index = outmostSubDf.index.droplevel('sheepSpeedMultiplier')
+#         for keyCol, outterSubDf in outmostSubDf.groupby('rewardSensitivityToDistance'):
+#             outterSubDf.index = outterSubDf.index.droplevel('rewardSensitivityToDistance')
+#             axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
+#             for keyRow, innerSubDf in outterSubDf.groupby('costActionRatio'):
+#                 innerSubDf.index = innerSubDf.index.droplevel('costActionRatio')
+#                 plt.ylim([0, 2000])
+#
+#                 innerSubDf.plot.line(ax = axForDraw, y='meanTrajAction', yerr='seTrajAction', label = keyRow, uplims=True, lolims=True, capsize=3)
+#                 if plotCounter <= numColumns:
+#                     axForDraw.title.set_text('Selfish Index = ' + str(keyCol))
+#                 if plotCounter% numColumns == 1:
+#                     axForDraw.set_ylabel('sheepSpeed' + str(key) + 'x')
+#                 axForDraw.set_xlabel('biteReward')
+#
+#             plotCounter += 1
+#             plt.xticks(independentVariables['biteReward'])
+#
+#             plt.legend(title='action cost')
+#
+#     figure.text(x=0.03, y=0.5, s='Mean Episode Moving Distance', ha='center', va='center', rotation=90)
+#     plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
+#     plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_MoveDistance_allBiteReward'))
+#     plt.show()
+#
 ###
     figure = plt.figure(figsize=(13, 11))
     plotCounter = 1
@@ -334,9 +365,9 @@ def main():
             axForDraw = figure.add_subplot(numRows, numColumns, plotCounter)
             for keyRow, innerSubDf in outterSubDf.groupby('rewardSensitivityToDistance'):
                 innerSubDf.index = innerSubDf.index.droplevel('rewardSensitivityToDistance')
-                plt.ylim([0, 250])
+                plt.ylim([0, 25])
 
-                innerSubDf.plot.line(ax = axForDraw, y='meanBite', yerr='seBite', label = keyRow, uplims=True, lolims=True, capsize=3)
+                innerSubDf.plot.line(ax = axForDraw, y='meanKill', yerr='seKill', label = keyRow, uplims=True, lolims=True, capsize=3)
                 if plotCounter <= numColumns:
                     axForDraw.title.set_text('biteReward' + str(keyCol))
                 if plotCounter% numColumns == 1:
@@ -349,9 +380,11 @@ def main():
             plt.legend(title='Selfish Index')
             # plt.legend(title='reward sensitivity')
 
-    figure.text(x=0.03, y=0.5, s='Mean Episode Bite', ha='center', va='center', rotation=90)
+    figure.text(x=0.03, y=0.5, s='Mean Episode Kill', ha='center', va='center', rotation=90)
     plt.suptitle('MADDPG Evaluate wolfType/ sheepSpeed/ actionCost/ rewardDist')
-    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_biteNum_regroup'))
+    # plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_killNum_regroup_allBiteReward'))
+    plt.savefig(os.path.join(resultPath, 'evalReward6v1WithKillProbAndDistSensitive_killNum_allBiteReward.pdf'), dpi=600)
+
     plt.show()
     plt.close()
 

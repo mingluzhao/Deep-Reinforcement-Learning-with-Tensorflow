@@ -41,10 +41,10 @@ def calcWolvesTrajReward(traj, wolvesID):
     return trajReward
 
 def main():
-    numWolves = 4
-    sheepSpeedMultiplier = 1.0
+    numWolves = 3
+    sheepSpeedMultiplier = 0.75
     costActionRatio = 0.0
-    rewardSensitivityToDistance = 0.0
+    rewardSensitivityToDistance = 10000.0
     biteReward = 0.0
 
     #
@@ -110,7 +110,7 @@ def main():
                                     entityMaxSpeedList, getVelFromAgentState, getPosFromAgentState)
     transit = TransitMultiAgentChasing(numEntities, reshapeAction, applyActionForce, applyEnvironForce, integrateState)
 
-    isTerminal = lambda state: terminalCheck.terminal
+    isTerminal = lambda state: False #lambda state: terminalCheck.terminal
     initObsForParams = observe(reset())
     obsShape = [initObsForParams[obsID].shape[0] for obsID in range(len(initObsForParams))]
 
@@ -129,7 +129,7 @@ def main():
     fileName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}_agent".format(
         numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio, rewardSensitivityToDistance, biteReward, killProportion)
     folderName = 'maddpg_rewardSensitiveToDist_23456wolves'
-    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, fileName + str(i) ) for i in range(numAgents)]
+    modelPaths = [os.path.join(dirName, '..', 'trainedModels', folderName, str(numWolves)+'tocopy', fileName + str(i) ) for i in range(numAgents)]
     [restoreVariables(model, path) for model, path in zip(modelsList, modelPaths)]
 
     actOneStepOneModel = ActOneStep(actByPolicyTrainNoisy)
@@ -188,10 +188,10 @@ def main():
     sheepColor = [0, 250, 0]
     blockColor = [200, 200, 200]
     circleColorSpace = [wolfColor] * numWolves + [sheepColor] * numSheeps + [blockColor] * numBlocks
-    viewRatio = 1.5
+    viewRatio = 1
     sheepSize = int(0.05 * screenWidth / (2 * viewRatio))
     wolfSize = int(0.075 * screenWidth / (3 * viewRatio))
-    blockSize = int(0.2 * screenWidth / (3 * viewRatio))
+    blockSize = int(0.2 * screenWidth / (2 * viewRatio))
     circleSizeSpace = [wolfSize] * numWolves + [sheepSize] * numSheeps + [blockSize] * numBlocks
     positionIndex = [0, 1]
     agentIdsToDraw = list(range(numWolves + numSheeps + numBlocks))
@@ -215,7 +215,7 @@ def main():
     drawCircleOutside = DrawCircleOutsideEnvMADDPG(screen, viewRatio, outsideCircleAgentIds, positionIndex,
                                                    outsideCircleColor, outsideCircleSize)
 
-    saveImage = True
+    saveImage = False
     numAgents = numWolves + numSheeps
     sheepsID = list(range(numWolves, numAgents))
 
@@ -236,15 +236,61 @@ def main():
     checkStatus = CheckStatus(wolvesID, sheepsID, isCollision, wolfSizeForCheck, sheepSizeForCheck, stateID, nextStateID)
     chaseTrial = ChaseTrialWithTrajWithKillNotation(stateIndexInTimeStep, drawState, checkStatus, interpolateState, actionIndexInTimeStep, posteriorIndexInTimeStep)
 
-    maxWolfPositions = np.array([max([max([max(abs(timeStep[0][wolfId][0]), abs(timeStep[0][wolfId][1]))
-                                           for wolfId in range(numWolves)])
-                                      for timeStep in trajectory])
-                                 for trajectory in trajList])
-    flags = maxWolfPositions < 1.3 * viewRatio
-    index = flags.nonzero()[0]
-    # [chaseTrial(trajectory) for trajectory in np.array(trajList)[index]]
     [chaseTrial(trajectory) for trajectory in np.array(trajList[:20])]
 
+    # screenWidth = 700
+    # screenHeight = 700
+    # screen = pg.display.set_mode((screenWidth, screenHeight))
+    # screenColor = THECOLORS['black']
+    # xBoundary = [0, 700]
+    # yBoundary = [0, 700]
+    # lineColor = THECOLORS['white']
+    # lineWidth = 4
+    # drawBackground = DrawBackground(screen, screenColor, xBoundary, yBoundary, lineColor, lineWidth)
+    #
+    # FPS = 10
+    # numBlocks = 2
+    # predatorColor = THECOLORS['white']# [255, 255, 255]
+    # preyColor = THECOLORS['green'] #[0, 250, 0]
+    # blockColor = THECOLORS['grey']
+    # circleColorSpace = [predatorColor] * numWolves + [preyColor] * numSheeps + [blockColor] * numBlocks
+    # viewRatio = 1
+    # preySize = int(0.05 * screenWidth / (2 * viewRatio))
+    # predatorSize = int(0.075 * screenWidth / (3 * viewRatio))
+    # blockSize = int(0.2 * screenWidth / (2 * viewRatio))
+    # circleSizeSpace = [predatorSize] * numWolves + [preySize] * numSheeps + [blockSize] * numBlocks
+    # positionIndex = [0, 1]
+    # agentIdsToDraw = list(range(numWolves + numSheeps + numBlocks))
+    #
+    # conditionName = "maddpg{}wolves{}sheep{}blocks{}episodes{}stepSheepSpeed{}WolfActCost{}sensitive{}biteReward{}killPercent{}".format(
+    #     numWolves, numSheeps, numBlocks, maxEpisode, maxTimeStep, sheepSpeedMultiplier, costActionRatio,
+    #     rewardSensitivityToDistance, biteReward, killProportion)
+    # imageSavePath = os.path.join(dirName, '..', 'trajectories', conditionName)
+    # if not os.path.exists(imageSavePath):
+    #     os.makedirs(imageSavePath)
+    # imageFolderName = str('forDemo')
+    # saveImageDir = os.path.join(os.path.join(imageSavePath, imageFolderName))
+    # if not os.path.exists(saveImageDir):
+    #     os.makedirs(saveImageDir)
+    #
+    # outsideCircleColor = [THECOLORS['red']] * numWolves
+    # outsideCircleSize = int(predatorSize * 1.5)
+    # drawCircleOutside = DrawCircleOutside(screen, wolvesID, positionIndex,
+    #                                       outsideCircleColor, outsideCircleSize, viewRatio=viewRatio)
+    # saveImage = False
+    # drawState = DrawState(FPS, screen, circleColorSpace, circleSizeSpace, agentIdsToDraw,
+    #                       positionIndex, saveImage, saveImageDir, sheepsID, wolvesID,
+    #                       drawBackground, drawCircleOutside=drawCircleOutside, viewRatio=viewRatio)
+    #
+    # # MDP Env
+    # stateID = 0
+    # nextStateID = 3
+    # predatorSizeForCheck = 0.075
+    # preySizeForCheck = 0.05
+    # checkStatus = CheckStatus(wolvesID, sheepsID, isCollision, predatorSizeForCheck, preySizeForCheck, stateID,
+    #                           nextStateID)
+    # chaseTrial = ChaseTrialWithTrajWithKillNotation(stateID, drawState, checkStatus)
+    # [chaseTrial(trajectory) for trajectory in np.array(trajList[:20])]
 
 if __name__ == '__main__':
     main()
